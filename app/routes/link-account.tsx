@@ -3,8 +3,8 @@ import { CountryCode, ItemPublicTokenExchangeResponse, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit } from "remix";
-import { createLinkToken, getAccessToken } from "~/helpers/plaidUtils";
-import { storeNewAccessToken } from "~/helpers/db";
+import { createPlaidLinkToken, exchangePublicTokenForAccessToken } from "~/helpers/plaidUtils";
+import { saveNewAccessToken } from "~/helpers/db";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async () => {
 		country_codes: [CountryCode.Us],
 	};
 
-	const createTokenResponse = await createLinkToken(request);
+	const createTokenResponse = await createPlaidLinkToken(request);
 
 	return {
         linkToken: createTokenResponse
@@ -43,16 +43,16 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const body = await request.formData();
 	const publicToken = body.get("public_token") as string;
-	const { error } = await getAccessToken(publicToken);
+	const { error } = await exchangePublicTokenForAccessToken(publicToken);
 
 	if (error) {
 		return json({ error: 'error making an access token' });
     }
 
 	// Can also get item_id here
-	const { access_token } = await getAccessToken(publicToken) as ItemPublicTokenExchangeResponse
+	const { access_token } = await exchangePublicTokenForAccessToken(publicToken) as ItemPublicTokenExchangeResponse
 
-	const res = await storeNewAccessToken(access_token);
+	const res = await saveNewAccessToken(access_token);
 
     return res;
 

@@ -22,7 +22,7 @@ const getDBConnection = async () => {
 
 };
 
-const getAccessTokens = async (userId = "sams_token") => {
+const retrieveStoredAccessTokens = async (userId = "sams_token") => {
 
 	const keysCollection = await getKeysCollection();
 	const existingTokens = await keysCollection.findOne({ user: userId });
@@ -40,7 +40,7 @@ const getKeysCollection = async () => {
 	return client.db().collection('keys')
 };
 
-const storeNewAccessToken = async (accessToken: string, userId = "sams_tokens") => {
+const saveNewAccessToken = async (accessToken: string, userId = "sams_tokens") => {
 
 	const keysCollection = await getKeysCollection();
 	const existingTokens = await keysCollection.findOne({ user: userId});
@@ -66,6 +66,6 @@ const storeNewAccessToken = async (accessToken: string, userId = "sams_tokens") 
 };
 
 export {
-    getAccessTokens,
-    storeNewAccessToken
+    retrieveStoredAccessTokens,
+    saveNewAccessToken
 }
