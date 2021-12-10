@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit } from "remix";
 import { createLinkToken, getAccessToken } from "~/helpers/plaidUtils";
-import { getTokenMap, appendNewToken } from "~/helpers/localTokenStorage";
+import { storeNewAccessToken } from "~/helpers/db";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -49,13 +49,12 @@ export const action: ActionFunction = async ({ request }) => {
 		return json({ error: 'error making an access token' });
     }
 
-	const { access_token, item_id } = await getAccessToken(publicToken) as ItemPublicTokenExchangeResponse
+	// Can also get item_id here
+	const { access_token } = await getAccessToken(publicToken) as ItemPublicTokenExchangeResponse
 
-	appendNewToken(item_id, access_token);
+	const res = await storeNewAccessToken(access_token);
 
-    console.log(getTokenMap());
-
-    return null;
+    return res;
 
 };
 
