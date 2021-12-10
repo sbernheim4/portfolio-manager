@@ -1,26 +1,10 @@
-import { Configuration, Holding, LinkTokenCreateRequest, PlaidApi, PlaidEnvironments } from "plaid";
-import { PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV } from "../../env";
-import { getTokenMap, getEntry } from "./localTokenStorage";
-
-const configuration = new Configuration({
-	basePath: PlaidEnvironments[PLAID_ENV],
-	baseOptions: {
-		headers: {
-			'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-			'PLAID-SECRET': PLAID_SECRET
-		},
-	},
-});
-
-const getClient = () => {
-	const client = new PlaidApi(configuration);
-	return client;
-}
+import { Holding, LinkTokenCreateRequest } from "plaid";
+import { getAccessTokens } from "./db";
+import { client } from "./plaidClient";
 
 export const getAccessToken = async (public_token: string) => {
 
 	try {
-		const client = getClient();
 
 		const request = { public_token };
 		const accessTokenRequest = await client.itemPublicTokenExchange(request);
@@ -42,20 +26,10 @@ const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfill
 
 export const getInvestmentHoldings = async (): Promise<Holding[]> => {
 
-	const keys = getTokenMap().keys();
-
-	console.log("in getInvestmentHoldings");
-	console.log(getTokenMap());
-
-	const accessTokens = Array.from(keys)
-		.flatMap(itemId => getEntry(itemId as string) ?? [])
-		.filter(Boolean);
-
-	console.log({ accessTokens });
+    const accessTokens = await getAccessTokens();
 
 	try {
 
-		const client = getClient();
 		const holdingsDataPromises = accessTokens.map(accessToken => {
 
 			return client.investmentsHoldingsGet({ access_token: accessToken });
@@ -80,10 +54,7 @@ export const createLinkToken = async (request: LinkTokenCreateRequest) => {
 
 	try {
 
-		const client = getClient();
-
 		const response = await client.linkTokenCreate(request);
-
 		const linkToken = response.data.link_token;
 
 		return linkToken;
