@@ -1,8 +1,8 @@
 import { Holding, LinkTokenCreateRequest } from "plaid";
-import { getAccessTokens } from "./db";
+import { retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
 
-export const getAccessToken = async (public_token: string) => {
+export const exchangePublicTokenForAccessToken = async (public_token: string) => {
 
 	try {
 
@@ -26,7 +26,7 @@ const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfill
 
 export const getInvestmentHoldings = async (): Promise<Holding[]> => {
 
-    const accessTokens = await getAccessTokens();
+    const accessTokens = await retrieveStoredAccessTokens();
 
 	try {
 
@@ -50,7 +50,7 @@ export const getInvestmentHoldings = async (): Promise<Holding[]> => {
 
 };
 
-export const createLinkToken = async (request: LinkTokenCreateRequest) => {
+export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 
 	try {
 
