@@ -1,21 +1,50 @@
-import { getInvestmentHoldings } from '~/helpers/plaidUtils';
-import { LoaderFunction, useLoaderData } from 'remix';
+import { getInvestmentHoldings, getPlaidAccountBalances } from '~/helpers/plaidUtils';
+import { LinksFunction, LoaderFunction, useLoaderData } from 'remix';
 import { Investments } from '~/components/Investments/Investments';
-import { Holding } from 'plaid';
+import { AccountBase, Holding, Security } from 'plaid';
+import dashboardStyles from './../styles/dashboard.css';
+import { Networth } from '~/components/Investments/Networth';
+
+export const links: LinksFunction = () => {
+
+	return [
+		{ rel: "stylesheet", href: dashboardStyles }
+	];
+
+};
+
+type InvestmentResponse = {
+	holdings: Holding[];
+	securities: Security[];
+}
+
+type DashboardProps = {
+	holdings: Holding[];
+	securities: Security[];
+	balances: AccountBase[];
+}
 
 export const loader: LoaderFunction = async () => {
 
-	const investmentData = await getInvestmentHoldings();
+	const investmentData: InvestmentResponse = await getInvestmentHoldings();
+	const balances: AccountBase[] = await getPlaidAccountBalances();
 
-	return investmentData;
+	return {
+		...investmentData,
+		balances
+	};
 
 };
 
 const Dashboard = () => {
-    const holdings = useLoaderData<Holding[]>();
+    const investmentData = useLoaderData<DashboardProps>();
+	const { holdings, securities, balances } = investmentData;
 
     return (
-        <Investments investments={holdings} />
+		<>
+			<Investments securities={securities} investments={holdings} />
+			<Networth accounts={balances} />
+		</>
     );
 
 };

@@ -1,6 +1,8 @@
-import { Holding, LinkTokenCreateRequest } from "plaid";
+import { LinkTokenCreateRequest } from "plaid";
 import { retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
+
+const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
 
 export const exchangePublicTokenForAccessToken = async (public_token: string) => {
 
@@ -22,34 +24,6 @@ export const exchangePublicTokenForAccessToken = async (public_token: string) =>
 
 };
 
-const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
-
-export const getInvestmentHoldings = async (): Promise<Holding[]> => {
-
-    const accessTokens = await retrieveStoredAccessTokens();
-
-	try {
-
-		const holdingsDataPromises = accessTokens.map(accessToken => {
-
-			return client.investmentsHoldingsGet({ access_token: accessToken });
-
-		});
-
-		const holdingsData = await Promise.allSettled(holdingsDataPromises)
-		const resolvedHoldingsData = holdingsData.filter(isFilled).flatMap(x => x.value.data.holdings);
-
-		return resolvedHoldingsData;
-
-
-	} catch (err) {
-
-		return [];
-
-	}
-
-};
-
 export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 
 	try {
@@ -64,4 +38,61 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 		return "";
 
 	}
+};
+
+export const getInvestmentHoldings = async () => {
+
+    const accessTokens = await retrieveStoredAccessTokens();
+
+	try {
+
+		const holdingsDataPromises = accessTokens.map(accessToken => {
+
+			return client.investmentsHoldingsGet({ access_token: accessToken });
+
+		});
+
+		const holdingsData = await Promise.allSettled(holdingsDataPromises)
+		const resolvedHoldingsData = holdingsData.filter(isFilled).map(x => x.value.data);
+
+		const holdings = resolvedHoldingsData.flatMap(x => x.holdings);
+		const securities = resolvedHoldingsData.flatMap(x => x.securities)
+
+		return {
+			holdings,
+			securities
+		};
+
+
+	} catch (err) {
+
+		return {
+			holdings: [],
+			securities: []
+		};
+
+	}
+
+};
+
+
+export const getPlaidAccountBalances = async () => {
+
+	try {
+
+		const accessTokens = await retrieveStoredAccessTokens();
+
+		const balancesPromises = accessTokens.map(token => {
+			return client.accountsBalanceGet({ access_token: token });
+		})
+
+		const balances = await Promise.allSettled(balancesPromises);
+		const resolvedBalancesData = balances.filter(isFilled).flatMap(x => x.value.data.accounts)
+
+		return resolvedBalancesData;
+
+	} catch (err) {
+		return [];
+	}
+
 };
