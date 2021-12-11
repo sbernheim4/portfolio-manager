@@ -1,9 +1,9 @@
 import { getInvestmentHoldings, getPlaidAccountBalances } from '~/helpers/plaidUtils';
 import { LinksFunction, LoaderFunction, useLoaderData } from 'remix';
-import { Investments } from '~/components/Investments/Investments';
+import { Investments } from '~/components/Investments';
 import { AccountBase, Holding, Security } from 'plaid';
 import dashboardStyles from './../styles/dashboard.css';
-import { Networth } from '~/components/Investments/Networth';
+import { Networth } from '~/components/Networth';
 
 export const links: LinksFunction = () => {
 
