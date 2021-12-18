@@ -12,7 +12,7 @@ export const Networth = (props: { accounts: AccountBase[] }) => {
 			<h1>Your Financial* Networth</h1>
 
 			<h2>You have {dollarFormatter.format(networth)}</h2>
-			{ accounts.map(account => <AccountInfo account={account}/>) }
+			{ accounts.map(account => <AccountInfo key={account.account_id} account={account}/>) }
 
 			<p>*You're worth far more than this 🙂</p>
 		</div>
