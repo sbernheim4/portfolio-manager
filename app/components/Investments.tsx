@@ -17,40 +17,70 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 };
 
-export const Investments = (props: { securities: Security[]; investments: Holding[] }) => {
-	const { securities, investments } = props;
+export const Investments = (props: { securities: Security[]; holdings: Holding[] }) => {
+	const { securities, holdings } = props;
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 
-    const totalInvested = investments.reduce((acc, curr) => acc + curr.institution_value, 0);
+
+	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
+	// per each account that holds it. We don't care about that however as we're focused on the
+	// aggregate investment risk NOT on the per account risk.
+	const mergedHoldings = holdings.reduce((acc, curr) => {
+
+		const currentSecurityId = curr.security_id;
+		const entryIndex = acc.findIndex(val => val.security_id === currentSecurityId);
+		const securityAlreadyExists = entryIndex !== -1;
+
+		if (!securityAlreadyExists) {
+			return [...acc, curr];
+		}
+
+		const existingEntry = acc[entryIndex];
+
+		const newEntry: Holding = {
+			...curr,
+			quantity: existingEntry.quantity + curr.quantity,
+			institution_value: existingEntry.institution_value + curr.institution_value,
+			// TODO: Need to figure out how to calculate the cost basis across all accounts
+			// that hold this security
+			// cost_basis:
+		};
+
+		const newArr = [...acc.slice(0, entryIndex), ...acc.slice(entryIndex + 1)];
+
+		return [...newArr, newEntry];
+
+	}, [] as Holding[]);
+
+    const totalInvested = mergedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
 
 	return (
 		<div className="investments">
-			<h1>Investment Information</h1>
+			<h1>Your Portfolio</h1>
 
-			<h2>Balance {dollarFormatter.format(totalInvested)}</h2>
+			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
 			<h2>Your Investments</h2>
 
-			<div className="investment-line-items">
-			{
-				investments.reverse().map((holding, i) => {
-					return (
-						<LineItem
-							ticker={securityIdToTickerSymbol[holding.security_id]}
-							totalInvested={totalInvested}
-							holding={holding}
-							key={securities[i].security_id}
-						/>
-					);
-				})
-			}
-			</div>
-
+				<div className="investment-line-items">
+				{
+					mergedHoldings.reverse().map((holding, i) => {
+						return (
+							<StockInvestmentSummary
+								ticker={securityIdToTickerSymbol[holding.security_id]}
+								totalInvested={totalInvested}
+								holding={holding}
+								key={securities[i].security_id}
+							/>
+						);
+					})
+				}
+				</div>
 		</div>
 	);
 };
 
-const LineItem = (props: {
+const StockInvestmentSummary = (props: {
 	totalInvested: number,
 	holding: Holding,
 	ticker: string | null
@@ -70,7 +100,7 @@ const LineItem = (props: {
 			<div className="investment-line-item">
 				<WarningSign aboveThreshold={aboveThreshold}/>
 
-				<h4 className="investment-line-item__ticker">{props.ticker ?? "QQQQQQ"}</h4>
+				<h4 className="investment-line-item__ticker">{props.ticker ?? "N/A"}</h4>
 				<p className="investment-line-item__share">{quantity} share(s)</p>
 				<p className="investment-line-item__percentage">{percentage} of your portfolio</p>
 				<p className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</p>
@@ -80,11 +110,5 @@ const LineItem = (props: {
 };
 
 const WarningSign = (props: { aboveThreshold: boolean }) => {
-	if (!props.aboveThreshold) {
-		return null;
-	}
-
-	return (
-		<p className="investment-line-item__warning-symbol">⚠️</p>
-	);
-}
+	return !props.aboveThreshold ? null : <p className="investment-line-item__warning-symbol">⚠️</p>
+};
