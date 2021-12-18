@@ -56,7 +56,7 @@ const Dashboard = () => {
 
     return (
 		<div className="dashboard">
-			<Investments securities={securities} investments={holdings} />
+			<Investments securities={securities} holdings={holdings} />
 			<Networth accounts={balances} />
 		</div>
     );

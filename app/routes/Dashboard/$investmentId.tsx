@@ -1,7 +1,16 @@
 import { AccountBase, Holding, Security } from "plaid";
-import { json, LoaderFunction, useLoaderData, useLocation } from "remix";
+import { json, Link, LinksFunction, LoaderFunction, useLoaderData } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Investments";
 import { getAccounts, getInvestmentHoldings } from "~/helpers/plaidUtils";
+import investmentStyles from './../../styles/investment.css';
+
+export const links: LinksFunction = () => {
+
+	return [
+		{ rel: "stylesheet", href: investmentStyles }
+	];
+
+};
 
 export const loader: LoaderFunction = async (loaderParams) => {
 
@@ -43,13 +52,12 @@ const IndividualInvestmentInformation = () => {
 	}, {} as Record<string, number>);
 
 	return (
-        <>
+        <div className="investment">
 			<h1>Accounts Holding {ticker}</h1>
-			{accounts.map(account => <p key={account.account_id}>{account.name}: {accountIdToHolding[account.account_id]} shares</p>)}
-		</>
+			{accounts.map(account => <Link to={`/account/${account.account_id}`}><p key={account.account_id}>{account.name}: {accountIdToHolding[account.account_id]} shares</p></Link>)}
+		</div>
 	);
 
 };
-
 
 export default IndividualInvestmentInformation;
