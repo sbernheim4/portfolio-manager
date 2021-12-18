@@ -1,9 +1,10 @@
 import { getInvestmentHoldings, getPlaidAccountBalances } from '~/helpers/plaidUtils';
-import { LinksFunction, LoaderFunction, useLoaderData } from 'remix';
+import { json, LinksFunction, LoaderFunction, useLoaderData } from 'remix';
 import { Investments } from '~/components/Investments';
 import { AccountBase, Holding, Security } from 'plaid';
-import dashboardStyles from './../styles/dashboard.css';
+import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
+import { isFilled } from '~/helpers/isFilled';
 
 export const links: LinksFunction = () => {
 
@@ -13,12 +14,12 @@ export const links: LinksFunction = () => {
 
 };
 
-type InvestmentResponse = {
+export type InvestmentResponse = {
 	holdings: Holding[];
 	securities: Security[];
 }
 
-type DashboardProps = {
+export type DashboardProps = {
 	holdings: Holding[];
 	securities: Security[];
 	balances: AccountBase[];
@@ -26,13 +27,26 @@ type DashboardProps = {
 
 export const loader: LoaderFunction = async () => {
 
-	const investmentData: InvestmentResponse = await getInvestmentHoldings();
-	const balances: AccountBase[] = await getPlaidAccountBalances();
+	const promises: [Promise<InvestmentResponse>, Promise<Array<AccountBase>> ] = [getInvestmentHoldings(), getPlaidAccountBalances()];
 
-	return {
-		...investmentData,
-		balances
-	};
+	const results = await Promise.allSettled(promises);
+
+	// @ts-ignore
+	const resolvedPromises: [
+		InvestmentResponse,
+		AccountBase[]
+	] = results
+		// @ts-ignore
+		.filter(isFilled)
+		// @ts-ignore
+		.map(x => x.value);
+
+	const [investmentData, balances] = resolvedPromises;
+
+	return json(
+		{ ...investmentData, balances },
+		{ headers: { "Cache-Control": "max-age=240" } }
+	);
 
 };
 
@@ -41,10 +55,10 @@ const Dashboard = () => {
 	const { holdings, securities, balances } = investmentData;
 
     return (
-		<>
+		<div className="dashboard">
 			<Investments securities={securities} investments={holdings} />
 			<Networth accounts={balances} />
-		</>
+		</div>
     );
 
 };

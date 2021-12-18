@@ -1,8 +1,7 @@
-import { LinkTokenCreateRequest } from "plaid";
+import {  Holding, LinkTokenCreateRequest, Security } from "plaid";
+import { isFilled } from "~/helpers/isFilled";
 import { retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
-
-const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
 
 export const exchangePublicTokenForAccessToken = async (public_token: string) => {
 
@@ -40,7 +39,7 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 	}
 };
 
-export const getInvestmentHoldings = async () => {
+export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; securities: Security[]}>=> {
 
     const accessTokens = await retrieveStoredAccessTokens();
 
@@ -72,6 +71,28 @@ export const getInvestmentHoldings = async () => {
 		};
 
 	}
+
+};
+
+export const getAccounts = async (accountIds: Array<string>) => {
+
+	try {
+
+		const accessTokens = await retrieveStoredAccessTokens();
+
+		const accountInformationPromises = accessTokens.map(token => {
+			return client.accountsGet({ access_token: token, options: { account_ids: accountIds } });
+		})
+
+		const accountInformation = await Promise.allSettled(accountInformationPromises);
+		const account = accountInformation.filter(isFilled).flatMap(x => x.value.data.accounts)
+
+		return account;
+
+	} catch (err) {
+		return [];
+	}
+
 
 };
 
