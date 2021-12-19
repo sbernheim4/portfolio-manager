@@ -1,6 +1,7 @@
 import { AccountBase } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { Positions, links as positionStyles } from "~/components/Positions";
+import { SectorWeight } from "~/components/SectorWeight";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { InvestmentResponse } from '../../types/index';
@@ -59,6 +60,7 @@ const Holdings = () => {
 	return (
 		<>
 			<Positions securities={securities} holdings={holdings} />
+			<SectorWeight securities={securities} holdings={holdings}/>
 		</>
 	);
 
