@@ -45,7 +45,6 @@ a {
 .investment-line-item__warning-symbol {
 	display: inline;
 	position: absolute;
-	background: yellow;
 	border-radius: 100%;
 	top: 0px;
 	right: 15px;
