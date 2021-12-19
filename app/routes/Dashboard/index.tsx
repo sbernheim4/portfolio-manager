@@ -1,4 +1,4 @@
-import { json, LinksFunction, LoaderFunction, useLoaderData } from "remix"
+import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
 import { AccountBase } from "plaid";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { isFilled } from "~/helpers/isFilled";
@@ -7,6 +7,13 @@ import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
 import { DashboardProps, InvestmentResponse } from '../../types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
+
+export const meta: MetaFunction = () => {
+	return {
+		title: "Analyze your Investment Portfolio",
+		description: "Portfolio analysis by position weight, sector weight, and more"
+	};
+};
 
 export const links: LinksFunction = () => {
 	return [
