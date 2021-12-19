@@ -90,7 +90,7 @@ export const Investments = (props: { securities: Security[]; holdings: Holding[]
 	);
 };
 
-const StockInvestmentSummary = (props: {
+export const StockInvestmentSummary = (props: {
 	totalInvested: number,
 	holding: Holding,
 	ticker: string | null

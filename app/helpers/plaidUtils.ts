@@ -76,7 +76,7 @@ export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; sec
 
 };
 
-export const getAccounts = async (accountIds: Array<string>) => {
+export const getPlaidAccounts = async (accountIds: Array<string>) => {
 
 	try {
 
