@@ -2,7 +2,7 @@ import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, useLoaderData } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
 import { StockInvestmentSummary } from "~/components/StockInvestmentSummary";
-import { dollarFormatter } from "~/formatters";
+import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import accountIdStyles from "./../../styles/account.css";
 

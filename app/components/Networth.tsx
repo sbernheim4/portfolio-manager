@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { dollarFormatter } from "~/formatters";
+import { dollarFormatter } from "~/helpers/formatters";
 
 export const Networth = (props: { accounts: AccountBase[] }) => {
 	const { accounts } = props;
