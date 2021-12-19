@@ -1,7 +1,17 @@
 nav {
-	color: green;
+	margin: 0 auto;
+	padding: 30px;
+	max-width: 1200px;
+	width: calc(100vw - 15px);
+	height: 45px;
+	border-bottom: 1px solid black;
+	display: flex;
+	justify-content: space-evenly
 }
 
 nav > a {
-	color: green;
+	height: 27px;
+}
+
+nav > a:hover {
 }
