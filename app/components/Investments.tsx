@@ -17,16 +17,8 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 };
 
-export const Investments = (props: { securities: Security[]; holdings: Holding[] }) => {
+const aggregateHoldings = (holdings: Holding[]) => {
 
-	const { securities, holdings } = props;
-
-	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
-
-
-	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
-	// per each account that holds it. We don't care about that however as we're focused on the
-	// aggregate investment risk NOT on the per account risk.
 	const mergedHoldings = holdings.reduce((acc, curr) => {
 
 		const currentSecurityId = curr.security_id;
@@ -37,14 +29,15 @@ export const Investments = (props: { securities: Security[]; holdings: Holding[]
 			return [...acc, curr];
 		}
 
+		// Merge the existing entry for a given symbol and the current entry for the same symbol
 		const existingEntry = acc[entryIndex];
 
 		const newEntry: Holding = {
 			...curr,
 			quantity: existingEntry.quantity + curr.quantity,
 			institution_value: existingEntry.institution_value + curr.institution_value,
-			// TODO: Need to figure out how to calculate the cost basis across all accounts
-			// that hold this security
+			// TODO: Need to figure out how to calculate the cost basis across all accounts that
+			// hold this security
 			// cost_basis:
 		};
 
@@ -54,18 +47,34 @@ export const Investments = (props: { securities: Security[]; holdings: Holding[]
 
 	}, [] as Holding[]);
 
-    const totalInvested = mergedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
+	return mergedHoldings;
+
+};
+
+export const Investments = (props: { securities: Security[]; holdings: Holding[] }) => {
+
+	const { securities, holdings } = props;
+
+	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
+
+
+	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
+	// per each account that holds it. We don't care about that however as we're focused on the
+	// aggregate investment risk NOT on the per account risk.
+	const aggregatedPositions = aggregateHoldings(holdings);
+    const totalInvested = aggregatedPositions.reduce((acc, curr) => acc + curr.institution_value, 0);
 
 	return (
 		<div className="investments">
 			<h1>Your Portfolio</h1>
 
 			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
+
 			<h2>Your Investments</h2>
 
 				<div className="investment-line-items">
 				{
-					mergedHoldings.reverse().map((holding, i) => {
+					aggregatedPositions.reverse().map((holding, i) => {
 						return (
 							<StockInvestmentSummary
 								ticker={securityIdToTickerSymbol[holding.security_id]}
