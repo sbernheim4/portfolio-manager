@@ -1,7 +1,7 @@
 
 import { AccountBase } from "plaid";
 import { json, Link, LinksFunction, LoaderFunction, useLoaderData, useParams } from "remix";
-import { constructSecurityIdToTickerSymbol } from "~/components/Investments";
+import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { DashboardProps, InvestmentResponse } from "../../types/index";

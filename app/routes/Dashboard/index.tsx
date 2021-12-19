@@ -37,9 +37,10 @@ export const loader: LoaderFunction = async () => {
 		.map(x => x.value);
 
 	const [investmentData, balances] = resolvedPromises;
+	const { holdings, securities } = investmentData;
 
 	return json(
-		{ ...investmentData, balances },
+		{ balances, holdings, securities },
 		{ headers: { "Cache-Control": "max-age=240" } }
 	);
 
