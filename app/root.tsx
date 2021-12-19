@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -13,7 +12,7 @@ import {
 import type { LinksFunction } from "remix";
 
 import globalStylesUrl from "~/styles/global.css";
-import { Navbar } from "./components/Navbar";
+import { Navbar, links as navbarStyles } from "./components/Navbar";
 
 /**
  * The `links` export is a function that returns an array of objects that map to
@@ -25,7 +24,8 @@ import { Navbar } from "./components/Navbar";
  */
 export let links: LinksFunction = () => {
   return [
-    { rel: "stylesheet", href: globalStylesUrl }
+    ...navbarStyles(),
+    { rel: "stylesheet", href: globalStylesUrl },
   ];
 };
 

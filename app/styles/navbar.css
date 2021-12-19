@@ -1,0 +1,7 @@
+nav {
+	color: green;
+}
+
+nav > a {
+	color: green;
+}

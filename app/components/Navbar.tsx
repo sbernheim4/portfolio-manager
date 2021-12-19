@@ -1,4 +1,11 @@
-import { Link } from "remix";
+import { Link, LinksFunction } from "remix";
+import navbarStlyes from "./../styles/navbar.css";
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: "stylesheet", href: navbarStlyes }
+	];
+};
 
 export const Navbar = () => {
 
