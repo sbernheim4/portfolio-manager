@@ -86,7 +86,7 @@ const StockInvestmentSummary = (props: {
 	ticker: string | null
 }) => {
 
-	const { totalInvested, holding } = props;
+	const { totalInvested, holding, ticker } = props;
 
 	const percentageOfAllFunds = (holding.institution_value / totalInvested);
 	const threshold = .1;
@@ -96,11 +96,11 @@ const StockInvestmentSummary = (props: {
 	const percentage = percentageFormatter.format(percentageOfAllFunds);
 
 	return (
-		<Link to={holding.security_id} state={{ holding }}>
+		<Link to={`/holding/${holding.security_id}`}>
 			<div className="investment-line-item">
 				<WarningSign aboveThreshold={aboveThreshold}/>
 
-				<h4 className="investment-line-item__ticker">{props.ticker ?? "N/A"}</h4>
+				<h4 className="investment-line-item__ticker">{ticker ?? "N/A"}</h4>
 				<p className="investment-line-item__share">{quantity} share(s)</p>
 				<p className="investment-line-item__percentage">{percentage} of your portfolio</p>
 				<p className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</p>

@@ -65,6 +65,8 @@ export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; sec
 
 	} catch (err) {
 
+		console.log("investmentHoldings: ", err);
+
 		return {
 			holdings: [],
 			securities: []
@@ -90,6 +92,9 @@ export const getAccounts = async (accountIds: Array<string>) => {
 		return account;
 
 	} catch (err) {
+
+		console.log("getAccounts: ", err);
+
 		return [];
 	}
 
@@ -105,7 +110,7 @@ export const getPlaidAccountBalances = async () => {
 
 		const balancesPromises = accessTokens.map(token => {
 			return client.accountsBalanceGet({ access_token: token });
-		})
+		});
 
 		const balances = await Promise.allSettled(balancesPromises);
 		const resolvedBalancesData = balances.filter(isFilled).flatMap(x => x.value.data.accounts)
@@ -113,7 +118,11 @@ export const getPlaidAccountBalances = async () => {
 		return resolvedBalancesData;
 
 	} catch (err) {
+
+		console.log("getAccountsBalance: ", err);
+
 		return [];
+
 	}
 
 };

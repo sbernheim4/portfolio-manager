@@ -4,18 +4,28 @@ import { MONGODB_PWD } from "../../env";
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
+let activeConnection: Promise<MongoClient> = (async () => await client.connect())();
+
 const getDBConnection = async () => {
+
+	if (activeConnection !== undefined) {
+
+		return await activeConnection;
+	}
 
 	try {
 
-		const x = await client.connect();
+		console.log("creating new connection");
 
-		return x;
+		activeConnection = await client.connect();
+
+		return activeConnection;
 
 	} catch(err) {
 
 		console.error(err);
 
+		activeConnection.then(res => res.close());
 		client.close();
 
 	}
@@ -36,8 +46,14 @@ const retrieveStoredAccessTokens = async (userId = "sams_token") => {
 };
 
 const getKeysCollection = async () => {
-	await getDBConnection();
-	return client.db().collection('keys')
+
+	const connection = await getDBConnection();
+
+	if (!connection) {
+		throw new Error("Could not connect to DB");
+	}
+
+	return connection.db().collection('keys')
 };
 
 const saveNewAccessToken = async (accessToken: string, userId = "sams_tokens") => {
