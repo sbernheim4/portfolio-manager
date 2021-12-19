@@ -2,7 +2,7 @@ import { json, LinksFunction, LoaderFunction, useLoaderData } from "remix"
 import { AccountBase } from "plaid";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { isFilled } from "~/helpers/isFilled";
-import { Positions } from '~/components/Investments';
+import { Positions } from '~/components/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
 import { DashboardProps, InvestmentResponse } from '../../types/index';
