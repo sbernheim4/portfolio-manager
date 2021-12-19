@@ -48,32 +48,40 @@ const IndividualInvestmentInformation = () => {
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 	const tickerSymbol = securityIdToTickerSymbol[securityId] ?? "Not Found";
 
-	const accountIdToHolding = holdings.reduce((acc, curr) => {
-		return {
-			...acc,
-			[curr.account_id]: curr.quantity
-		}
-	}, {} as Record<string, number>);
+	const accountIdToHolding = holdings
+		.filter(holding => holding.security_id === securityId)
+		.reduce((acc, curr) => {
+
+			if (acc[curr.account_id]) {
+				return {
+					...acc,
+					[curr.account_id]: acc[curr.account_id] + curr.quantity
+				}
+			} else {
+				return {
+					...acc,
+					[curr.account_id]: curr.quantity
+				}
+			}
+		}, {} as Record<string, number>);
 
 	const getAccountNameById = (accountId: string) => {
-		return balances.find(account => account.account_id === accountId);
-	};
+		const account = balances.find(account => account.account_id === accountId);
 
-	console.log(accountIdToHolding)
+		return account?.name ?? account?.official_name ?? account?.account_id ?? "Account Name not found";
+	};
 
 	return (
         <div className="investment">
 			<h1>Accounts Holding {tickerSymbol}</h1>
 
 			{
-				/*
 			Object.keys(accountIdToHolding).map(accountId => {
 				return (
 					<Link key={accountId} to={`/account/${accountId}`}>
 						<p>{getAccountNameById(accountId)}: {accountIdToHolding[accountId]} shares</p>
 					</Link>)
 				})
-			*/
 			}
 		</div>
 	);

@@ -18,6 +18,7 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 };
 
 export const Investments = (props: { securities: Security[]; holdings: Holding[] }) => {
+
 	const { securities, holdings } = props;
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
