@@ -1,8 +1,9 @@
 import { LinksFunction, useOutletContext } from 'remix';
-import { Investments } from '~/components/Investments';
+import { Positions } from '~/components/Investments';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
 import { DashboardProps } from '../dashboard';
+import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 
 export const links: LinksFunction = () => {
 	return [
@@ -16,7 +17,8 @@ const Dashboard = () => {
 
     return (
 		<div className="dashboard">
-			<Investments securities={securities} holdings={holdings} />
+			<Positions securities={securities} holdings={holdings} />
+			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
 			<Networth accounts={balances} />
 		</div>
     );

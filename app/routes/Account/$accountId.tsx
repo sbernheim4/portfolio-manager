@@ -54,7 +54,7 @@ const Accounts = () => {
 			<h3>Account Holdings</h3>
 				<div className="investment-line-items">
 				{
-					holdingsInCurrentAccount.map(holding => {
+					holdingsInCurrentAccount.reverse().map(holding => {
 						return (
 							<StockInvestmentSummary
 								totalInvested={accountBalance.balances.current ?? 1000000}

@@ -25,7 +25,7 @@ export const StockInvestmentSummary = (props: {
 
 				<h4 className="investment-line-item__ticker">{ticker ?? "N/A"}</h4>
 				<p className="investment-line-item__share">{quantity} share(s)</p>
-				<p className="investment-line-item__percentage">{percentage} of your portfolio</p>
+				<p className="investment-line-item__percentage">{percentage}</p>
 				<p className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</p>
 			</div>
 		</Link>
