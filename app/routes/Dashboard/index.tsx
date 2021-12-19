@@ -1,8 +1,11 @@
-import { LinksFunction, useOutletContext } from 'remix';
+import { json, LinksFunction, LoaderFunction, useLoaderData } from "remix"
+import { AccountBase } from "plaid";
+import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { isFilled } from "~/helpers/isFilled";
 import { Positions } from '~/components/Investments';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
-import { DashboardProps } from '../dashboard';
+import { DashboardProps, InvestmentResponse } from '../../types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 
 export const links: LinksFunction = () => {
@@ -11,8 +14,39 @@ export const links: LinksFunction = () => {
 	];
 };
 
+export const loader: LoaderFunction = async () => {
+
+	const promises: [
+		Promise<InvestmentResponse>,
+		Promise<Array<AccountBase>>
+	] = [
+		getInvestmentHoldings(),
+		getPlaidAccountBalances()
+	];
+
+	const results = await Promise.allSettled(promises);
+
+	// @ts-ignore
+	const resolvedPromises: [
+		InvestmentResponse,
+		AccountBase[]
+	] = results
+		// @ts-ignore
+		.filter(isFilled)
+		// @ts-ignore
+		.map(x => x.value);
+
+	const [investmentData, balances] = resolvedPromises;
+
+	return json(
+		{ ...investmentData, balances },
+		{ headers: { "Cache-Control": "max-age=240" } }
+	);
+
+};
+
 const Dashboard = () => {
-    const investmentData = useOutletContext<DashboardProps>();
+    const investmentData = useLoaderData<DashboardProps>();
 	const { holdings, securities, balances } = investmentData;
 
     return (

@@ -4,7 +4,7 @@ import { json, Link, LinksFunction, LoaderFunction, useLoaderData, useParams } f
 import { constructSecurityIdToTickerSymbol } from "~/components/Investments";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { DashboardProps, InvestmentResponse } from "../dashboard";
+import { DashboardProps, InvestmentResponse } from "../../types/index";
 import investmentStyles from './../../styles/investment.css';
 
 export const links: LinksFunction = () => {
