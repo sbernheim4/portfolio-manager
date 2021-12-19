@@ -1,33 +1,19 @@
+.accounts {
+	margin: 0 auto;
+	width: 80%;
+}
+
 a {
 	color: inherit;
 	text-decoration: none;
 }
 
-/******************************************************************************/
-
-.dashboard {
-}
-
-/******************************************************************************/
-
-.investments {
-	margin: 30px auto;
-	max-width: 1500px;
-}
-
-.investments > h1 {
+.accounts > h1 {
 	text-align: center;
 }
 
-.investments > h2 {
-	margin: 30px;
+.accounts > h3 {
 }
-
-.investments > .investment-line-items > p {
-	margin: 0;
-}
-
-/******************************************************************************/
 
 .investment-line-items {
 	margin: 0 auto;
@@ -72,26 +58,4 @@ a {
 	border-radius: 100%;
 	top: 0px;
 	right: 15px;
-}
-
-/******************************************************************************/
-
-.networth {
-
-}
-
-.networth > h1 {
-
-}
-
-.networth > h2 {
-
-}
-
-.networth > h4 {
-
-}
-
-.networth > p {
-
 }
