@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { json, LoaderFunction, MetaFunction, useLoaderData } from "remix";
+import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -10,6 +10,12 @@ export const meta: MetaFunction = () => {
 		title: "Account Specific Information",
 		description: "View your investments for a given account"
 	};
+};
+
+export const links: LinksFunction = () => {
+    return [
+
+    ];
 };
 
 export const loader: LoaderFunction = async () => {
