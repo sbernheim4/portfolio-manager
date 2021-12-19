@@ -1,6 +1,6 @@
 import { Holding, Security } from 'plaid';
 import { Link } from 'remix';
-import { decimalFormatter, dollarFormatter, percentageFormatter } from '~/formatters';
+import { decimalFormatter, dollarFormatter, percentageFormatter } from '~/helpers/formatters';
 
 export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) => {
 
