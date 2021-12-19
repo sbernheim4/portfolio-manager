@@ -1,6 +1,6 @@
 import { AccountBase } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
-import { Positions } from "~/components/Positions";
+import { Positions, links as positionStyles } from "~/components/Positions";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { InvestmentResponse } from '../../types/index';
@@ -15,6 +15,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
+        ...positionStyles(),
 		{ rel: "stylesheet", href: holdingStyles }
 	];
 };

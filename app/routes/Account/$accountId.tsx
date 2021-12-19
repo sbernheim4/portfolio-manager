@@ -4,7 +4,7 @@ import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
 import { StockInvestmentSummary } from "~/components/StockInvestmentSummary";
 import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import accountIdStyles from "./../../styles/account.css";
+import positionCss from "./../../styles/positions.css";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -15,7 +15,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: "stylesheet", href: accountIdStyles }
+		{ rel: "stylesheet", href: positionCss }
 	];
 };
 
