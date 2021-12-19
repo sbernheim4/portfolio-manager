@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async () => {
 
 	return json(
 		{ balances, holdings, securities },
-		{ headers: { "Cache-Control": "max-age=240" } }
+		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
 
 };
