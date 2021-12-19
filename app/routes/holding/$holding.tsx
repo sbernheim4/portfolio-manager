@@ -2,6 +2,7 @@
 import { AccountBase } from "plaid";
 import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useParams } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
+import { decimalFormatter, percentageFormatter } from "~/helpers/formatters";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { DashboardProps, InvestmentResponse } from "../../types/index";
@@ -21,10 +22,10 @@ export const links: LinksFunction = () => {
 	];
 
 };
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({params}) => {
 
+	const securityId = params.holding
 	const promises: [Promise<InvestmentResponse>, Promise<Array<AccountBase>> ] = [getInvestmentHoldings(), getPlaidAccountBalances()];
-
 	const results = await Promise.allSettled(promises);
 
 	// @ts-ignore
@@ -40,8 +41,10 @@ export const loader: LoaderFunction = async () => {
 	const [investmentData, balances] = resolvedPromises;
 	const { holdings, securities } = investmentData;
 
+	const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
+
 	return json(
-		{ balances, holdings, securities },
+		{ balances, holdings: holdingsOfCurrentSecurity, securities },
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
 
@@ -55,7 +58,9 @@ const IndividualInvestmentInformation = () => {
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 	const tickerSymbol = securityIdToTickerSymbol[securityId] ?? "Not Found";
 
-	const accountIdToHolding = holdings
+	// const holdings = holdings.filter(holding => holding.security_id === securityId);
+
+	const accountIdToNumberOfShares = holdings
 		.filter(holding => holding.security_id === securityId)
 		.reduce((acc, curr) => {
 
@@ -78,15 +83,27 @@ const IndividualInvestmentInformation = () => {
 		return account?.name ?? account?.official_name ?? account?.account_id ?? "Account Name not found";
 	};
 
+	const totalNumberShares = decimalFormatter.format(
+		holdings
+			.reduce((acc, curr) => acc + curr.quantity, 0)
+	);
+
+	const totalNumberOfSharesOfSecurity = holdings.filter(h => h.security_id === securityId).reduce((acc, curr) => acc + curr.quantity, 0);
+
+
 	return (
         <div className="investment">
 			<h1>Accounts Holding {tickerSymbol}</h1>
 
+            <p>Total number of shares: {totalNumberShares}</p>
+
 			{
-			Object.keys(accountIdToHolding).map(accountId => {
+			holdings.map(holding => {
+				const percentage = percentageFormatter.format(holding.institution_value / totalNumberOfSharesOfSecurity);
+
 				return (
-					<Link key={accountId} to={`/account/${accountId}`}>
-						<p>{getAccountNameById(accountId)}: {accountIdToHolding[accountId]} shares</p>
+					<Link key={holding.account_id} to={`/account/${holding}`}>
+						<p>{getAccountNameById(holding.account_id)}: {decimalFormatter.format(accountIdToNumberOfShares[holding.account_id])} shares - {percentage}</p>
 					</Link>)
 				})
 			}

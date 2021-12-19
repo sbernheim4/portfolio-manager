@@ -15,7 +15,7 @@ export const meta: MetaFunction = () => {
 
 export const loader: LoaderFunction = async () => {
 
-	// Get the client_user_id by searching for the current user
+    // The logged in user's unique id
 	// const { id: clientUserId } = await User.find(...);
 	const clientUserId = "5a24ca6a4e95b836d37e37fe"
 
