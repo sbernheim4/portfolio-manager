@@ -13,6 +13,7 @@ import {
 import type { LinksFunction } from "remix";
 
 import globalStylesUrl from "~/styles/global.css";
+import { Navbar } from "./components/Navbar";
 
 /**
  * The `links` export is a function that returns an array of objects that map to
@@ -36,6 +37,7 @@ export let links: LinksFunction = () => {
 export default function App() {
   return (
     <Document>
+		<Navbar />
         <Outlet />
     </Document>
   );
