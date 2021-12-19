@@ -2,7 +2,7 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from
 import { AccountBase } from "plaid";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { isFilled } from "~/helpers/isFilled";
-import { Positions } from '~/components/Positions';
+import { Positions, links as positionsStyles } from '~/components/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
 import { DashboardProps, InvestmentResponse } from '../../types/index';
@@ -17,6 +17,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
+		...positionsStyles(),
 		{ rel: "stylesheet", href: dashboardStyles }
 	];
 };
