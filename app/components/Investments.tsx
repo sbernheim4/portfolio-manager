@@ -51,7 +51,7 @@ const aggregateHoldings = (holdings: Holding[]) => {
 
 };
 
-export const Investments = (props: { securities: Security[]; holdings: Holding[] }) => {
+export const Positions = (props: { securities: Security[]; holdings: Holding[] }) => {
 
 	const { securities, holdings } = props;
 
@@ -65,8 +65,8 @@ export const Investments = (props: { securities: Security[]; holdings: Holding[]
     const totalInvested = aggregatedPositions.reduce((acc, curr) => acc + curr.institution_value, 0);
 
 	return (
-		<div className="investments">
-			<h1>Your Portfolio</h1>
+		<div>
+			<h1>Your Positions</h1>
 
 			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
 

@@ -28,8 +28,8 @@ export const loader: LoaderFunction = async () => {
 
 	// @ts-ignore
 	const resolvedPromises: [
-		AccountBase[],
-		InvestmentResponse
+		InvestmentResponse,
+		AccountBase[]
 	] = results
 		// @ts-ignore
 		.filter(isFilled)

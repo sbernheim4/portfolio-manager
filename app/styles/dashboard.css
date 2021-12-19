@@ -10,25 +10,6 @@ a {
 
 /******************************************************************************/
 
-.investments {
-	margin: 30px auto;
-	max-width: 1500px;
-}
-
-.investments > h1 {
-	text-align: center;
-}
-
-.investments > h2 {
-	margin: 30px;
-}
-
-.investments > .investment-line-items > p {
-	margin: 0;
-}
-
-/******************************************************************************/
-
 .investment-line-items {
 	margin: 0 auto;
 	display: flex;
