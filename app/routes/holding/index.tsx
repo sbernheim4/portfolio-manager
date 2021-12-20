@@ -1,6 +1,6 @@
-import { AccountBase } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
-import { Positions, links as positionStyles } from "~/components/Positions";
+import { AccountBase, Holding } from "plaid";
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, useActionData, useLoaderData } from "remix";
+import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions";
 import { SectorWeight } from "~/components/SectorWeight";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -21,8 +21,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async () => {
-
+export const getInvestmentsAndAccountBalances = async () => {
 	const promises: [
 		Promise<InvestmentResponse>,
 		Promise<Array<AccountBase>>
@@ -46,6 +45,18 @@ export const loader: LoaderFunction = async () => {
 	const [investmentData, balances] = resolvedPromises;
 	const { holdings, securities } = investmentData;
 
+	return {
+		balances,
+		holdings,
+		securities
+	};
+
+};
+
+export const loader: LoaderFunction = async () => {
+
+	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
+
 	return json(
 		{ balances, holdings, securities },
 		{ headers: { "Cache-Control": "max-age=43200" } }
@@ -53,13 +64,45 @@ export const loader: LoaderFunction = async () => {
 
 };
 
+export const action: ActionFunction = async ({ request }) => {
+
+	const queryParams = await request.text();
+	const searchTerm = queryParams.slice(queryParams.indexOf("=") + 1).toUpperCase();
+
+	// Return nothing if the search term is an empty string;
+	if (searchTerm.length === 0) {
+		return json({});
+	}
+
+	// Retrieve data
+	const { securities, holdings } = await getInvestmentsAndAccountBalances();
+
+	// Construct Ticker Symbol -> Security ID map
+	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(securities);
+
+	// Find any ticker symbols that match search term, and retrieve those tickers' security ids
+	const matchedSecurityIds = Object.keys(tickerSymbolToSecurityId)
+		.map(ticker => ticker.toUpperCase()) // Normalize
+		.filter(ticker => ticker.includes(searchTerm)) // Filter
+		.map(ticker => tickerSymbolToSecurityId[ticker]); // Ticker -> Security ID
+
+	const filteredHoldings = holdings.filter(x => matchedSecurityIds.includes(x.security_id));
+
+	return json({ filteredHoldings });
+
+};
+
+
 const Holdings = () => {
     const investmentData = useLoaderData<InvestmentResponse>();
 	const { holdings, securities } = investmentData;
 
+	const actionData = useActionData<{ filteredHoldings: Holding[] }>();
+	const filteredHoldings = actionData?.filteredHoldings;
+
 	return (
 		<>
-			<Positions securities={securities} holdings={holdings} />
+			<Positions securities={securities} filteredHoldings={filteredHoldings} holdings={holdings} />
 			<SectorWeight securities={securities} holdings={holdings}/>
 		</>
 	);

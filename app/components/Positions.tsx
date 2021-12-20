@@ -1,5 +1,5 @@
 import { Holding, Security } from 'plaid';
-import { LinksFunction } from 'remix';
+import { Form, LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary';
 
@@ -7,6 +7,23 @@ export const links: LinksFunction = () => {
 	return [
 		...stockInvestmentSummaryStyles()
 	];
+};
+
+export const constructTickerSymbolToSecurityId = (securities: Array<Security>) => {
+
+	const tickerSymbolToSecurityId = securities.reduce((acc, curr) => {
+
+		return curr.ticker_symbol ?
+			{
+				...acc,
+				[curr.ticker_symbol]: curr.security_id
+			} :
+			acc;
+
+	}, {} as Record<string, string>);
+
+    return tickerSymbolToSecurityId;
+
 };
 
 export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) => {
@@ -24,7 +41,7 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 };
 
-const aggregateHoldings = (holdings: Holding[]) => {
+export const aggregateHoldings = (holdings: Holding[]) => {
 
 	const mergedHoldings = holdings.reduce((acc, curr) => {
 
@@ -58,18 +75,19 @@ const aggregateHoldings = (holdings: Holding[]) => {
 
 };
 
-export const Positions = (props: { securities: Security[]; holdings: Holding[] }) => {
+export const Positions = (props: { securities: Security[]; holdings: Holding[], filteredHoldings: Holding[] | undefined }) => {
 
-	const { securities, holdings } = props;
+	const { securities, holdings, filteredHoldings } = props;
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
-
+	const holdingsToDisplay = filteredHoldings ?? holdings;
 
 	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
 	// per each account that holds it. We don't care about that however as we're focused on the
 	// aggregate investment risk NOT on the per account risk.
-	const aggregatedPositions = aggregateHoldings(holdings);
+	const aggregatedPositions = aggregateHoldings(holdingsToDisplay);
     const totalInvested = aggregatedPositions.reduce((acc, curr) => acc + curr.institution_value, 0);
+
 
 	return (
 		<div>
@@ -79,7 +97,12 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			<h2>Your Investments</h2>
 
-				<div className="investment-line-items">
+			<Form method="post">
+				<input name="search" placeholder="Search by ticker"/>
+				<input type="submit"/>
+			</Form>
+
+			<div className="investment-line-items">
 				{
 					aggregatedPositions.reverse().map((holding, i) => {
 						return (
@@ -92,7 +115,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 						);
 					})
 				}
-				</div>
+			</div>
 		</div>
 	);
 };

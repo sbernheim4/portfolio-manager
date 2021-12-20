@@ -1,12 +1,10 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
-import { AccountBase } from "plaid";
-import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { isFilled } from "~/helpers/isFilled";
 import { Positions, links as positionsStyles } from '~/components/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
-import { DashboardProps, InvestmentResponse } from '../../types/index';
+import { DashboardProps } from '../../types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
+import { getInvestmentsAndAccountBalances } from "../holding";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -24,28 +22,7 @@ export const links: LinksFunction = () => {
 
 export const loader: LoaderFunction = async () => {
 
-	const promises: [
-		Promise<InvestmentResponse>,
-		Promise<Array<AccountBase>>
-	] = [
-		getInvestmentHoldings(),
-		getPlaidAccountBalances()
-	];
-
-	const results = await Promise.allSettled(promises);
-
-	// @ts-ignore
-	const resolvedPromises: [
-		InvestmentResponse,
-		AccountBase[]
-	] = results
-		// @ts-ignore
-		.filter(isFilled)
-		// @ts-ignore
-		.map(x => x.value);
-
-	const [investmentData, balances] = resolvedPromises;
-	const { holdings, securities } = investmentData;
+	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 
 	return json(
 		{ balances, holdings, securities },
@@ -60,7 +37,7 @@ const Dashboard = () => {
 
     return (
 		<div className="dashboard">
-			<Positions securities={securities} holdings={holdings} />
+			<Positions filteredHoldings={undefined} securities={securities} holdings={holdings} />
 			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
 			<Networth accounts={balances} />
 		</div>

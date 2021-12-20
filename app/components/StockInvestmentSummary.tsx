@@ -7,7 +7,7 @@ import stockInvestmentSummaryStyles from "./../styles/StockInvestmentSummary.css
 export const links: LinksFunction = () => {
 	return [
 		{ rel: "stylesheet", href: stockInvestmentSummaryStyles }
-	]
+	];
 };
 
 export const StockInvestmentSummary = (props: {
