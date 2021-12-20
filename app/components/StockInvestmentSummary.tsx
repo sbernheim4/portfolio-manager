@@ -1,7 +1,14 @@
 import { Holding } from "plaid";
-import { Link } from "remix";
+import { Link, LinksFunction } from "remix";
 import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 import { WarningSign } from "./WarningSign";
+import stockInvestmentSummaryStyles from "./../styles/StockInvestmentSummary.css";
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: "stylesheet", href: stockInvestmentSummaryStyles }
+	]
+};
 
 export const StockInvestmentSummary = (props: {
 	totalInvested: number,
