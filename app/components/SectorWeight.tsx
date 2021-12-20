@@ -48,7 +48,7 @@ export const SectorWeight = (props: { securities: Security[], holdings: Holding[
 					const dollarAmount = dollarFormatter.format(investmentTypeToValueForThatType[type]);
 					const percentage = investmentTypeToValueForThatType[type] / totalInvested;
 
-					return <p>{type}: {dollarAmount} - {percentageFormatter.format(percentage)}</p>
+					return <p key={type}>{type}: {dollarAmount} - {percentageFormatter.format(percentage)}</p>
 				})
 			}
 
