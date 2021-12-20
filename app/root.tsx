@@ -12,7 +12,7 @@ import {
 import type { LinksFunction } from "remix";
 
 import globalStylesUrl from "~/styles/global.css";
-import { Navbar, links as navbarStyles } from "./components/Navbar";
+import { Navbar, links as navbarStyles } from "./components/Navbar/Navbar";
 
 /**
  * The `links` export is a function that returns an array of objects that map to

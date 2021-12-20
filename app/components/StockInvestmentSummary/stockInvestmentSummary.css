@@ -1,0 +1,47 @@
+/******************************************************************************/
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/******************************************************************************/
+.investment-line-items {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/******************************************************************************/
+.investment-line-item {
+  margin: 10px;
+  min-width: 230px;
+  padding: 15px;
+  border: 1px solid #aaaaaa;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+}
+.investment-line-item:hover {
+  background: #fafafa;
+}
+.investment-line-item__ticker {
+  margin: 10px;
+  text-align: center;
+  font-weight: 400;
+}
+.investment-line-item__share {
+  font-weight: 600;
+}
+.investment-line-item__warning-symbol {
+  display: inline;
+  position: absolute;
+  border-radius: 100%;
+  top: 0px;
+  right: 15px;
+}
+
+/******************************************************************************/
+
+/*# sourceMappingURL=stockInvestmentSummary.css.map */

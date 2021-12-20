@@ -1,7 +1,7 @@
 import { Holding, Security } from 'plaid';
 import { Form, LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
-import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary';
+import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './stockinvestmentsummary/stockinvestmentsummary';
 
 export const links: LinksFunction = () => {
 	return [
