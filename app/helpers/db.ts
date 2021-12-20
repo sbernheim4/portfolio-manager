@@ -1,8 +1,8 @@
 import { MongoClient } from 'mongodb';
 import { MONGODB_PWD } from "../../env";
 
-const userId = "sams_tokens";
-const collectionName = "keys";
+const userId = "sams-unique-user-id-12345";
+const collectionName = "userInfo";
 
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -20,16 +20,16 @@ const getDBConnection = async () => {
 
 		console.log("creating new connection");
 
-		activeConnection = await client.connect();
+		activeConnection = client.connect();
 
 		return activeConnection;
 
 	} catch(err) {
 
-		console.error(err);
+        const foo = await activeConnection;
+        foo.close();
 
-		activeConnection.then(res => res.close());
-		client.close();
+		await client.close();
 
 	}
 
@@ -70,6 +70,7 @@ const saveNewAccessToken = async (accessToken: string) => {
 	const existingTokens = await keysCollection.findOne({ user: userId});
 
 	if (existingTokens === null) {
+        console.log("No existing tokens found");
 
 		// New User
 		return keysCollection.insertOne({
@@ -78,12 +79,16 @@ const saveNewAccessToken = async (accessToken: string) => {
 		});
 
 	} else {
+        console.log("Updating existing user's tokens");
 
 		// Existing User
 		const storedAccessTokens = existingTokens.accessTokens;
 		const updatedAccessTokens = [...storedAccessTokens, accessToken];
 
-		return keysCollection.updateOne({ user: userId }, {accessTokens: updatedAccessTokens});
+		return keysCollection.findOneAndUpdate(
+            { user: userId },
+            { $set: { accessTokens: updatedAccessTokens } }
+		);
 
 	}
 
