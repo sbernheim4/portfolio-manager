@@ -1,10 +1,9 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
-import { StockInvestmentSummary } from "~/components/StockInvestmentSummary";
+import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from "~/components/StockInvestmentSummary";
 import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import positionCss from "./../../styles/positions.css";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -15,7 +14,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: "stylesheet", href: positionCss }
+		...stockInvestmentSummaryStyles()
 	];
 };
 

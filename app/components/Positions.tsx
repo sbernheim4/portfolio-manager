@@ -1,13 +1,12 @@
 import { Holding, Security } from 'plaid';
 import { LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
-import positionStyles from "./../styles/positions.css";
-import { StockInvestmentSummary } from './StockInvestmentSummary';
+import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary';
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: "stylesheet", href: positionStyles }
-	]
+		...stockInvestmentSummaryStyles()
+	];
 };
 
 export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) => {
