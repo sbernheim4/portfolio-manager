@@ -1,8 +1,8 @@
 import { Holding } from "plaid";
 import { Link, LinksFunction } from "remix";
 import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
-import { WarningSign } from "./WarningSign";
-import stockInvestmentSummaryStyles from "./../styles/stockInvestmentSummary.css";
+import { WarningSign } from "./../WarningSign";
+import stockInvestmentSummaryStyles from "./stockInvestmentSummary.css";
 
 export const links: LinksFunction = () => {
 	return [
