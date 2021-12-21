@@ -5,9 +5,11 @@ import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
 import { useSearchHoldings } from '~/hooks/useSearch';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
 import positionsStyles from './positions.css';
+import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 
 export const links: LinksFunction = () => {
 	return [
+		...StockPieChartStyles(),
 		...stockInvestmentSummaryStyles(),
 		{ rel: "stylesheet", href: positionsStyles }
 	];
@@ -112,16 +114,17 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 	return (
 		<div className="positions">
-			<h2>Your Positions</h2>
+			<h1>Your Positions</h1>
 
-			<h3>Balance: {dollarFormatter.format(totalInvested)}</h3>
+			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
 
-			<h3>Your Investments</h3>
+			<h2>Your Investments</h2>
 
 			{
 				/* Client side searching when JS is enabled */
 				isClientSideJSEnabled() ?
 					<input
+						className="positions__search"
 						value={searchTerm}
 						onChange={(e) => handleSearch(e)}
 						name="search"
@@ -131,13 +134,14 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 					null
 			}
 
-			{/* Server side searching when JS is disabled */}
+			{/* Support searching server side when JS is disabled */}
 			<noscript>
 				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
 				<Form action="/positions" method="post">
-					<input name="search" type="search" placeholder="Search by ticker"/>
+					<input className="positions__search" name="search" type="search" placeholder="Search by ticker"/>
 				</Form>
 			</noscript>
+
 
 			<div className="investment-line-items">
 				{
@@ -153,6 +157,12 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 					})
 				}
 			</div>
+
+			<StockPieChart
+				securityIdToTickerSymbol={securityIdToTickerSymbol}
+				holdings={aggregatedHoldings}
+			/>
+
 		</div>
 	);
 };

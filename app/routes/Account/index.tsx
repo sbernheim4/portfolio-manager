@@ -2,6 +2,7 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { DashboardProps } from "../../types/index";
 import { getInvestmentsAndAccountBalances } from "../positions";
+// import accountsStyles from "./accounts.css";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -11,9 +12,9 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => {
-    return [
-
-    ];
+	return [
+		// { rel: "stylesheet", href: accountsStyles }
+	];
 };
 
 export const loader: LoaderFunction = async () => {
