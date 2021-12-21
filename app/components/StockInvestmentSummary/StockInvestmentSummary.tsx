@@ -26,7 +26,7 @@ export const StockInvestmentSummary = (props: {
 	const percentage = percentageFormatter.format(percentageOfAllFunds);
 
 	return (
-		<Link to={`/holding/${holding.security_id}`}>
+		<Link to={`/positions/${holding.security_id}`}>
 			<div className="investment-line-item">
 				<WarningSign aboveThreshold={aboveThreshold}/>
 
