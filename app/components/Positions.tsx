@@ -1,6 +1,7 @@
 import { Holding, Security } from 'plaid';
-import { LinksFunction } from 'remix';
+import { Form, LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
+import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
 import { useSearchHoldings } from '~/hooks/useSearch';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary/StockInvestmentSummary';
 
@@ -112,7 +113,25 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			<h2>Your Investments</h2>
 
-			<input value={searchTerm} onChange={(e) => handleChange(e)} name="search" type="search" placeholder="Search by ticker"/>
+			{
+				/* Client side searching when JS is enabled */
+				isClientSideJSEnabled() ?
+					<input
+						value={searchTerm}
+						onChange={(e) => handleChange(e)}
+						name="search"
+						type="search"
+						placeholder="Search by ticker"
+					/>  :
+					null
+			}
+
+			{/* Server side searching when JS is disabled */}
+			<noscript>
+				<Form method="post">
+					<input name="search" type="search" placeholder="Search by ticker -- NO JS"/>
+				</Form>
+			</noscript>
 
 			<div className="investment-line-items">
 				{
