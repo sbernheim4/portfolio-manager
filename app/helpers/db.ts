@@ -5,31 +5,29 @@ const userId = "sams-unique-user-id-12345";
 const collectionName = "userInfo";
 
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
-const client = new MongoClient(uri);
-
-let activeConnection: Promise<MongoClient> = (async () => await client.connect())();
+const client = new MongoClient(uri).connect().then(x => activeConnection = x);
+let activeConnection: MongoClient;
 
 const getDBConnection = async () => {
 
 	if (activeConnection !== undefined) {
 
-		return await activeConnection;
+		return activeConnection;
 	}
 
 	try {
 
 		console.log("creating new connection");
 
-		activeConnection = client.connect();
-
-		return activeConnection;
+		return client
+			.then(x => {
+				activeConnection = x
+				return activeConnection;
+			})
 
 	} catch(err) {
 
-        const foo = await activeConnection;
-        foo.close();
-
-		await client.close();
+		client.then(x => x.close());
 
 	}
 

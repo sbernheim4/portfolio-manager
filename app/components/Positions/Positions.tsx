@@ -3,11 +3,13 @@ import { Form, LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
 import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
 import { useSearchHoldings } from '~/hooks/useSearch';
-import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary/StockInvestmentSummary';
+import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
+import positionsStyles from './positions.css';
 
 export const links: LinksFunction = () => {
 	return [
-		...stockInvestmentSummaryStyles()
+		...stockInvestmentSummaryStyles(),
+		{ rel: "stylesheet", href: positionsStyles }
 	];
 };
 
@@ -106,7 +108,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 	};
 
 	return (
-		<div>
+		<div className="positions">
 			<h1>Your Positions</h1>
 
 			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
@@ -128,8 +130,9 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			{/* Server side searching when JS is disabled */}
 			<noscript>
+				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
 				<Form action="/positions" method="post">
-					<input name="search" type="search" placeholder="Search by ticker -- NO JS"/>
+					<input name="search" type="search" placeholder="Search by ticker"/>
 				</Form>
 			</noscript>
 

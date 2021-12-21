@@ -1,0 +1,17 @@
+.positions {
+
+	.investment-line-items {
+		margin: 0 auto;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	.noJS {
+		font-style: italic;
+		margin-left: 15px;
+		font-size: 10pt;
+	}
+
+}

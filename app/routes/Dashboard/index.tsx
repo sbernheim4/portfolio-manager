@@ -1,8 +1,8 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
-import { Positions, links as positionsStyles } from '~/components/Positions';
+import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
-import { DashboardProps } from '../../types/index';
+import { DashboardProps } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 
