@@ -1,12 +1,12 @@
 
 import { AccountBase } from "plaid";
 import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useParams } from "remix";
-import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
+import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter, percentageFormatter } from "~/helpers/formatters";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { DashboardProps, InvestmentResponse } from "../../types/index";
-import investmentStyles from './../../styles/investment.css';
+import investmentStyles from '~/styles/investment.css';
 
 export const meta: MetaFunction = () => {
 	return {

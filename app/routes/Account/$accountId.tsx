@@ -1,6 +1,6 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
-import { constructSecurityIdToTickerSymbol } from "~/components/Positions";
+import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from "~/components/StockInvestmentSummary/StockInvestmentSummary";
 import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
