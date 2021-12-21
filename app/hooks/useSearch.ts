@@ -10,14 +10,20 @@ export const useSearchHoldings = <T>(
 
 	useEffect(() => {
 
-		if (searchTerm === "") {
-			setDisplayItems(initialList);
+		const getFilteredItems = () => {
+
+			if (searchTerm === "") {
+				return initialList;
+			}
+
+			const filterFunction = toFilterFn(searchTerm);
+			const filteredValues = initialList.filter(item => filterFunction(item));
+
+			return filteredValues;
 		}
 
-		const filterFunction = toFilterFn(searchTerm);
-		const filteredValues = initialList.filter(item => filterFunction(item));
+		setDisplayItems(getFilteredItems());
 
-		setDisplayItems(filteredValues);
 
 	}, [searchTerm]);
 

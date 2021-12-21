@@ -1,11 +1,10 @@
 
-import { AccountBase, Holding, Security } from "plaid";
+import { Holding, Security } from "plaid";
 import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useOutletContext, useParams } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
-import { decimalFormatter, percentageFormatter } from "~/helpers/formatters";
-import { isFilled } from "~/helpers/isFilled";
-import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { DashboardProps, InvestmentResponse } from "../../types/index";
+import { decimalFormatter } from "~/helpers/formatters";
+import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { DashboardProps } from "../../types/index";
 import investmentStyles from '~/styles/investment.css';
 
 export const meta: MetaFunction = () => {
@@ -22,29 +21,12 @@ export const links: LinksFunction = () => {
 	];
 
 };
-export const loader: LoaderFunction = async ({params}) => {
+export const loader: LoaderFunction = async () => {
 
-	const securityId = params.holding
-	const promises: [Promise<InvestmentResponse>, Promise<Array<AccountBase>> ] = [getInvestmentHoldings(), getPlaidAccountBalances()];
-	const results = await Promise.allSettled(promises);
-
-	// @ts-ignore
-	const resolvedPromises: [
-		InvestmentResponse,
-		AccountBase[]
-	] = results
-		// @ts-ignore
-		.filter(isFilled)
-		// @ts-ignore
-		.map(x => x.value);
-
-	const [investmentData, balances] = resolvedPromises;
-	const { holdings, securities } = investmentData;
-
-	const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
+	const balances = await getPlaidAccountBalances();
 
 	return json(
-		{ balances, holdings: holdingsOfCurrentSecurity, securities },
+		{ balances },
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
 
@@ -57,7 +39,6 @@ const IndividualInvestmentInformation = () => {
 	const params = useParams();
 	const securityId = params.position ?? "";
     const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
-    console.log(holdingsOfCurrentSecurity);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 	const tickerSymbol = securityIdToTickerSymbol[securityId] ?? "Not Found";
@@ -84,16 +65,16 @@ const IndividualInvestmentInformation = () => {
 	const getAccountNameById = (accountId: string) => {
 		const account = balances.find(account => account.account_id === accountId);
 
-		return account?.name ?? account?.official_name ?? account?.account_id ?? "Account Name not found";
+		return account?.name ??
+			account?.official_name ??
+			account?.account_id ??
+			"Account Name not found";
 	};
 
 	const totalNumberShares = decimalFormatter.format(
 		holdingsOfCurrentSecurity
 			.reduce((acc, curr) => acc + curr.quantity, 0)
 	);
-
-	const totalNumberOfSharesOfSecurity = holdings.filter(h => h.security_id === securityId).reduce((acc, curr) => acc + curr.quantity, 0);
-
 
 	return (
         <div className="investment">
@@ -103,11 +84,13 @@ const IndividualInvestmentInformation = () => {
 
 			{
 			holdingsOfCurrentSecurity.map(holding => {
-				const percentage = percentageFormatter.format(holding.institution_value / totalNumberOfSharesOfSecurity);
+				const accountName = getAccountNameById(holding.account_id);
+				const numberOfShares = accountIdToNumberOfShares[holding.account_id];
+				const formattedNumberOfShares = decimalFormatter.format(numberOfShares);
 
 				return (
-					<Link key={holding.account_id} to={`/account/${holding}`}>
-						<p>{getAccountNameById(holding.account_id)}: {decimalFormatter.format(accountIdToNumberOfShares[holding.account_id])} shares - {percentage}</p>
+					<Link key={holding.account_id} to={`/account/${holding.account_id}`}>
+						<p>{accountName}: {formattedNumberOfShares} shares</p>
 					</Link>)
 				})
 			}
