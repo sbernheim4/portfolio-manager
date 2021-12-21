@@ -3,63 +3,58 @@ import { MONGODB_PWD } from "../../env";
 
 const userId = "sams-unique-user-id-12345";
 const collectionName = "userInfo";
-
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
-const client = new MongoClient(uri).connect().then(x => activeConnection = x);
-let activeConnection: MongoClient;
+const client = new MongoClient(uri);
 
-const getDBConnection = async () => {
+let activeConnection: Promise<MongoClient> | undefined;
 
-	if (activeConnection !== undefined) {
+try {
 
-		return activeConnection;
-	}
-
-	try {
+	if (activeConnection === undefined) {
 
 		console.log("creating new connection");
 
-		return client
-			.then(x => {
-				activeConnection = x
-				return activeConnection;
-			})
-
-	} catch(err) {
-
-		client.then(x => x.close());
+		activeConnection = client.connect();
 
 	}
 
-};
+} catch(err) {
+
+	if (activeConnection !== undefined) {
+		activeConnection.then(x => x.close());
+	}
+
+}
 
 const retrieveStoredAccessTokens = async () => {
 
-    try {
-        const keysCollection = await getKeysCollection();
-        const existingTokens = await keysCollection.findOne({ user: userId });
+	try {
+		const keysCollection = await getKeysCollection();
+		const existingTokens = await keysCollection.findOne({ user: userId });
 
-        if (existingTokens === null) {
-            return [];
-        }
+		if (existingTokens === null) {
+			return [];
+		}
 
-        return existingTokens.accessTokens as Array<string>;
-    } catch (err) {
-        console.log("ERR", err);
-        return [];
-    }
+		return existingTokens.accessTokens as Array<string>;
+	} catch (err) {
+		console.log("ERR", err);
+		return [];
+	}
 
 };
 
 const getKeysCollection = async () => {
 
-	const connection = await getDBConnection();
+	// const connection = await getDBConnection();
 
-	if (!connection) {
+	if (activeConnection === undefined) {
 		throw new Error("Could not connect to DB");
 	}
 
-	return connection.db().collection(collectionName);
+	return activeConnection.then(x => {
+		return x.db().collection(collectionName);
+	});
 };
 
 const saveNewAccessToken = async (accessToken: string) => {
@@ -68,7 +63,6 @@ const saveNewAccessToken = async (accessToken: string) => {
 	const existingTokens = await keysCollection.findOne({ user: userId});
 
 	if (existingTokens === null) {
-        console.log("No existing tokens found");
 
 		// New User
 		return keysCollection.insertOne({
@@ -84,8 +78,8 @@ const saveNewAccessToken = async (accessToken: string) => {
 		const updatedAccessTokens = [...storedAccessTokens, accessToken];
 
 		return keysCollection.findOneAndUpdate(
-            { user: userId },
-            { $set: { accessTokens: updatedAccessTokens } }
+			{ user: userId },
+			{ $set: { accessTokens: updatedAccessTokens } }
 		);
 
 	}
@@ -93,6 +87,6 @@ const saveNewAccessToken = async (accessToken: string) => {
 };
 
 export {
-    retrieveStoredAccessTokens,
-    saveNewAccessToken
+	retrieveStoredAccessTokens,
+	saveNewAccessToken
 }
