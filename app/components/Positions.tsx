@@ -1,6 +1,7 @@
 import { Holding, Security } from 'plaid';
-import { Form, LinksFunction } from 'remix';
+import { LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
+import { useSearchHoldings } from '~/hooks/useSearch';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from './StockInvestmentSummary/StockInvestmentSummary';
 
 export const links: LinksFunction = () => {
@@ -75,12 +76,23 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 
 };
 
-export const Positions = (props: { securities: Security[]; holdings: Holding[], filteredHoldings: Holding[] | undefined }) => {
+export const Positions = (props: { securities: Security[]; holdings: Holding[] }) => {
 
-	const { securities, holdings, filteredHoldings } = props;
+	const { securities, holdings } = props;
+
+	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(securities);
+
+	const toMatchedSecurityIds = (searchTerm: string) => Object.keys(tickerSymbolToSecurityId)
+		.map(ticker => ticker.toUpperCase()) // Normalize
+		.filter(ticker => ticker.includes(searchTerm)) // Filter
+		.map(ticker => tickerSymbolToSecurityId[ticker]); // Ticker -> Security ID
+
+	const [searchTerm, setSearchTerm, holdingsToDisplay] = useSearchHoldings(
+		holdings,
+		(searchTerm: string) => (holding: Holding) => toMatchedSecurityIds(searchTerm).includes(holding.security_id),
+	);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
-	const holdingsToDisplay = filteredHoldings ?? holdings;
 
 	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
 	// per each account that holds it. We don't care about that however as we're focused on the
@@ -88,6 +100,9 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[], 
 	const aggregatedPositions = aggregateHoldings(holdingsToDisplay);
     const totalInvested = aggregatedPositions.reduce((acc, curr) => acc + curr.institution_value, 0);
 
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value.toUpperCase());
+	};
 
 	return (
 		<div>
@@ -97,10 +112,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[], 
 
 			<h2>Your Investments</h2>
 
-			<Form method="post">
-				<input name="search" placeholder="Search by ticker"/>
-				<input type="submit"/>
-			</Form>
+			<input value={searchTerm} onChange={(e) => handleChange(e)} name="search" type="search" placeholder="Search by ticker"/>
 
 			<div className="investment-line-items">
 				{
