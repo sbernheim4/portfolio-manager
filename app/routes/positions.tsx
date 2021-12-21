@@ -4,8 +4,8 @@ import { Positions, links as positionStyles, aggregateHoldings, constructTickerS
 import { SectorWeight } from "~/components/SectorWeight";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { InvestmentResponse } from '../../types/index';
-import holdingStyles from "./../../styles/holding.css"
+import { InvestmentResponse } from '~/types/index';
+import holdingStyles from "~/styles/holding.css";
 
 export const meta: MetaFunction = () => {
 	return {

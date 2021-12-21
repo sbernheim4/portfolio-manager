@@ -4,7 +4,7 @@ import dashboardStyles from './../../styles/dashboard.css';
 import { Networth } from '~/components/Networth';
 import { DashboardProps } from '../../types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
-import { getInvestmentsAndAccountBalances } from "../holding";
+import { getInvestmentsAndAccountBalances } from "../positions";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -38,7 +38,9 @@ const Dashboard = () => {
     return (
 		<div className="dashboard">
 			<Positions securities={securities} holdings={holdings} />
+
 			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
+
 			<Networth accounts={balances} />
 		</div>
     );
