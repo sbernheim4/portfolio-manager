@@ -1,3 +1,14 @@
+.positions h1 {
+  margin: 15px;
+}
+.positions h2 {
+  margin: 15px 30px;
+}
+.positions__search {
+  margin-left: -30px;
+  width: 100vw;
+  height: 40px;
+}
 .positions .investment-line-items {
   margin: 0 auto;
   display: flex;

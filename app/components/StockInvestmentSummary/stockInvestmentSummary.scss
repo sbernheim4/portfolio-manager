@@ -16,7 +16,9 @@ a {
 
 .investment-line-item {
 	margin: 10px;
-	min-width: 230px;
+	min-width: 200px;
+	width: 200px;
+	max-width: 200px;
 	padding: 15px;
 	border: 1px solid rgb(170, 170, 170);
 	border-radius: 5px;
@@ -31,7 +33,8 @@ a {
 		margin: 10px;
 		text-align: center;
 		font-weight: 400;
-
+		text-overflow: ellipsis;
+		overflow: clip;
 	}
 
 	&__share {
@@ -46,7 +49,7 @@ a {
 		position: absolute;
 		border-radius: 100%;
 		top: 0px;
-		right: 15px;
+		right: 3px;
 	}
 }
 

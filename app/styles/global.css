@@ -2,12 +2,17 @@
  * You can just delete everything here or keep whatever you like, it's just a
  * quick baseline!
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+
 :root {
 	--color-foreground: hsl(0, 0%, 7%);
 	--color-background: hsl(0, 0%, 100%);
 	--color-links: hsl(213, 100%, 52%);
 	--color-links-hover: hsl(213, 100%, 43%);
 	--color-border: hsl(0, 0%, 82%);
+	--font-body: 'Lato';
 }
 
 html {
@@ -16,6 +21,8 @@ html {
 
 *, *::before, *::after {
 	box-sizing: inherit;
+    margin: 0;
+    padding: 0;
 }
 
 :-moz-focusring {
@@ -29,13 +36,13 @@ html {
 
 html,
 body {
-	padding: 0;
 	margin: 0;
 	background-color: var(--color-background);
 	color: var(--color-foreground);
 }
 
 body {
+	padding: 30px;
 	font-family: var(--font-body);
 	line-height: 1.5;
 }
