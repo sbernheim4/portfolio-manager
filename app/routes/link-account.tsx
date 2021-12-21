@@ -2,15 +2,22 @@ import { Option, Some } from "excoptional";
 import { CountryCode, ItemPublicTokenExchangeResponse, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit } from "remix";
+import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit, LinksFunction } from "remix";
 import { createPlaidLinkToken, exchangePublicTokenForAccessToken } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
+import linkAccountStyles from '~/styles/link-account.css';
 
 export const meta: MetaFunction = () => {
 	return {
 		title: "View and gain insights into your investments",
 		description: "Track your investments, distributions, and more"
 	};
+};
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: "stylesheet", href: linkAccountStyles }
+	];
 };
 
 export const loader: LoaderFunction = async () => {
@@ -77,7 +84,7 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 	return (
 		<>
 			<button onClick={() => open()} disabled={!ready}>
-				Link account
+				Link Account
 			</button>
 		</>
 	);
@@ -110,11 +117,17 @@ const LinkAccount = () => {
 
 	return (
 
-		<div className="">
+		<div className="link-account">
 
-			<h2>Link a new account</h2>
+			<h1>Link Your Account</h1>
 
-			{ linkToken.length ? <Link linkToken={linkToken} setPublicToken={setPublicToken} /> : null }
+			<p>Get started by linking your account. Click the button below to begin.</p>
+
+			{
+				linkToken.length ?
+					<Link linkToken={linkToken} setPublicToken={setPublicToken} /> :
+					null
+			}
 
 
 		</div>
