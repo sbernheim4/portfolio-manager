@@ -1,5 +1,5 @@
 import { AccountBase, Holding } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, useActionData, useLoaderData } from "remix";
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, useActionData, useLoaderData } from "remix";
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 import { SectorWeight } from "~/components/SectorWeight";
 import { isFilled } from "~/helpers/isFilled";
@@ -100,6 +100,8 @@ const Holdings = () => {
 
 	return (
 		<>
+            <Outlet context={{ securities, holdings, holdingsToDisplay }}/>
+
 			<Positions securities={securities} holdings={holdingsToDisplay} />
 			<SectorWeight securities={securities} holdings={holdings}/>
 		</>

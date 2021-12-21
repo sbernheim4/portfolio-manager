@@ -1,6 +1,6 @@
 
-import { AccountBase } from "plaid";
-import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useParams } from "remix";
+import { AccountBase, Holding, Security } from "plaid";
+import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useOutletContext, useParams } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter, percentageFormatter } from "~/helpers/formatters";
 import { isFilled } from "~/helpers/isFilled";
@@ -51,9 +51,13 @@ export const loader: LoaderFunction = async ({params}) => {
 };
 
 const IndividualInvestmentInformation = () => {
-	const { balances, holdings, securities } = useLoaderData<DashboardProps>();
+	const { balances } = useLoaderData<DashboardProps>();
+    const { securities, holdings } = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
+
 	const params = useParams();
-	const securityId = params.holding ?? "";
+	const securityId = params.position ?? "";
+    const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
+    console.log(holdingsOfCurrentSecurity);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 	const tickerSymbol = securityIdToTickerSymbol[securityId] ?? "Not Found";
@@ -84,7 +88,7 @@ const IndividualInvestmentInformation = () => {
 	};
 
 	const totalNumberShares = decimalFormatter.format(
-		holdings
+		holdingsOfCurrentSecurity
 			.reduce((acc, curr) => acc + curr.quantity, 0)
 	);
 
@@ -98,7 +102,7 @@ const IndividualInvestmentInformation = () => {
             <p>Total number of shares: {totalNumberShares}</p>
 
 			{
-			holdings.map(holding => {
+			holdingsOfCurrentSecurity.map(holding => {
 				const percentage = percentageFormatter.format(holding.institution_value / totalNumberOfSharesOfSecurity);
 
 				return (
