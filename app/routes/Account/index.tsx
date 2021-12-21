@@ -1,7 +1,7 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { DashboardProps } from "../../types/index";
-import { getInvestmentsAndAccountBalances } from "../holding";
+import { getInvestmentsAndAccountBalances } from "../positions";
 
 export const meta: MetaFunction = () => {
 	return {

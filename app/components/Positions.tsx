@@ -128,7 +128,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			{/* Server side searching when JS is disabled */}
 			<noscript>
-				<Form method="post">
+				<Form action="/positions" method="post">
 					<input name="search" type="search" placeholder="Search by ticker -- NO JS"/>
 				</Form>
 			</noscript>
