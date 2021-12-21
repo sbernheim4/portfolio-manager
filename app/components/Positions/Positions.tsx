@@ -85,42 +85,45 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(securities);
 
+	// Curried for use in the useSearchHoldings hook
 	const toMatchedSecurityIds = (searchTerm: string) => Object.keys(tickerSymbolToSecurityId)
 		.map(ticker => ticker.toUpperCase()) // Normalize
 		.filter(ticker => ticker.includes(searchTerm)) // Filter
-		.map(ticker => tickerSymbolToSecurityId[ticker]); // Ticker -> Security ID
+		.map(ticker => tickerSymbolToSecurityId[ticker]); // convert tickers to security id
+
+	// Note: A single stock can be held in multiple accounts. Plaid
+	// (correctly) returns the stock per each account that holds it. This
+	// means that if the same stock is held in two accounts, it will appear
+	// twice in the holdings list. We don't care about that however as we're
+	// focused on the total investment risk NOT the risk of each account.
+	const aggregatedHoldings = aggregateHoldings(holdings);
 
 	const [searchTerm, setSearchTerm, holdingsToDisplay] = useSearchHoldings(
-		holdings,
+		aggregatedHoldings,
 		(searchTerm: string) => (holding: Holding) => toMatchedSecurityIds(searchTerm).includes(holding.security_id),
 	);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
+    const totalInvested = aggregatedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
 
-	// Note: A single stock can be held in multiple accounts. Plaid (correctly) returns the stock
-	// per each account that holds it. We don't care about that however as we're focused on the
-	// aggregate investment risk NOT on the per account risk.
-	const aggregatedPositions = aggregateHoldings(holdingsToDisplay);
-    const totalInvested = aggregatedPositions.reduce((acc, curr) => acc + curr.institution_value, 0);
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value.toUpperCase());
 	};
 
 	return (
 		<div className="positions">
-			<h1>Your Positions</h1>
+			<h2>Your Positions</h2>
 
-			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
+			<h3>Balance: {dollarFormatter.format(totalInvested)}</h3>
 
-			<h2>Your Investments</h2>
+			<h3>Your Investments</h3>
 
 			{
 				/* Client side searching when JS is enabled */
 				isClientSideJSEnabled() ?
 					<input
 						value={searchTerm}
-						onChange={(e) => handleChange(e)}
+						onChange={(e) => handleSearch(e)}
 						name="search"
 						type="search"
 						placeholder="Search by ticker"
@@ -138,7 +141,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			<div className="investment-line-items">
 				{
-					aggregatedPositions.reverse().map((holding, i) => {
+					holdingsToDisplay.sort((a, b) => a.institution_value > b.institution_value ? -1 : 1).map((holding, i) => {
 						return (
 							<StockInvestmentSummary
 								ticker={securityIdToTickerSymbol[holding.security_id]}
