@@ -19,6 +19,7 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({params}) => {
+
 	const accountId = params.accountId;
 
 	const accountData = await getPlaidAccountBalances();
@@ -32,6 +33,7 @@ export const loader: LoaderFunction = async ({params}) => {
 		holdingsInCurrentAccount,
 		securities
 	});
+
 };
 
 const Accounts = () => {
@@ -40,16 +42,20 @@ const Accounts = () => {
 		holdingsInCurrentAccount,
 		account
 	} = useLoaderData<{
-		account: AccountBase,
+		account: AccountBase | undefined,
 		holdingsInCurrentAccount: Holding[],
 		securities: Security[]
 	}>();
 
-	const currentAmount = account.balances.current ?
+	const currentAmount = account?.balances.current ?
 		dollarFormatter.format(account.balances.current) :
 		"N/A";
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
+
+	if (account === undefined) {
+		return null;
+	}
 
 	return (
 		<div className="accounts">
