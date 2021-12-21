@@ -37,7 +37,7 @@ const Dashboard = () => {
 
     return (
 		<div className="dashboard">
-			<Positions filteredHoldings={undefined} securities={securities} holdings={holdings} />
+			<Positions securities={securities} holdings={holdings} />
 			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
 			<Networth accounts={balances} />
 		</div>
