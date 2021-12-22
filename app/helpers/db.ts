@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { MONGODB_PWD } from "../../env";
+import { MONGODB_PWD } from "../env";
 
 const userId = "sams-unique-user-id-12345";
 const collectionName = "userInfo";
