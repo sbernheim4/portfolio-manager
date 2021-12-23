@@ -2,8 +2,8 @@ import { Option, Some } from "excoptional";
 import { CountryCode, Institution, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit, LinksFunction } from "remix";
-import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, getPlaidLinkedAccounts, unlinkPlaidItem } from "~/helpers/plaidUtils";
+import { ActionFunction, LinksFunction, LoaderFunction, MetaFunction, json, useLoaderData, useSubmit } from "remix";
+import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, unlinkPlaidItem } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 
@@ -30,7 +30,7 @@ type LoaderResponse = {
 	linkToken: string;
 };
 
-export const loader: LoaderFunction<LoaderResponse> = async () => {
+export const loader: LoaderFunction = async () => {
 
 	const linkedInstitutions = await getPlaidLinkedInstitutions();
 
