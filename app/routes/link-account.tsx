@@ -136,7 +136,11 @@ const LinkAccount = () => {
 			}
 
 			<h1>Linked Accounts</h1>
-			<LinkedAccounts linkedAccounts={linkedAccounts} />
+			<p>Not all linked accounts will be used, only investment and brokerage accounts</p>
+			<br />
+			<div className="manage-accounts__container">
+				<LinkedAccounts linkedAccounts={linkedAccounts} />
+			</div>
 
 		</div>
 

@@ -27,7 +27,7 @@ const LinkedAccount = (props: { linkedAccount: AccountBase }) => {
 	const account = props.linkedAccount;
 
 	return (
-		<div className="manage-accounts__modify">
+		<div className="manage-accounts__container__modify">
 			<p>{account.name}</p>
 			<button>Unlink Account</button>
 		</div>
