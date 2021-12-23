@@ -17,7 +17,7 @@ export const InvestmentAccounts = (props: {balances: AccountBase[], securities: 
 				investmentAndBrokerageAccounts.map((account) => {
 					return (
 						<Link key={account.account_id} to={`/account/${account.account_id}`}>
-							{account.name}
+							<p>{account.name}</p>
 						</Link>
 					);
 				})

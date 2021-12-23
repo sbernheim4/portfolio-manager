@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async () => {
 			// This should correspond to a unique id for the current user.
 			client_user_id: clientUserId,
 		},
-		client_name: 'Plaid Test App',
+		client_name: 'Portfolio Manager',
 		products: [Products.Auth],
 		language: 'en',
 		webhook: 'https://webhook.example.com',
