@@ -12,7 +12,7 @@ export const Navbar = () => {
 	return (
 		<nav>
 			<Link to={"/dashboard"}>Dashboard</Link>
-			<Link to={"/account"}>Accounts</Link>
+			<Link to={"/accounts"}>Accounts</Link>
 			<Link to={"/positions"}>Positions</Link>
 			<Link to={"/link-account"}>Manage Accounts</Link>
 		</nav>
