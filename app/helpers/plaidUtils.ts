@@ -1,4 +1,4 @@
-import {  Holding, LinkTokenCreateRequest, Security } from "plaid";
+import {  CountryCode, Holding, LinkTokenCreateRequest, Security } from "plaid";
 import { isFilled } from "~/helpers/isFilled";
 import { retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
@@ -41,7 +41,7 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 
 export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; securities: Security[]}>=> {
 
-    const accessTokens = await retrieveStoredAccessTokens();
+	const accessTokens = await retrieveStoredAccessTokens();
 
 	try {
 
@@ -124,5 +124,62 @@ export const getPlaidAccountBalances = async () => {
 		return [];
 
 	}
+
+};
+
+export const getPlaidLinkedInstitutions = async () => {
+
+	try {
+
+		const accessTokens = await retrieveStoredAccessTokens();
+
+		const itemPromises = accessTokens.map(token => {
+			return client.itemGet({ access_token: token });
+		});
+
+		const items = await Promise.allSettled(itemPromises);
+		const resolvedItems = items.filter(isFilled).map(x => x.value.data.item)
+
+		const requests = resolvedItems
+			.filter(item => !!item.institution_id)
+			.map(item => {
+
+				return {
+					institution_id: item.institution_id as string,
+					country_codes: ['US'] as CountryCode[],
+				};
+
+			});
+
+		const institutionRequests = requests.map(req => client.institutionsGetById(req));
+		const institutions = await Promise.allSettled(institutionRequests);
+		const resolvedInstutions = institutions.filter(isFilled).map(x => x.value.data.institution);
+
+		return resolvedInstutions;
+
+	} catch (err) {
+
+		return []
+
+	}
+
+};
+
+export const unlinkPlaidItem = async (accessToken: string) => {
+	// TODO: Determine how to relate an institutionId to an access token
+
+	// const accessTokens = await retrieveStoredAccessTokens();
+
+	// try {
+	//
+	// 	const response = await client.itemRemove({ access_token: token });
+	//
+	// } catch (error) {
+	//
+	// 	 handle error
+	//
+	// }
+
+	// The Item was removed, access_token is now invalid
 
 };

@@ -1,4 +1,4 @@
-import { AccountBase } from "plaid";
+import { Institution } from "plaid";
 import { LinksFunction } from "remix";
 import linkAccountStyles from './styles/linked-account.css';
 
@@ -8,28 +8,28 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const LinkedAccounts = (props: { linkedAccounts: AccountBase[] }) => {
+export const LinkedInstitutions = (props: { linkedInstitutions: Institution[] }) => {
 
-	const { linkedAccounts } = props;
+	const { linkedInstitutions } = props;
 
 	return (
 		<>
 			{
-				linkedAccounts.map((acc: AccountBase) => <LinkedAccount key={acc.account_id} linkedAccount={acc} />)
+				linkedInstitutions.map((acc) => <LinkedInstitution key={acc.item_id} linkedInstitution={acc} />)
 			}
 		</>
 	);
 
 };
 
-const LinkedAccount = (props: { linkedAccount: AccountBase }) => {
+const LinkedInstitution = (props: { linkedInstitution: Institution }) => {
 
-	const account = props.linkedAccount;
+	const institution = props.linkedInstitution;
 
 	return (
 		<div className="manage-accounts__container__modify">
-			<p>{account.name}</p>
-			<button>Unlink Account</button>
+			<p>{institution.name}</p>
+			<button>Unlink Instituion</button>
 		</div>
 	);
 
