@@ -14,21 +14,27 @@
 		cursor: pointer;
 	}
 
-	&__modify {
-		margin: 5px;
+	&__container {
 		display: flex;
-		justify-content: space-evenly;
-		align-items: center;
+		align-items: flex-start;
+		flex-direction: column;
 
-		p {
-			width: 250px;
+		&__modify {
+			margin: 5px 5px 5px 0;
+			display: flex;
+			justify-content: space-evenly;
+			align-items: center;
 
-		}
+			p {
+				width: 250px;
 
-		button {
-			width: 150px;
-			height: auto;
-			padding: 10px;
+			}
+
+			button {
+				width: 150px;
+				height: auto;
+				padding: 10px;
+			}
 		}
 	}
 
