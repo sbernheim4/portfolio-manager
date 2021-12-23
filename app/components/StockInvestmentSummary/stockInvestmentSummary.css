@@ -1,7 +1,10 @@
 /******************************************************************************/
 a {
-  color: inherit;
   text-decoration: none;
+}
+
+.investment-line-item-link {
+  color: black;
 }
 
 .investment-line-items {
