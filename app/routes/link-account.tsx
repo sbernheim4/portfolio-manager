@@ -1,11 +1,11 @@
 import { Option, Some } from "excoptional";
-import { CountryCode, ItemPublicTokenExchangeResponse, Products } from "plaid";
+import { AccountBase, CountryCode, ItemPublicTokenExchangeResponse, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit, LinksFunction } from "remix";
-import { createPlaidLinkToken, exchangePublicTokenForAccessToken } from "~/helpers/plaidUtils";
+import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedAccounts } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
-import linkAccountStyles from '~/styles/link-account.css';
+import { LinkedAccounts, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -16,11 +16,18 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: "stylesheet", href: linkAccountStyles }
+		...linkedAccountStyles(),
 	];
 };
 
+type LoaderResponse = {
+	linkedAccounts: AccountBase[],
+	linkToken: string
+};
+
 export const loader: LoaderFunction = async () => {
+
+	const linkedAccounts = await getPlaidLinkedAccounts();
 
     // The logged in user's unique id
 	// const { id: clientUserId } = await User.find(...);
@@ -41,6 +48,7 @@ export const loader: LoaderFunction = async () => {
 	const createTokenResponse = await createPlaidLinkToken(request);
 
 	return {
+		linkedAccounts,
         linkToken: createTokenResponse
 	};
 
@@ -94,11 +102,11 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 
 const LinkAccount = () => {
 
-	const loaderData = useLoaderData<{linkToken: string}>();
+	const loaderData = useLoaderData<LoaderResponse>();
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
 
-	const { linkToken } = loaderData;
+	const { linkToken, linkedAccounts } = loaderData;
 
 	useEffect(() => {
 
@@ -117,11 +125,9 @@ const LinkAccount = () => {
 
 	return (
 
-		<div className="link-account">
+		<div className="manage-accounts">
 
-			<h1>Link Your Account</h1>
-
-			<p>Get started by linking your account. Click the button below to begin.</p>
+			<h1>Link A New Account</h1>
 
 			{
 				linkToken.length ?
@@ -129,6 +135,8 @@ const LinkAccount = () => {
 					null
 			}
 
+			<h1>Linked Accounts</h1>
+			<LinkedAccounts linkedAccounts={linkedAccounts} />
 
 		</div>
 
