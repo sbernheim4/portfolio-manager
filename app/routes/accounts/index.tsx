@@ -17,10 +17,10 @@ export const links: LinksFunction = () => {
 
 export const loader: LoaderFunction = async () => {
 
-	const { accounts, holdings, securities } = await getInvestmentsAndAccountBalances();
+	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 
 	return json(
-		{ accounts, holdings, securities },
+		{ balances, holdings, securities },
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
 
@@ -29,7 +29,7 @@ export const loader: LoaderFunction = async () => {
 const Accounts = () => {
     const investmentData = useLoaderData<DashboardProps>();
 
-	const { accounts, securities, holdings } = investmentData;
+	const { balances, securities, holdings } = investmentData;
 
 	return (
 		<div className="accounts">
@@ -37,7 +37,7 @@ const Accounts = () => {
 			<h1>Investment and Brokerage Accounts</h1>
 
 			<InvestmentAccounts
-				accounts={accounts}
+				balances={balances}
 				securities={securities}
 				holdings={holdings}
 			/>

@@ -1,7 +1,7 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { Link } from "remix";
 
-export const InvestmentAccounts = (props: {balances: AccountBase[], securities: Security[], holdings: Holding[]}) => {
+export const InvestmentAccounts = (props: { balances: AccountBase[], securities: Security[], holdings: Holding[]}) => {
 
 	const { balances } = props;
 
