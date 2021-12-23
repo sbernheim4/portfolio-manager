@@ -1,11 +1,11 @@
 import { Option, Some } from "excoptional";
-import { AccountBase, CountryCode, ItemPublicTokenExchangeResponse, Products } from "plaid";
+import { CountryCode, Institution, ItemPublicTokenExchangeResponse, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit, LinksFunction } from "remix";
-import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedAccounts } from "~/helpers/plaidUtils";
+import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, getPlaidLinkedAccounts } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
-import { LinkedAccounts, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
+import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -21,13 +21,13 @@ export const links: LinksFunction = () => {
 };
 
 type LoaderResponse = {
-	linkedAccounts: AccountBase[],
+	linkedInstitutions: Institution[],
 	linkToken: string
 };
 
 export const loader: LoaderFunction = async () => {
 
-	const linkedAccounts = await getPlaidLinkedAccounts();
+	const linkedInstitutions = await getPlaidLinkedInstitutions();
 
     // The logged in user's unique id
 	// const { id: clientUserId } = await User.find(...);
@@ -48,7 +48,7 @@ export const loader: LoaderFunction = async () => {
 	const createTokenResponse = await createPlaidLinkToken(request);
 
 	return {
-		linkedAccounts,
+		linkedInstitutions,
         linkToken: createTokenResponse
 	};
 
@@ -106,7 +106,7 @@ const LinkAccount = () => {
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
 
-	const { linkToken, linkedAccounts } = loaderData;
+	const { linkToken, linkedInstitutions } = loaderData;
 
 	useEffect(() => {
 
@@ -139,7 +139,7 @@ const LinkAccount = () => {
 			<p>Not all linked accounts will be used, only investment and brokerage accounts</p>
 			<br />
 			<div className="manage-accounts__container">
-				<LinkedAccounts linkedAccounts={linkedAccounts} />
+				<LinkedInstitutions linkedInstitutions={linkedInstitutions} />
 			</div>
 
 		</div>
