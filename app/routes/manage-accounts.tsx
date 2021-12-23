@@ -1,9 +1,9 @@
 import { Option, Some } from "excoptional";
-import { CountryCode, Institution, ItemPublicTokenExchangeResponse, Products } from "plaid";
+import { CountryCode, Institution, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { MetaFunction, LoaderFunction, useLoaderData, ActionFunction, json, useSubmit, LinksFunction } from "remix";
-import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, getPlaidLinkedAccounts } from "~/helpers/plaidUtils";
+import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, getPlaidLinkedAccounts, unlinkPlaidItem } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 
@@ -20,12 +20,17 @@ export const links: LinksFunction = () => {
 	];
 };
 
+export type LinkedInstitutionsResponse = {
+    itemId: string;
+    institution: Institution;
+}[]
+
 type LoaderResponse = {
-	linkedInstitutions: Institution[],
-	linkToken: string
+	linkedInstitutions: LinkedInstitutionsResponse;
+	linkToken: string;
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction<LoaderResponse> = async () => {
 
 	const linkedInstitutions = await getPlaidLinkedInstitutions();
 
@@ -57,20 +62,33 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({ request }) => {
 
 	const body = await request.formData();
-	const publicToken = body.get("public_token") as string;
-	const { error } = await exchangePublicTokenForAccessToken(publicToken);
+	const action = body.get("_action");
 
-	if (error) {
-		return json({ error: 'error making an access token' });
-    }
+	switch(action) {
+		case "linkAccount":
+			const publicToken = body.get("public_token") as string;
+			const { error } = await exchangePublicTokenForAccessToken(publicToken);
 
-	// Can also get item_id here
-	const { access_token } = await exchangePublicTokenForAccessToken(publicToken) as ItemPublicTokenExchangeResponse
+			if (error) {
+				return json({
+					error: 'error making an access token'
+				});
+			}
 
-	const res = await saveNewAccessToken(access_token);
+			// Can also get item_id here
+			const { access_token, item_id } = await exchangePublicTokenForAccessToken(publicToken);
 
-    return res;
+			await saveNewAccessToken(access_token, item_id);
 
+			return null;
+		case "unlinkAccount":
+			const itemId = body.get("itemId") as string;
+			unlinkPlaidItem(itemId);
+			return null;
+		default:
+			console.log("whoops, uncaught action type");
+			break;
+	}
 };
 
 const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.SetStateAction<Option<string>>>}) => {
@@ -113,7 +131,8 @@ const LinkAccount = () => {
 		publicTokenOpt.map(async (publicToken) => {
 
 			const data = new FormData();
-			data.set("public_token", publicToken)
+			data.set("public_token", publicToken);
+			data.set("_name", "linkAccount");
 
 			submit(data, {
 				method: 'post'

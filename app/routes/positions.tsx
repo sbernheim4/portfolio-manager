@@ -40,7 +40,7 @@ export const getInvestmentsAndAccountBalances = async () => {
 		// @ts-ignore
 		.map(x => x.value);
 
-	const [investmentData, balances] = resolvedPromises;
+	const [ investmentData, balances ] = resolvedPromises;
 	const { holdings, securities } = investmentData;
 
 	return {

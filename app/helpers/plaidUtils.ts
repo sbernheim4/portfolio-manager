@@ -1,6 +1,7 @@
-import {  CountryCode, Holding, LinkTokenCreateRequest, Security } from "plaid";
+import {  CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
+import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { retrieveStoredAccessTokens } from "./db";
+import { retrieveItemIdToAccessTokenMap, retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
 
 export const exchangePublicTokenForAccessToken = async (public_token: string) => {
@@ -15,9 +16,9 @@ export const exchangePublicTokenForAccessToken = async (public_token: string) =>
 
 	} catch (err) {
 
-		return {
-			error: 'error exchanging a public token for an access token'
-		}
+		console.error('error exchanging a public token for an access token');
+
+		throw err;
 
 	}
 
@@ -145,17 +146,49 @@ export const getPlaidLinkedInstitutions = async () => {
 			.map(item => {
 
 				return {
+					itemId: item.item_id,
 					institution_id: item.institution_id as string,
 					country_codes: ['US'] as CountryCode[],
 				};
 
 			});
 
-		const institutionRequests = requests.map(req => client.institutionsGetById(req));
-		const institutions = await Promise.allSettled(institutionRequests);
-		const resolvedInstutions = institutions.filter(isFilled).map(x => x.value.data.institution);
+		const institutionRequests = requests.map((req) => {
+			const plaidRequest = {
+				institution_id: req.institution_id,
+				country_codes: req.country_codes
+			};
 
-		return resolvedInstutions;
+			return {
+				itemId: req.itemId,
+				request: client.institutionsGetById(plaidRequest).catch(() => "ERR")
+			};
+
+		});
+
+		const res = institutionRequests.map(async (x) => {
+			return {
+				itemId: x.itemId,
+				response: await x.request
+			};
+		})
+
+		const x = await Promise.all(res)
+
+		const results = x
+			.filter(y => y.response !== "ERR")
+			.map(x => {
+
+				const response = x.response as AxiosResponse<InstitutionsGetByIdResponse>;
+				const institution = response.data.institution;
+
+				return {
+					itemId: x.itemId,
+					institution
+				}
+			});
+
+			return results;
 
 	} catch (err) {
 
@@ -165,21 +198,24 @@ export const getPlaidLinkedInstitutions = async () => {
 
 };
 
-export const unlinkPlaidItem = async (accessToken: string) => {
-	// TODO: Determine how to relate an institutionId to an access token
+export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 
-	// const accessTokens = await retrieveStoredAccessTokens();
+	if (numTries > 5) {
+		throw new Error("Could not remove access token after 5 tries");
+	}
 
-	// try {
-	//
-	// 	const response = await client.itemRemove({ access_token: token });
-	//
-	// } catch (error) {
-	//
-	// 	 handle error
-	//
-	// }
+	const x = await retrieveItemIdToAccessTokenMap();
 
-	// The Item was removed, access_token is now invalid
+	const accessToken = x[itemId];
+
+	try {
+
+		console.log("removing account with access token", accessToken);
+
+		// await client.itemRemove({ access_token: accessToken });
+
+	} catch (error) {
+		unlinkPlaidItem(itemId, numTries++);
+	}
 
 };

@@ -26,9 +26,36 @@ try {
 
 }
 
+export const retrieveItemIdToAccessTokenMap = async () => {
+
+	try {
+
+		const keysCollection = await getKeysCollection();
+		const existingTokens = await keysCollection.findOne({ user: userId });
+
+		if (existingTokens === null) {
+			return {};
+		}
+
+		const { itemIdToAccessToken } = existingTokens;
+
+		return itemIdToAccessToken as Record<string, string[]>;
+
+
+	} catch (err) {
+
+		console.log("ERR", err);
+
+		return {};
+
+	}
+
+};
+
 const retrieveStoredAccessTokens = async () => {
 
 	try {
+
 		const keysCollection = await getKeysCollection();
 		const existingTokens = await keysCollection.findOne({ user: userId });
 
@@ -36,10 +63,18 @@ const retrieveStoredAccessTokens = async () => {
 			return [];
 		}
 
-		return existingTokens.accessTokens as Array<string>;
+		const { itemIdToAccessToken } = existingTokens;
+
+		const res = Object.values(itemIdToAccessToken);
+
+		return res as string[];
+
 	} catch (err) {
+
 		console.log("ERR", err);
+
 		return [];
+
 	}
 
 };
@@ -57,7 +92,7 @@ const getKeysCollection = async () => {
 	});
 };
 
-const saveNewAccessToken = async (accessToken: string) => {
+const saveNewAccessToken = async (accessToken: string, itemId: string) => {
 
 	const keysCollection = await getKeysCollection();
 	const existingTokens = await keysCollection.findOne({ user: userId});
@@ -67,19 +102,26 @@ const saveNewAccessToken = async (accessToken: string) => {
 		// New User
 		return keysCollection.insertOne({
 			user: userId,
-			accessTokens: [accessToken]
+			itemIdToAccessToken: {
+				[itemId]: accessToken
+			}
 		});
 
 	} else {
+
         console.log("Updating existing user's tokens");
 
 		// Existing User
-		const storedAccessTokens = existingTokens.accessTokens;
-		const updatedAccessTokens = [...storedAccessTokens, accessToken];
+		const { itemIdToAccessToken } = existingTokens;
+
+		const newItemIdToAccessToken = {
+			...itemIdToAccessToken,
+			[itemId]: accessToken
+		};
 
 		return keysCollection.findOneAndUpdate(
 			{ user: userId },
-			{ $set: { accessTokens: updatedAccessTokens } }
+			{ $set: { itemIdToAccessToken: newItemIdToAccessToken } }
 		);
 
 	}

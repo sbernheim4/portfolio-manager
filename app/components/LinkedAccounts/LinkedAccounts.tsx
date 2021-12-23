@@ -1,5 +1,6 @@
 import { Institution } from "plaid";
-import { LinksFunction } from "remix";
+import { Form, LinksFunction } from "remix";
+import { LinkedInstitutionsResponse } from "~/routes/manage-accounts";
 import linkAccountStyles from './styles/linked-account.css';
 
 export const links: LinksFunction = () => {
@@ -8,28 +9,32 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const LinkedInstitutions = (props: { linkedInstitutions: Institution[] }) => {
+export const LinkedInstitutions = (props: { linkedInstitutions: LinkedInstitutionsResponse }) => {
 
 	const { linkedInstitutions } = props;
 
 	return (
 		<>
 			{
-				linkedInstitutions.map((acc) => <LinkedInstitution key={acc.item_id} linkedInstitution={acc} />)
+				linkedInstitutions.map((acc) => <LinkedInstitution key={acc.institution.institution_id} itemId={acc.itemId} linkedInstitution={acc.institution} />)
 			}
 		</>
 	);
 
 };
 
-const LinkedInstitution = (props: { linkedInstitution: Institution }) => {
+const LinkedInstitution = (props: { itemId: string, linkedInstitution: Institution }) => {
 
-	const institution = props.linkedInstitution;
+	const { linkedInstitution, itemId } = props;
 
 	return (
 		<div className="manage-accounts__container__modify">
-			<p>{institution.name}</p>
-			<button>Unlink Instituion</button>
+			<p>{linkedInstitution.name}</p>
+			<Form action="/manage-accounts" method="post">
+				<input type="submit" value="Unlink Instituion" />
+				<input type="hidden" name="_action" value="unlinkAccount" readOnly />
+				<input type="hidden" value={itemId} name="itemId" readOnly />
+			</Form>
 		</div>
 	);
 
