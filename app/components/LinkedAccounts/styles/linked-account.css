@@ -1,0 +1,27 @@
+.manage-accounts h1 {
+  margin: 30px 0;
+}
+.manage-accounts h5 {
+  margin: 30px 0;
+}
+.manage-accounts button {
+  width: 150px;
+  height: 35px;
+  cursor: pointer;
+}
+.manage-accounts__modify {
+  margin: 5px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.manage-accounts__modify p {
+  width: 250px;
+}
+.manage-accounts__modify button {
+  width: 150px;
+  height: auto;
+  padding: 10px;
+}
+
+/*# sourceMappingURL=linked-account.css.map */

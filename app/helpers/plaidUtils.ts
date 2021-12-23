@@ -76,14 +76,14 @@ export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; sec
 
 };
 
-export const getPlaidAccounts = async (accountIds: Array<string>) => {
+export const getPlaidLinkedAccounts = async () => {
 
 	try {
 
 		const accessTokens = await retrieveStoredAccessTokens();
 
 		const accountInformationPromises = accessTokens.map(token => {
-			return client.accountsGet({ access_token: token, options: { account_ids: accountIds } });
+			return client.accountsGet({ access_token: token });
 		})
 
 		const accountInformation = await Promise.allSettled(accountInformationPromises);
