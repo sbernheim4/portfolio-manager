@@ -28,7 +28,7 @@ export const Networth = (props: { accounts: AccountBase[] }) => {
 			<br />
 			{ accounts.map(account => <AccountInfo key={account.account_id} account={account}/>) }
 
-			<p>*You're worth far more than this 🙂</p>
+			<p>*This doesn't define you</p>
 		</div>
 	);
 };

@@ -34,8 +34,6 @@ const Accounts = () => {
 	return (
 		<div className="accounts">
 
-			<h1>Investment and Brokerage Accounts</h1>
-
 			<InvestmentAccounts
 				balances={balances}
 				securities={securities}

@@ -11,6 +11,8 @@ export const InvestmentAccounts = (props: { balances: AccountBase[], securities:
 
 	return (
 		<>
+			<h1>Investment and Brokerage Accounts</h1>
+
 			{
 				investmentAndBrokerageAccounts.map((account) => {
 					return (
