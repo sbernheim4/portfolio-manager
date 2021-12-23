@@ -2,7 +2,6 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { DashboardProps } from "../../types/index";
 import { getInvestmentsAndAccountBalances } from "../positions";
-// import accountsStyles from "./accounts.css";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -13,16 +12,15 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		// { rel: "stylesheet", href: accountsStyles }
 	];
 };
 
 export const loader: LoaderFunction = async () => {
 
-	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
+	const { accounts, holdings, securities } = await getInvestmentsAndAccountBalances();
 
 	return json(
-		{ balances, holdings, securities },
+		{ accounts, holdings, securities },
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
 
@@ -31,14 +29,21 @@ export const loader: LoaderFunction = async () => {
 const Accounts = () => {
     const investmentData = useLoaderData<DashboardProps>();
 
-	const {balances, securities, holdings} = investmentData;
+	const { accounts, securities, holdings } = investmentData;
 
 	return (
 		<div className="accounts">
-			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
+
+			<h1>Investment and Brokerage Accounts</h1>
+
+			<InvestmentAccounts
+				accounts={accounts}
+				securities={securities}
+				holdings={holdings}
+			/>
+
 		</div>
 	);
 };
 
 export default Accounts;
-
