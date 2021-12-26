@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import { isToday } from 'date-fns';
 import { MONGODB_PWD } from "../env";
 
 const userId = "sams-unique-user-id-12345";
@@ -7,6 +8,12 @@ const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongo
 const client = new MongoClient(uri);
 
 let activeConnection: Promise<MongoClient> | undefined;
+
+type UserInfo = {
+	user: string;
+	itemIdToAccessToken: Record<string, string>;
+	balances: Array<{date: string, balances: number}>
+};
 
 try {
 
@@ -30,14 +37,14 @@ export const retrieveItemIdToAccessTokenMap = async () => {
 
 	try {
 
-		const keysCollection = await getKeysCollection();
-		const existingTokens = await keysCollection.findOne({ user: userId });
+		const userInfoCollection = await getUserInfoCollection();
+		const userInfo = await userInfoCollection.findOne({ user: userId });
 
-		if (existingTokens === null) {
+		if (userInfo === null) {
 			return {};
 		}
 
-		const { itemIdToAccessToken } = existingTokens;
+		const { itemIdToAccessToken } = userInfo;
 
 		return itemIdToAccessToken as Record<string, string[]>;
 
@@ -52,18 +59,18 @@ export const retrieveItemIdToAccessTokenMap = async () => {
 
 };
 
-const retrieveStoredAccessTokens = async () => {
+export const retrieveStoredAccessTokens = async () => {
 
 	try {
 
-		const keysCollection = await getKeysCollection();
-		const existingTokens = await keysCollection.findOne({ user: userId });
+		const userInfoCollection = await getUserInfoCollection();
+		const userInfo = await userInfoCollection.findOne({ user: userId });
 
-		if (existingTokens === null) {
+		if (userInfo === null) {
 			return [];
 		}
 
-		const { itemIdToAccessToken } = existingTokens;
+		const { itemIdToAccessToken } = userInfo;
 
 		const res = Object.values(itemIdToAccessToken);
 
@@ -79,7 +86,7 @@ const retrieveStoredAccessTokens = async () => {
 
 };
 
-const getKeysCollection = async () => {
+const getUserInfoCollection = async () => {
 
 	// const connection = await getDBConnection();
 
@@ -92,43 +99,90 @@ const getKeysCollection = async () => {
 	});
 };
 
-const saveNewAccessToken = async (accessToken: string, itemId: string) => {
+const updateDB = async <T>(name: string, initialValue: T, fn: (userInfo: UserInfo) => T) => {
 
-	const keysCollection = await getKeysCollection();
-	const existingTokens = await keysCollection.findOne({ user: userId});
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: userId}) as unknown as UserInfo;
 
-	if (existingTokens === null) {
+	// @ts-ignore
+	const nestedData = userInfo[name];
+	console.log({ nestedData });
+
+	if (userInfo === null || nestedData === null || nestedData === undefined) {
 
 		// New User
-		return keysCollection.insertOne({
+		return userInfoCollection.insertOne({
 			user: userId,
-			itemIdToAccessToken: {
-				[itemId]: accessToken
-			}
+			[name]: initialValue
 		});
 
 	} else {
 
-        console.log("Updating existing user's tokens");
-
 		// Existing User
-		const { itemIdToAccessToken } = existingTokens;
+		const valueToInsert = fn(userInfo);
 
-		const newItemIdToAccessToken = {
-			...itemIdToAccessToken,
-			[itemId]: accessToken
-		};
-
-		return keysCollection.findOneAndUpdate(
+		return userInfoCollection.findOneAndUpdate(
 			{ user: userId },
-			{ $set: { itemIdToAccessToken: newItemIdToAccessToken } }
+			{ $set: { [name]:  valueToInsert } }
 		);
 
 	}
 
 };
 
-export {
-	retrieveStoredAccessTokens,
-	saveNewAccessToken
-}
+export const saveNewAccessToken = async (accessToken: string, itemId: string) => {
+
+	updateDB('itemIdToAccessToken', { [itemId]: accessToken }, (userInfo) => {
+
+		// Existing User
+		const { itemIdToAccessToken } = userInfo;
+
+		const newItemIdToAccessToken = {
+			...itemIdToAccessToken,
+			[itemId]: accessToken
+		};
+
+		return newItemIdToAccessToken;
+
+	});
+
+};
+
+export const saveNetworthToDB = async (newBalance: number) => {
+
+	const newDataPoint = [{
+		date: new Date().toISOString(),
+		balances: newBalance
+	}];
+
+	updateDB('balances', newDataPoint, (userInfo) => {
+
+		const { balances } = userInfo;
+
+		if (balances.length) {
+			const lastEntry = balances[balances.length - 1];
+			const mostRecentEntry = new Date(lastEntry.date)
+
+			return isToday(mostRecentEntry) ?
+				balances :
+				[...balances, ...newDataPoint];
+		} else {
+
+			return newDataPoint;
+
+		}
+
+	});
+
+};
+
+export const getNetworthFromDb = async () => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: userId }) as unknown as UserInfo;
+
+	const { balances } = userInfo;
+
+	return balances;
+
+};

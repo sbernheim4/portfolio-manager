@@ -1,13 +1,13 @@
 import { AccountBase } from "plaid";
 import { dollarFormatter } from "~/helpers/formatters";
 
-const positiveAccountTypes = [
+export const positiveAccountTypes = [
 	"investment",
 	"depository",
 	"brokerage",
 ];
 
-export const Networth = (props: { accounts: AccountBase[] }) => {
+export const NetworthComponent = (props: { accounts: AccountBase[] }) => {
 	const { accounts } = props;
 
 	const networth = accounts.reduce(
@@ -18,17 +18,13 @@ export const Networth = (props: { accounts: AccountBase[] }) => {
 				acc - (account.balances.current ?? 0)
 		},
 		0
-	)
+	);
 
 	return (
-		<div className="networth">
-			<h1>Your Financial* Networth</h1>
-
+		<div>
 			<h2>Account Balances: {dollarFormatter.format(networth)}</h2>
 			<br />
 			{ accounts.map(account => <AccountInfo key={account.account_id} account={account}/>) }
-
-			<p>*This doesn't define you</p>
 		</div>
 	);
 };
