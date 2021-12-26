@@ -102,7 +102,7 @@ export const getPlaidLinkedAccounts = async () => {
 
 };
 
-export const filterBrokerageAccounts = (accounts: Array<AccountBase>) => {
+export const filterForInvestmentAccounts = (accounts: Array<AccountBase>) => {
 	const validInvestmentAccounts = ["investment", "brokerage"];
 
 	return accounts.filter(account => validInvestmentAccounts.includes(account.type));

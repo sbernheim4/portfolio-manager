@@ -1,11 +1,10 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
-import { NetworthComponent } from '~/components/NetworthComponent';
 import { DashboardProps } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
-import { filterBrokerageAccounts } from "~/helpers/plaidUtils";
+import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -24,7 +23,7 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async () => {
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
-	const investmentAccounts = filterBrokerageAccounts(balances);
+	const investmentAccounts = filterForInvestmentAccounts(balances);
 
 	return json(
 		{ balances: investmentAccounts, holdings, securities },
@@ -41,10 +40,8 @@ const Dashboard = () => {
 		<div className="dashboard">
 			<Positions securities={securities} holdings={holdings} />
 
-			<InvestmentAccounts balances={balances} securities={securities} holdings={holdings}/>
-
 			<h1>Your Portfolio Balance</h1>
-			<NetworthComponent accounts={balances} />
+			<InvestmentAccounts balances={balances} />
 		</div>
     );
 
