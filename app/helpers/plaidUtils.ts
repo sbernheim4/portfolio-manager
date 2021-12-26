@@ -1,4 +1,4 @@
-import {  CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
+import {  AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
 import { retrieveItemIdToAccessTokenMap, retrieveStoredAccessTokens } from "./db";
@@ -102,6 +102,12 @@ export const getPlaidLinkedAccounts = async () => {
 
 };
 
+export const filterBrokerageAccounts = (accounts: Array<AccountBase>) => {
+	const validInvestmentAccounts = ["investment", "brokerage"];
+
+	return accounts.filter(account => validInvestmentAccounts.includes(account.type));
+
+};
 
 export const getPlaidAccountBalances = async () => {
 
