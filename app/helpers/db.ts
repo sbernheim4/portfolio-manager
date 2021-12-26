@@ -106,7 +106,6 @@ const updateDB = async <T>(name: string, initialValue: T, fn: (userInfo: UserInf
 
 	// @ts-ignore
 	const nestedData = userInfo[name];
-	console.log({ nestedData });
 
 	if (userInfo === null || nestedData === null || nestedData === undefined) {
 
