@@ -3,11 +3,11 @@ import { AccountBase } from "plaid";
 import { useEffect } from "react";
 import { CartesianAxis, Line, LineChart, XAxis, YAxis } from "recharts";
 import { ActionFunction, Form, json, LinksFunction, LoaderFunction, useLoaderData, useSubmit } from "remix";
-import { NetworthComponent, positiveAccountTypes } from "~/components/NetworthComponent";
+import { InvestmentAccounts } from "~/components/InvestmentAccounts";
+import { positiveAccountTypes } from "~/components/NetworthComponent";
 import { getNetworthFromDb, saveNetworthToDB } from "~/helpers/db";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
-import { filterBrokerageAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import networthStyles from "./networth/styles/networth.css";
+import { filterForInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 
 type LoaderResponse = {
 	balances: Array<Record<string, number>>;
@@ -17,12 +17,11 @@ type LoaderResponse = {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: "stylesheet", href: networthStyles }
 	];
 };
 
 export const loader: LoaderFunction = async () => {
-	const accountBase = filterBrokerageAccounts(await getPlaidAccountBalances());
+	const accountBase = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
 	const currentAccountBalances = accountBase
 		.reduce((acc, curr) => {
@@ -72,7 +71,7 @@ const Networth = () => {
 	return (
 		<>
 			<h1>Your Portfolio Balance</h1>
-			<NetworthComponent accounts={accountBase} />
+			<InvestmentAccounts balances={accountBase} />
 
 			{
 				// If JS is disabled allow the user to store the data

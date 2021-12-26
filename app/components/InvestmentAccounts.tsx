@@ -1,13 +1,26 @@
-import { AccountBase, Holding, Security } from "plaid";
+import { AccountBase } from "plaid";
 import { Link } from "remix";
+import { dollarFormatter } from "~/helpers/formatters";
+import { positiveAccountTypes } from "./NetworthComponent";
 
-export const InvestmentAccounts = (props: { balances: AccountBase[], securities: Security[], holdings: Holding[]}) => {
+export const InvestmentAccounts = (props: { balances: AccountBase[] }) => {
 
 	const { balances } = props;
 
+	const totalBalance = balances.reduce(
+		(acc, account) => {
+			const isPositive = positiveAccountTypes.includes(account.type);
+			return isPositive ?
+				acc + (account.balances.current ?? 0) :
+				acc - (account.balances.current ?? 0)
+		},
+		0
+	);
+
 	return (
 		<>
-			<h1>Investment and Brokerage Accounts</h1>
+			<h2>Investment and Brokerage Accounts</h2>
+            <h3>Account Balances: {dollarFormatter.format(totalBalance)}</h3>
 
 			{
 				balances.map((account) => {
