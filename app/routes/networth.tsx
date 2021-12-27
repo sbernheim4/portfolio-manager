@@ -1,7 +1,7 @@
 import { isToday } from "date-fns";
 import { AccountBase } from "plaid";
 import { useEffect, useState } from "react";
-import { Area, AreaChart, CartesianAxis, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianAxis, Tooltip, XAxis, YAxis } from "recharts";
 import { ActionFunction, Form, json, LinksFunction, LoaderFunction, useLoaderData, useSubmit } from "remix";
 
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
@@ -11,6 +11,7 @@ import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import networthStyles from "~/styles/networth/networth.css";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -29,6 +30,7 @@ type LoaderResponse = {
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: "stylesheet", href: networthStyles }
 	];
 };
 
@@ -142,7 +144,7 @@ const Networth = () => {
 	};
 
 	return (
-		<>
+		<div className="networth">
 			<h1>Your Portfolio Balance</h1>
 			<InvestmentAccounts balances={accountBase} />
 
@@ -156,20 +158,23 @@ const Networth = () => {
 					null
 			}
 
+			<br />
 			<div className="networth__chart">
 
 				<>
+                    <h4>Accounts To Display</h4>
 					{accountIdsToName.map(entry => {
 						return (
-							<>
-								<input onClick={handleClick} id={entry.name} type="checkbox" name={entry.name} />
+							<div className="networth__chart__checkbox-container" key={entry.accountId}>
+                                <input onClick={handleClick} id={entry.name} type="checkbox" name={entry.name} />
 								<label htmlFor={entry.name}>{entry.name}</label>
-							</>
+							</div>
 						);
 					})}
 				</>
+				<br />
 
-				<AreaChart margin={{ top: 5 }} width={730} height={240} data={accountBalancesChartData}>
+				<AreaChart margin={{ left: 50, top: 30 }} width={730} height={240} data={accountBalancesChartData}>
 
 					<CartesianAxis />
 
@@ -196,7 +201,7 @@ const Networth = () => {
 				</AreaChart>
 			</div>
 
-		</>
+		</div>
 	);
 
 };
