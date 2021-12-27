@@ -1,18 +1,30 @@
-import { format } from "date-fns";
+import { isToday } from "date-fns";
 import { AccountBase } from "plaid";
-import { useEffect } from "react";
-import { CartesianAxis, Line, LineChart, XAxis, YAxis } from "recharts";
+import { useEffect, useState } from "react";
+import { Area, AreaChart, CartesianAxis, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { ActionFunction, Form, json, LinksFunction, LoaderFunction, useLoaderData, useSubmit } from "remix";
+
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
-import { positiveAccountTypes } from "~/components/NetworthComponent";
-import { getNetworthFromDb, saveNetworthToDB } from "~/helpers/db";
+import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
+import { saveAccountBalancesToDB } from "~/helpers/db";
+import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
+import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 
+export type AccountBalanceChartData = Array<{
+	[key: string]: number;
+	// @ts-ignore
+	date: string;
+	totalBalance: number;
+}>
+
 type LoaderResponse = {
-	balances: Array<Record<string, number>>;
 	todaysBalance: number;
 	accountBase: Array<AccountBase>;
+	accountIdsToName: Array<{ accountId: string; name: string; }>;
+	todaysBalanceData: Record<string, number>;
+	accountBalancesChartData: AccountBalanceChartData
 };
 
 export const links: LinksFunction = () => {
@@ -20,53 +32,114 @@ export const links: LinksFunction = () => {
 	];
 };
 
+const mergeHistoricalAndTodaysBalanceData = (
+	historicalBalanceData: AccountBalanceChartData,
+	todaysBalance: number,
+	todaysBalanceData: Record<string, number>
+) => {
+
+	const lastEntry = historicalBalanceData.at(-1);
+	const noEntriesExist = lastEntry === undefined;
+
+	if(noEntriesExist) {
+
+		return [{
+			date: new Date().toISOString(),
+			totalBalance: todaysBalance,
+			...todaysBalanceData
+		}];
+	}
+
+	const lastEntryDate = new Date(lastEntry.date);
+
+	return isToday(lastEntryDate) ?
+		historicalBalanceData :
+		[
+			...historicalBalanceData,
+			{
+				date: new Date().toISOString(),
+				totalBalance: todaysBalance,
+				...todaysBalanceData
+			}
+		];
+
+};
+
 export const loader: LoaderFunction = async () => {
+
+	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances();
 	const accountBase = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
-	const currentAccountBalances = accountBase
-		.reduce((acc, curr) => {
-			const isPositive = positiveAccountTypes.includes(curr.type);
-			return isPositive ?
-				acc + (curr.balances.current ?? 0) :
-				acc - (curr.balances.current ?? 0)
-		}, 0);
+	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(accountBase);
+	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getIndividualAccountBalancesForToday(accountBase);
 
-	const balances = await getNetworthFromDb();
-	const formattedBalances = balances.map(dataPoint => {
-		return {
-			date: format(new Date(dataPoint.date), "MM/dd/yyyy"),
-			balances: dataPoint.balances
-		};
-	});
+	const mergedAccountBalancesChartData = mergeHistoricalAndTodaysBalanceData(
+		// @ts-ignore
+		accountBalancesChartData,
+		todaysBalance,
+		todaysBalanceData
+	);
 
 	return json({
+		accountBalancesChartData: mergedAccountBalancesChartData,
+		todaysBalanceData,
+		accountIdsToName,
 		accountBase,
-		balances: formattedBalances,
-		todaysBalance: currentAccountBalances
+		todaysBalance
 	});
 };
 
 export const action: ActionFunction = async ({ request }) => {
 
 	const formData = await request.formData();
-	const balance = parseFloat(formData.get("balance") as string);
 
-	saveNetworthToDB(balance);
+	const balance = parseFloat(formData.get("totalBalance") as string);
+	const accountRecords = JSON.parse(formData.get("accountsBalance") as string) as Record<string, number>;
+
+	// Fire and forget
+	saveAccountBalancesToDB(accountRecords, balance);
 
 	return null;
+
 
 };
 
 const Networth = () => {
-	const { balances, todaysBalance, accountBase } = useLoaderData<LoaderResponse>();
+	const {
+		accountBalancesChartData,
+		accountIdsToName,
+		todaysBalanceData,
+		todaysBalance,
+		accountBase
+	} = useLoaderData<LoaderResponse>();
+
 	const submit = useSubmit();
 
 	// Auto Submit today's balance when JS is enabled via useEffect
+    // The DB handler takes care of only storing todays balance if it hasn't yet
+    // been stored
 	useEffect(() => {
+
 		const formData = new FormData();
-		formData.set("balance", todaysBalance.toString());
+		formData.set("totalBalance", todaysBalance.toString());
+		formData.set("accountsBalance", JSON.stringify(todaysBalanceData));
+
 		submit(formData, { method: "post" });
 	}, []);
+
+	const [accountsToShow, setAccountsToShow] = useState(accountIdsToName);
+
+	const handleClick = () => {
+		const checkBoxes = document.querySelectorAll('input[type=checkbox]');
+		const checkedValues = Array.from(checkBoxes).filter(el => el.checked).map(el => el.name);
+		const allUnchecked = Array.from(checkBoxes).reduce((acc, curr) => acc && !curr.checked, true)
+
+		const x = allUnchecked ?
+			accountIdsToName :
+			accountIdsToName.filter(x => checkedValues.includes(x.name));
+
+		setAccountsToShow(x);
+	};
 
 	return (
 		<>
@@ -76,7 +149,7 @@ const Networth = () => {
 			{
 				// If JS is disabled allow the user to store the data
 				!isClientSideJSEnabled() ?
-					<Form method="post">
+					<Form>
 						<input type="submit" value="Save Balance" />
 						<input type="hidden" name="balance" value={todaysBalance} readOnly />
 					</Form> :
@@ -84,17 +157,52 @@ const Networth = () => {
 			}
 
 			<div className="networth__chart">
-				<LineChart margin={{ top: 5 }} width={730} height={240} data={balances}>
+
+				<>
+					{accountIdsToName.map(entry => {
+						return (
+							<>
+								<input onClick={handleClick} id={entry.name} type="checkbox" name={entry.name} />
+								<label htmlFor={entry.name}>{entry.name}</label>
+							</>
+						);
+					})}
+				</>
+
+				<AreaChart margin={{ top: 5 }} width={730} height={240} data={accountBalancesChartData}>
+
 					<CartesianAxis />
+
 					<XAxis dataKey="date" />
-					<YAxis />
-					<Line dataKey="balances" />
-				</LineChart>
+
+					<YAxis domain={['dataMin', 'dataMax']} />
+
+					<Tooltip formatter={tooltipFormatter} />
+
+					<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+
+					{accountsToShow.map((acc, index ) => {
+						return <Area
+							type="monotone"
+							fillOpacity={.5}
+							fill={COLORS[index % COLORS.length]}
+							stroke={COLORS[index % COLORS.length]}
+							name={acc.name}
+							key={acc.accountId}
+							dataKey={acc.accountId}
+						/>
+					})}
+
+				</AreaChart>
 			</div>
 
 		</>
 	);
 
+};
+
+const tooltipFormatter = (dollarAmount: number) => {
+	return dollarFormatter.format(dollarAmount);
 };
 
 export default Networth;
