@@ -40,7 +40,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 	todaysBalanceData: Record<string, number>
 ) => {
 
-	const lastEntry = historicalBalanceData.at(-1);
+	const lastEntry = historicalBalanceData[-1];
 	const noEntriesExist = lastEntry === undefined;
 
 	if(noEntriesExist) {
