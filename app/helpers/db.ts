@@ -13,6 +13,13 @@ type UserInfo = {
 	user: string;
 	itemIdToAccessToken: Record<string, string>;
 	balances: Array<{date: string, balances: number}>
+	accountBalances: Array<{
+		// @ts-ignore
+		"date": string,
+
+		"totalBalance": number;
+		[key: string]: number
+	}>; // Array<AccountBalance>
 };
 
 try {
@@ -147,41 +154,52 @@ export const saveNewAccessToken = async (accessToken: string, itemId: string) =>
 
 };
 
-export const saveNetworthToDB = async (newBalance: number) => {
+type AccountId = string;
+type AccountBalance = number;
+export const saveAccountBalancesToDB = (
+	accountRecords: Record<AccountId, AccountBalance>,
+	totalBalance: number
+) => {
 
-	const newDataPoint = [{
-		date: new Date().toISOString(),
-		balances: newBalance
+	const newEntry = [{
+		...accountRecords,
+		totalBalance,
+		date: new Date().toISOString()
 	}];
 
-	updateDB('balances', newDataPoint, (userInfo) => {
+ 	updateDB('accountBalances', newEntry, (userInfo) => {
 
-		const { balances } = userInfo;
+ 		const { accountBalances } = userInfo;
 
-		if (balances.length) {
-			const lastEntry = balances[balances.length - 1];
-			const mostRecentEntry = new Date(lastEntry.date)
+ 		if (accountBalances.length) {
+ 			const lastEntry = accountBalances[accountBalances.length - 1];
+ 			const mostRecentEntry = new Date(lastEntry.date)
 
-			return isToday(mostRecentEntry) ?
-				balances :
-				[...balances, ...newDataPoint];
-		} else {
+ 			return isToday(mostRecentEntry) ?
+ 				accountBalances :
+ 				[
+ 					...accountBalances,
+ 					...newEntry
+ 				];
 
-			return newDataPoint;
+ 		} else {
 
-		}
+ 			return newEntry;
 
-	});
+ 		}
+
+ 	});
+
 
 };
 
-export const getNetworthFromDb = async () => {
+export const getAccountBalancesFromDB = async () => {
 
 	const userInfoCollection = await getUserInfoCollection();
 	const userInfo = await userInfoCollection.findOne({ user: userId }) as unknown as UserInfo;
 
-	const { balances } = userInfo;
+	const { accountBalances } = userInfo;
 
-	return balances;
+	return accountBalances;
 
 };
