@@ -109,6 +109,12 @@ export const filterForInvestmentAccounts = (accounts: Array<AccountBase>) => {
 
 };
 
+export const filterForNonInvestmentAccounts = (accounts: Array<AccountBase>) => {
+	const validInvestmentAccounts = ["investment", "brokerage"];
+
+	return accounts.filter(account => !validInvestmentAccounts.includes(account.type));
+};
+
 export const getPlaidAccountBalances = async () => {
 
 	try {
