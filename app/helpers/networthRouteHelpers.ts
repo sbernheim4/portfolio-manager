@@ -14,7 +14,7 @@ export const calculateTodaysTotalBalance = (accounts: AccountBase[]) => {
 		}, 0);
 };
 
-export const getIndividualAccountBalancesForToday = (accounts: AccountBase[]) => {
+export const getPerAccountBalancesForToday = (accounts: AccountBase[]) => {
 
 	const accountIdsToName = accounts.filter(x => !!x.balances.current || !!x.balances.available).map(acc => {
 		return {

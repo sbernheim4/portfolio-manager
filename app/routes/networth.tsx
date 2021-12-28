@@ -40,7 +40,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 	todaysBalanceData: Record<string, number>
 ) => {
 
-	const lastEntry = historicalBalanceData[-1];
+	const lastEntry = historicalBalanceData[historicalBalanceData.length - 1];
 	const noEntriesExist = lastEntry === undefined;
 
 	if(noEntriesExist) {
@@ -73,7 +73,7 @@ export const loader: LoaderFunction = async () => {
 	const accountBase = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
 	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(accountBase);
-	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getIndividualAccountBalancesForToday(accountBase);
+	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getPerAccountBalancesForToday(accountBase);
 
 	const mergedAccountBalancesChartData = mergeHistoricalAndTodaysBalanceData(
 		// @ts-ignore
