@@ -3,6 +3,7 @@ import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
 import { retrieveItemIdToAccessTokenMap, retrieveStoredAccessTokens } from "./db";
 import { client } from "./plaidClient";
+import { format } from "date-fns";
 
 export const exchangePublicTokenForAccessToken = async (public_token: string) => {
 
@@ -224,10 +225,45 @@ export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 
 		console.log("removing account with access token", accessToken);
 
+		// TODO: Uncomment to go live
 		// await client.itemRemove({ access_token: accessToken });
 
 	} catch (error) {
 		unlinkPlaidItem(itemId, numTries++);
+	}
+
+};
+
+export const getInvestmentTransactions = async () => {
+
+	const today = new Date();
+	const currentYear = today.getFullYear();
+	const start_date = format(new Date(currentYear, 0, 1), "yyyy-MM-dd");
+	const end_date = format(today, "yyyy-MM-dd");
+
+	try {
+
+		const accessTokens = await retrieveStoredAccessTokens();
+
+		const transactionPromises = accessTokens.map(token => {
+			return client.investmentsTransactionsGet({
+				access_token: token,
+				start_date,
+				end_date
+			})
+		});
+
+		const investmentTransactions = await Promise.allSettled(transactionPromises);
+
+		const resolvedInvestmentTransactions = investmentTransactions.filter(isFilled).flatMap(x => x.value.data.investment_transactions);
+
+		return resolvedInvestmentTransactions;
+
+	} catch (err) {
+
+		console.log("getInvestmentTransactions:", err);
+
+		return [];
 	}
 
 };
