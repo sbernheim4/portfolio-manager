@@ -17,7 +17,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-        ...positionStyles(),
+		...positionStyles(),
 	];
 };
 
@@ -26,9 +26,9 @@ export const getInvestmentsAndAccountBalances = async () => {
 		Promise<InvestmentResponse>,
 		Promise<Array<AccountBase>>
 	] = [
-		getInvestmentHoldings(),
-		getPlaidAccountBalances()
-	];
+			getInvestmentHoldings(),
+			getPlaidAccountBalances()
+		];
 
 	const results = await Promise.allSettled(promises);
 
@@ -42,7 +42,7 @@ export const getInvestmentsAndAccountBalances = async () => {
 		// @ts-ignore
 		.map(x => x.value);
 
-	const [ investmentData, balances ] = resolvedPromises;
+	const [investmentData, balances] = resolvedPromises;
 	const { holdings, securities } = investmentData;
 
 	return {
@@ -57,21 +57,16 @@ export const loader: LoaderFunction = async () => {
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentTransactions = await getInvestmentTransactions();
-    const dates = investmentTransactions
-        .map(tx => tx.date)
-        .map(dateAsString => new Date(dateAsString));
-
-    const cashflows = investmentTransactions.map(tx => tx.amount - (tx.fees ?? 0));
-
-    console.log(dates);
+	const dates = investmentTransactions.map(tx => tx.date);
+	const cashflows = investmentTransactions.map(tx => tx.amount - (tx.fees ?? 0));
 
 	return json(
 		{
-            cashflows: [cashflows, dates],
-            balances,
-            holdings,
-            securities,
-            investmentTransactions
+			cashflows: [cashflows, dates],
+			balances,
+			holdings,
+			securities,
+			investmentTransactions
 		},
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
@@ -108,19 +103,19 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const Holdings = () => {
-    const investmentData = useLoaderData<PositionsLoaderData>();
+	const investmentData = useLoaderData<PositionsLoaderData>();
 	const { cashflows, holdings, securities, investmentTransactions } = investmentData;
-	const action = useActionData<{filteredHoldings: Holding[]}>();
+	const action = useActionData<{ filteredHoldings: Holding[] }>();
 
 	const holdingsToDisplay = action?.filteredHoldings ?? holdings;
 
 	return (
 		<>
-            <Outlet context={{ securities, holdings, holdingsToDisplay }}/>
+			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
 			<RateOfReturn investmentTransactions={investmentTransactions} cashflows={cashflows} />
 			<Positions securities={securities} holdings={holdingsToDisplay} />
-			<SectorWeight securities={securities} holdings={holdings}/>
+			<SectorWeight securities={securities} holdings={holdings} />
 		</>
 	);
 

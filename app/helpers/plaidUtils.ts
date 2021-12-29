@@ -234,7 +234,7 @@ export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 
 };
 
-export const getInvestmentTransactions = async () => {
+export const getInvestmentTransactions = async (offset = 0, count = 200) => {
 
 	const today = new Date();
 	const currentYear = today.getFullYear();
@@ -249,7 +249,11 @@ export const getInvestmentTransactions = async () => {
 			return client.investmentsTransactionsGet({
 				access_token: token,
 				start_date,
-				end_date
+				end_date,
+				options: {
+					count,
+					offset
+				}
 			})
 		});
 
