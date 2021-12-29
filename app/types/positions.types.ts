@@ -4,5 +4,5 @@ export type PositionsLoaderData = {
 	holdings: Holding[];
 	securities: Security[];
     investmentTransactions: InvestmentTransaction[];
-	cashflows: [number[], Date[]];
+	cashflows: [number[], string[]];
 };
