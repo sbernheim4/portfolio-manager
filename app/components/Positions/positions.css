@@ -1,18 +1,10 @@
-.positions h1 {
-  margin: 15px;
-}
-.positions h2 {
-  margin: 15px 30px;
-}
 .positions__search {
   height: 40px;
+  margin: 40px auto;
+  margin-top: 15px;
 }
 .positions .investment-line-items {
   margin: 0 auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 .positions .noJS {
   font-style: italic;

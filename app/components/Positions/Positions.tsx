@@ -28,7 +28,7 @@ export const constructTickerSymbolToSecurityId = (securities: Array<Security>) =
 
 	}, {} as Record<string, string>);
 
-    return tickerSymbolToSecurityId;
+	return tickerSymbolToSecurityId;
 
 };
 
@@ -43,7 +43,7 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 	}, {} as Record<string, string | null>);
 
-    return securityIdToTickerSymbol;
+	return securityIdToTickerSymbol;
 
 };
 
@@ -106,7 +106,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 	);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
-    const totalInvested = aggregatedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
+	const totalInvested = aggregatedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value.toUpperCase());
@@ -116,9 +116,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 		<div className="positions">
 			<h1>Your Positions</h1>
 
-			<h2>Balance: {dollarFormatter.format(totalInvested)}</h2>
-
-			<h2>Your Investments</h2>
+			<h3>Balance: {dollarFormatter.format(totalInvested)}</h3>
 
 			{
 				/* Client side searching when JS is enabled */
@@ -130,7 +128,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 						name="search"
 						type="search"
 						placeholder="Search by ticker"
-					/>  :
+					/> :
 					null
 			}
 
@@ -138,25 +136,36 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 			<noscript>
 				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
 				<Form action="/positions" method="post">
-					<input className="positions__search" name="search" type="search" placeholder="Search by ticker"/>
+					<input className="positions__search" name="search" type="search" placeholder="Search by ticker" />
 				</Form>
 			</noscript>
 
 
-			<div className="investment-line-items">
-				{
-					holdingsToDisplay.sort((a, b) => a.institution_value > b.institution_value ? -1 : 1).map((holding, i) => {
-						return (
-							<StockInvestmentSummary
-								ticker={securityIdToTickerSymbol[holding.security_id]}
-								totalInvested={totalInvested}
-								holding={holding}
-								key={securities[i].security_id}
-							/>
-						);
-					})
-				}
-			</div>
+			<table className="investment-line-items">
+				<thead>
+					<tr>
+						<th>Ticker</th>
+						<th>Quantity (shares)</th>
+						<th>Percentage</th>
+						<th>Dollar Value</th>
+						<th>Above Threshold</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						holdingsToDisplay.sort((a, b) => a.institution_value > b.institution_value ? -1 : 1).map((holding, i) => {
+							return (
+								<StockInvestmentSummary
+									ticker={securityIdToTickerSymbol[holding.security_id]}
+									totalInvested={totalInvested}
+									holding={holding}
+									key={securities[i].security_id}
+								/>
+							);
+						})
+					}
+				</tbody>
+			</table>
 
 			<StockPieChart
 				securityIdToTickerSymbol={securityIdToTickerSymbol}

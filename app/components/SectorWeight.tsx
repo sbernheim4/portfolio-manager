@@ -1,11 +1,11 @@
 import { Holding, Security } from "plaid";
 import { dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 
-export const SectorWeight = (props: { securities: Security[], holdings: Holding[]}) => {
+export const SectorWeight = (props: { securities: Security[], holdings: Holding[] }) => {
 
 	const { securities, holdings } = props;
 
-	const securityIdToType  = securities.reduce((acc, curr) => {
+	const securityIdToType = securities.reduce((acc, curr) => {
 
 		return {
 			...acc,
@@ -14,9 +14,12 @@ export const SectorWeight = (props: { securities: Security[], holdings: Holding[
 
 	}, {} as Record<string, string | null>);
 
-	const investmentTypeToValueForThatType = holdings.reduce((acc, curr) => {
+	console.log(securityIdToType);
+
+	const investmentTypeToValue = holdings.reduce((acc, curr) => {
 		const securityId = curr.security_id;
 		const type = securityIdToType[securityId];
+		console.log(curr);
 
 		if (!type) {
 			return acc;
@@ -41,18 +44,20 @@ export const SectorWeight = (props: { securities: Security[], holdings: Holding[
 		<>
 			<h1>Portfolio by Weights</h1>
 
-			<h3>Weights by Type</h3>
+			<h3>Accounts by Type</h3>
 			{
-				Object.keys(investmentTypeToValueForThatType).map(type => {
+				Object.keys(investmentTypeToValue).map(type => {
 
-					const dollarAmount = dollarFormatter.format(investmentTypeToValueForThatType[type]);
-					const percentage = investmentTypeToValueForThatType[type] / totalInvested;
+					const dollarAmount = dollarFormatter.format(investmentTypeToValue[type]);
+					const percentage = investmentTypeToValue[type] / totalInvested;
+					const formattedPercentage = percentageFormatter.format(percentage);
+					const formattedType = type[0].toUpperCase() + type.slice(1);
 
-					return <p key={type}>{type}: {dollarAmount} - {percentageFormatter.format(percentage)}</p>
+					return <p key={type}>{formattedType}: {dollarAmount} - {formattedPercentage}</p>
 				})
 			}
 
-			<h3>Weights by Sector</h3>
+			{/* <h3>Weights by Sector</h3> */}
 
 			{/* TODO: Find an API or download data of security --> Sector */}
 			{/* Might need to use polygon.io --> Free api keys */}
