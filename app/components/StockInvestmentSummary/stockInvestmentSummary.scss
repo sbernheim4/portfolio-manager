@@ -1,27 +1,35 @@
 /******************************************************************************/
-a {
-	text-decoration: none;
-}
-
 .investment-line-item-link {
 	color: black;
 }
 
 .investment-line-items {
 	margin: 0 auto;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	flex-wrap: wrap;
+	table-layout: fixed;
+    width: 700px;
+
+	tr {
+
+		th {
+			text-align: left;
+		}
+
+	}
+
+	a {
+		text-decoration: none;
+		display: contents;
+	}
+
 }
 
 /******************************************************************************/
 
 .investment-line-item {
 	margin: 10px;
-	min-width: 200px;
-	width: 200px;
-	max-width: 200px;
+	// min-width: 200px;
+	// width: 200px;
+	// max-width: 200px;
 	padding: 15px;
 	border: 1px solid rgb(170, 170, 170);
 	border-radius: 5px;
@@ -34,10 +42,10 @@ a {
 
 	&__ticker {
 		margin: 10px;
-		text-align: center;
 		font-weight: 400;
 		text-overflow: ellipsis;
 		overflow: clip;
+		padding-right: 10px;
 	}
 
 	&__share {
@@ -48,11 +56,11 @@ a {
 	}
 
 	&__warning-symbol {
-		display: inline;
-		position: absolute;
-		border-radius: 100%;
-		top: 0px;
-		right: 3px;
+		// display: inline;
+		// position: absolute;
+		// border-radius: 100%;
+		// top: 0px;
+		// right: 3px;
 	}
 }
 

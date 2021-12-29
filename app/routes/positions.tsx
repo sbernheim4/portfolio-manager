@@ -62,7 +62,7 @@ export const loader: LoaderFunction = async () => {
 
 	return json(
 		{
-			cashflows: [cashflows, dates],
+			cashflowData: [cashflows, dates],
 			balances,
 			holdings,
 			securities,
@@ -104,7 +104,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 const Holdings = () => {
 	const investmentData = useLoaderData<PositionsLoaderData>();
-	const { cashflows, holdings, securities, investmentTransactions } = investmentData;
+	const { cashflowData, holdings, securities, investmentTransactions } = investmentData;
 	const action = useActionData<{ filteredHoldings: Holding[] }>();
 
 	const holdingsToDisplay = action?.filteredHoldings ?? holdings;
@@ -113,7 +113,7 @@ const Holdings = () => {
 		<>
 			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
-			<RateOfReturn investmentTransactions={investmentTransactions} cashflows={cashflows} />
+			{ /* <RateOfReturn investmentTransactions={investmentTransactions} cashflowData={cashflowData} /> */}
 			<Positions securities={securities} holdings={holdingsToDisplay} />
 			<SectorWeight securities={securities} holdings={holdings} />
 		</>

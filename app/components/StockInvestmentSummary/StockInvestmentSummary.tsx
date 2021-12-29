@@ -25,20 +25,16 @@ export const StockInvestmentSummary = (props: {
 	const quantity = decimalFormatter.format(holding.quantity);
 	const percentage = percentageFormatter.format(percentageOfAllFunds);
 
-	const sharesDisplayName = quantity === "1" ?
-		"share" :
-		"shares";
-
 	return (
-		<Link className="investment-line-item-link" to={`/positions/${holding.security_id}`}>
-			<div className="investment-line-item">
-				<WarningSign aboveThreshold={aboveThreshold}/>
+		<tr className="investment-line-item">
+			<Link className="investment-line-item-link" to={`/positions/${holding.security_id}`}>
 
-				<h4 className="investment-line-item__ticker">{ticker ?? "N/A"}</h4>
-				<p className="investment-line-item__share">{quantity} {sharesDisplayName}</p>
-				<p className="investment-line-item__percentage">{percentage}</p>
-				<p className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</p>
-			</div>
-		</Link>
+				<td className="investment-line-item__ticker">{ticker ?? "N/A"}</td>
+				<td className="investment-line-item__share">{quantity}</td>
+				<td className="investment-line-item__percentage">{percentage}</td>
+				<td className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</td>
+				<td><WarningSign aboveThreshold={aboveThreshold} /></td>
+			</Link>
+		</tr>
 	);
 };

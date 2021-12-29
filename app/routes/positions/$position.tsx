@@ -34,11 +34,11 @@ export const loader: LoaderFunction = async () => {
 
 const IndividualInvestmentInformation = () => {
 	const { balances } = useLoaderData<DashboardProps>();
-    const { securities, holdings } = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
+	const { securities, holdings } = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
 
 	const params = useParams();
 	const securityId = params.position ?? "";
-    const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
+	const holdingsOfCurrentSecurity = holdings.filter(holding => holding.security_id === securityId);
 
 	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
 	const tickerSymbol = securityIdToTickerSymbol[securityId] ?? "Not Found";
@@ -77,21 +77,21 @@ const IndividualInvestmentInformation = () => {
 	);
 
 	return (
-        <div className="investment">
+		<div className="investment">
 			<h1>Accounts Holding {tickerSymbol}</h1>
 
-            <p>Total number of shares: {totalNumberShares}</p>
+			<h3>Total number of shares: {totalNumberShares}</h3>
 
 			{
-			holdingsOfCurrentSecurity.map(holding => {
-				const accountName = getAccountNameById(holding.account_id);
-				const numberOfShares = accountIdToNumberOfShares[holding.account_id];
-				const formattedNumberOfShares = decimalFormatter.format(numberOfShares);
+				holdingsOfCurrentSecurity.map(holding => {
+					const accountName = getAccountNameById(holding.account_id);
+					const numberOfShares = accountIdToNumberOfShares[holding.account_id];
+					const formattedNumberOfShares = decimalFormatter.format(numberOfShares);
 
-				return (
-					<Link key={holding.account_id} to={`/account/${holding.account_id}`}>
-						<p>{accountName}: {formattedNumberOfShares} shares</p>
-					</Link>)
+					return (
+						<Link key={holding.account_id} to={`/accounts/${holding.account_id}`}>
+							<p>{accountName}: {formattedNumberOfShares} shares</p>
+						</Link>)
 				})
 			}
 		</div>
