@@ -1,11 +1,11 @@
 import { AccountBase, Holding } from "plaid";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, useActionData, useLoaderData } from "remix";
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
-import { RateOfReturn } from "~/components/RateOfReturn";
+// import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { InvestmentResponse } from '~/types/index';
+import { HoldingsSecurities } from '~/types/index';
 import { PositionsLoaderData } from "~/types/positions.types";
 
 export const meta: MetaFunction = () => {
@@ -23,7 +23,7 @@ export const links: LinksFunction = () => {
 
 export const getInvestmentsAndAccountBalances = async () => {
 	const promises: [
-		Promise<InvestmentResponse>,
+		Promise<HoldingsSecurities>,
 		Promise<Array<AccountBase>>
 	] = [
 			getInvestmentHoldings(),
@@ -34,7 +34,7 @@ export const getInvestmentsAndAccountBalances = async () => {
 
 	// @ts-ignore
 	const resolvedPromises: [
-		InvestmentResponse,
+		HoldingsSecurities,
 		AccountBase[]
 	] = results
 		// @ts-ignore

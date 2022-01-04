@@ -1,10 +1,9 @@
 
-import { Holding, Security } from "plaid";
+import { AccountBase, Holding, Security } from "plaid";
 import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useOutletContext, useParams } from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { DashboardProps } from "../../types/index";
 import investmentStyles from '~/styles/investment.css';
 
 export const meta: MetaFunction = () => {
@@ -33,7 +32,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 const IndividualInvestmentInformation = () => {
-	const { balances } = useLoaderData<DashboardProps>();
+	const { balances } = useLoaderData<{ balances: AccountBase[] }>();
 	const { securities, holdings } = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
 
 	const params = useParams();

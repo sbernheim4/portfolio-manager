@@ -1,7 +1,7 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
-import { DashboardProps } from '~/types/index';
+import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
@@ -33,7 +33,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 const Dashboard = () => {
-    const investmentData = useLoaderData<DashboardProps>();
+    const investmentData = useLoaderData<BalancesHoldingsSecurities>();
 	const { holdings, securities, balances } = investmentData;
 
     return (

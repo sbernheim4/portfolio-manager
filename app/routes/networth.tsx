@@ -20,9 +20,9 @@ export type AccountBalanceChartData = Array<{
 	totalBalance: number;
 }>
 
-type LoaderResponse = {
+type NetworthLoaderData = {
 	todaysBalance: number;
-	accountBase: Array<AccountBase>;
+	balances: Array<AccountBase>;
 	accountIdsToName: Array<{ accountId: string; name: string; }>;
 	todaysBalanceData: Record<string, number>;
 	accountBalancesChartData: AccountBalanceChartData
@@ -70,10 +70,10 @@ const mergeHistoricalAndTodaysBalanceData = (
 export const loader: LoaderFunction = async () => {
 
 	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances();
-	const accountBase = filterForInvestmentAccounts(await getPlaidAccountBalances());
+	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
-	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(accountBase);
-	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getPerAccountBalancesForToday(accountBase);
+	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(balances);
+	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getPerAccountBalancesForToday(balances);
 
 	const mergedAccountBalancesChartData = mergeHistoricalAndTodaysBalanceData(
 		// @ts-ignore
@@ -86,7 +86,7 @@ export const loader: LoaderFunction = async () => {
 		accountBalancesChartData: mergedAccountBalancesChartData,
 		todaysBalanceData,
 		accountIdsToName,
-		accountBase,
+		balances,
 		todaysBalance
 	});
 };
@@ -112,8 +112,8 @@ const Networth = () => {
 		accountIdsToName,
 		todaysBalanceData,
 		todaysBalance,
-		accountBase
-	} = useLoaderData<LoaderResponse>();
+		balances
+	} = useLoaderData<NetworthLoaderData>();
 
 	const submit = useSubmit();
 
@@ -146,7 +146,7 @@ const Networth = () => {
 	return (
 		<div className="networth">
 			<h1>Your Portfolio Balance</h1>
-			<InvestmentAccounts balances={accountBase} />
+			<InvestmentAccounts balances={balances} />
 
 			{
 				// If JS is disabled allow the user to store the data

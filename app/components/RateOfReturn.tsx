@@ -1,6 +1,4 @@
 import { xirr } from "@webcarrot/xirr";
-
-
 import { InvestmentTransaction } from "plaid";
 
 export const RateOfReturn = (props: {

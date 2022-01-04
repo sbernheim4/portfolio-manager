@@ -1,5 +1,5 @@
 import { Link, LinksFunction } from "remix";
-import navbarStlyes from "./navbar.css";
+import navbarStlyes from "./styles/navbar.css";
 
 export const links: LinksFunction = () => {
 	return [
