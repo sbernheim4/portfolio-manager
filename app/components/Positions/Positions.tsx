@@ -4,7 +4,7 @@ import { dollarFormatter } from '~/helpers/formatters';
 import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
 import { useSearchHoldings } from '~/hooks/useSearch';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
-import positionsStyles from './positions.css';
+import positionsStyles from './styles/positions.css';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 
 export const links: LinksFunction = () => {
@@ -49,6 +49,34 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 export const aggregateHoldings = (holdings: Holding[]) => {
 
+
+	const consolidateHolding = (holdingList: Holding[], holding: Holding, entryIndex: number) => {
+
+		const existingHoldingEntry = holdingList[entryIndex];
+
+		const updatedHoldingEntry: Holding = {
+			...holding,
+			quantity: existingHoldingEntry.quantity + holding.quantity,
+			institution_value: existingHoldingEntry.institution_value + holding.institution_value,
+			// TODO: Need to figure out how to calculate the cost basis across all accounts that
+			// hold this security
+			// cost_basis:
+		};
+
+        // Remove the existing holding entry from the list - it will be replaced
+        // by `updatedHoldingEntry`
+		const cleanedHoldingArray = [
+			...holdingList.slice(0, entryIndex),
+			...holdingList.slice(entryIndex + 1)
+		];
+
+		return [
+			updatedHoldingEntry,
+			...cleanedHoldingArray
+		];
+
+	};
+
 	const mergedHoldings = holdings.reduce((acc, curr) => {
 
 		const currentSecurityId = curr.security_id;
@@ -57,23 +85,9 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 
 		if (!securityAlreadyExists) {
 			return [...acc, curr];
+		} else {
+			return consolidateHolding(acc, curr, entryIndex);
 		}
-
-		// Merge the existing entry for a given symbol and the current entry for the same symbol
-		const existingEntry = acc[entryIndex];
-
-		const newEntry: Holding = {
-			...curr,
-			quantity: existingEntry.quantity + curr.quantity,
-			institution_value: existingEntry.institution_value + curr.institution_value,
-			// TODO: Need to figure out how to calculate the cost basis across all accounts that
-			// hold this security
-			// cost_basis:
-		};
-
-		const newArr = [...acc.slice(0, entryIndex), ...acc.slice(entryIndex + 1)];
-
-		return [...newArr, newEntry];
 
 	}, [] as Holding[]);
 

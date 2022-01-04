@@ -25,7 +25,7 @@ export type LinkedInstitutionsResponse = {
     institution: Institution;
 }[]
 
-type LoaderResponse = {
+type ManageAccountsLoader = {
 	linkedInstitutions: LinkedInstitutionsResponse;
 	linkToken: string;
 };
@@ -120,7 +120,7 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 
 const LinkAccount = () => {
 
-	const loaderData = useLoaderData<LoaderResponse>();
+	const loaderData = useLoaderData<ManageAccountsLoader>();
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
 
