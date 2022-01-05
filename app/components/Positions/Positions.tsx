@@ -151,6 +151,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
 				<Form action="/positions" method="post">
 					<input className="positions__search" name="search" type="search" placeholder="Search by ticker" />
+					<input type="hidden" name="_action" value="search" readOnly />
 				</Form>
 			</noscript>
 

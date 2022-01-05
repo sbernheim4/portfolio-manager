@@ -14,12 +14,9 @@ export const SectorWeight = (props: { securities: Security[], holdings: Holding[
 
 	}, {} as Record<string, string | null>);
 
-	console.log(securityIdToType);
-
 	const investmentTypeToValue = holdings.reduce((acc, curr) => {
 		const securityId = curr.security_id;
 		const type = securityIdToType[securityId];
-		console.log(curr);
 
 		if (!type) {
 			return acc;

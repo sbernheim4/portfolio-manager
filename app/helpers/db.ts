@@ -10,9 +10,10 @@ const client = new MongoClient(uri);
 let activeConnection: Promise<MongoClient> | undefined;
 
 type UserInfo = {
+	lastAccessed: string;
 	user: string;
 	itemIdToAccessToken: Record<string, string>;
-	balances: Array<{date: string, balances: number}>
+	balances: Array<{ date: string, balances: number }>
 	accountBalances: Array<{
 		// @ts-ignore
 		"date": string,
@@ -32,7 +33,7 @@ try {
 
 	}
 
-} catch(err) {
+} catch (err) {
 
 	if (activeConnection !== undefined) {
 		activeConnection.then(x => x.close());
@@ -109,7 +110,7 @@ const getUserInfoCollection = async () => {
 const updateDB = async <T>(name: string, initialValue: T, fn: (userInfo: UserInfo) => T) => {
 
 	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: userId}) as unknown as UserInfo;
+	const userInfo = await userInfoCollection.findOne({ user: userId }) as unknown as UserInfo;
 
 	// @ts-ignore
 	const nestedData = userInfo[name];
@@ -129,7 +130,7 @@ const updateDB = async <T>(name: string, initialValue: T, fn: (userInfo: UserInf
 
 		return userInfoCollection.findOneAndUpdate(
 			{ user: userId },
-			{ $set: { [name]:  valueToInsert } }
+			{ $set: { [name]: valueToInsert } }
 		);
 
 	}
@@ -167,28 +168,28 @@ export const saveAccountBalancesToDB = (
 		date: new Date().toISOString()
 	}];
 
- 	updateDB('accountBalances', newEntry, (userInfo) => {
+	updateDB('accountBalances', newEntry, (userInfo) => {
 
- 		const { accountBalances } = userInfo;
+		const { accountBalances } = userInfo;
 
- 		if (accountBalances.length) {
- 			const lastEntry = accountBalances[accountBalances.length - 1];
- 			const mostRecentEntry = new Date(lastEntry.date)
+		if (accountBalances.length) {
+			const lastEntry = accountBalances[accountBalances.length - 1];
+			const mostRecentEntry = new Date(lastEntry.date)
 
- 			return isToday(mostRecentEntry) ?
- 				accountBalances :
- 				[
- 					...accountBalances,
- 					...newEntry
- 				];
+			return isToday(mostRecentEntry) ?
+				accountBalances :
+				[
+					...accountBalances,
+					...newEntry
+				];
 
- 		} else {
+		} else {
 
- 			return newEntry;
+			return newEntry;
 
- 		}
+		}
 
- 	});
+	});
 
 
 };
@@ -202,4 +203,9 @@ export const getAccountBalancesFromDB = async () => {
 
 	return accountBalances;
 
+};
+
+export const updateLastAccessed = async (date: string) => {
+	console.log({ date });
+	updateDB("lastAccessed", date, () => date);
 };
