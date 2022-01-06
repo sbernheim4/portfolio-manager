@@ -6,6 +6,7 @@ import { ActionFunction, LinksFunction, LoaderFunction, MetaFunction, json, useL
 import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, unlinkPlaidItem } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
+import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -21,8 +22,8 @@ export const links: LinksFunction = () => {
 };
 
 export type LinkedInstitutionsResponse = {
-    itemId: string;
-    institution: Institution;
+	itemId: string;
+	institution: Institution;
 }[]
 
 type ManageAccountsLoader = {
@@ -30,15 +31,15 @@ type ManageAccountsLoader = {
 	linkToken: string;
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
 
 	const linkedInstitutions = await getPlaidLinkedInstitutions();
 
-    // The logged in user's unique id
+	// The logged in user's unique id
 	// const { id: clientUserId } = await User.find(...);
 	const clientUserId = "5a24ca6a4e95b836d37e37fe"
 
-	const request = {
+	const plaidRequest = {
 		user: {
 			// This should correspond to a unique id for the current user.
 			client_user_id: clientUserId,
@@ -50,11 +51,11 @@ export const loader: LoaderFunction = async () => {
 		country_codes: [CountryCode.Us],
 	};
 
-	const createTokenResponse = await createPlaidLinkToken(request);
+	const createTokenResponse = await createPlaidLinkToken(plaidRequest);
 
 	return {
 		linkedInstitutions,
-        linkToken: createTokenResponse
+		linkToken: createTokenResponse
 	};
 
 };
@@ -64,7 +65,7 @@ export const action: ActionFunction = async ({ request }) => {
 	const body = await request.formData();
 	const action = body.get("_action");
 
-	switch(action) {
+	switch (action) {
 		case "linkAccount":
 			const publicToken = body.get("public_token") as string;
 			const { error } = await exchangePublicTokenForAccessToken(publicToken);
@@ -91,7 +92,7 @@ export const action: ActionFunction = async ({ request }) => {
 	}
 };
 
-const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.SetStateAction<Option<string>>>}) => {
+const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.SetStateAction<Option<string>>> }) => {
 
 	const onSuccess = useCallback(async (public_token, _metadata) => {
 
