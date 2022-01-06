@@ -4,6 +4,7 @@ import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { sumAccountBalances } from "~/helpers/sumAccountBalances";
+import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -17,7 +18,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
 
 	const balances = await getPlaidAccountBalances();
 	const investmentAccounts = filterForInvestmentAccounts(balances);
@@ -34,31 +35,31 @@ export const loader: LoaderFunction = async () => {
 };
 
 const Accounts = () => {
-    const investmentData = useLoaderData<{
+	const investmentData = useLoaderData<{
 		investmentAccounts: AccountBase[],
 		nonInvestmentAccounts: AccountBase[],
-    }> ();
+	}>();
 
 	const {
 		investmentAccounts,
 		nonInvestmentAccounts
 	} = investmentData;
 
-    const allAccounts = [
-        ...investmentAccounts,
-        ...nonInvestmentAccounts
-    ];
+	const allAccounts = [
+		...investmentAccounts,
+		...nonInvestmentAccounts
+	];
 
 	const totalBalance = sumAccountBalances(allAccounts);
 
 	return (
 		<div className="accounts">
 
-            <h1>Account Balances: {dollarFormatter.format(totalBalance)}</h1>
+			<h1>Account Balances: {dollarFormatter.format(totalBalance)}</h1>
 
 			<InvestmentAccounts balances={investmentAccounts}>
 				<h2>Investment and Brokerage Accounts</h2>
-            </InvestmentAccounts>
+			</InvestmentAccounts>
 
 			<InvestmentAccounts balances={nonInvestmentAccounts}>
 				<h2>Cash and Loan Accounts</h2>

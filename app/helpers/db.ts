@@ -1,8 +1,9 @@
 import { MongoClient } from 'mongodb';
+import { Option } from "excoptional";
 import { isToday } from 'date-fns';
 import { MONGODB_PWD } from "../env";
 
-const userId = "sams-unique-user-id-12345";
+export const userId = "sams-unique-user-id-12345";
 const collectionName = "userInfo";
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -205,7 +206,10 @@ export const getAccountBalancesFromDB = async () => {
 
 };
 
-export const updateLastAccessed = async (date: string) => {
-	console.log({ date });
-	updateDB("lastAccessed", date, () => date);
+export const updateLastAccessed = async (date: Option<string>) => {
+
+	date.map(d => {
+		updateDB("positionsLastUpdatedAt", d, () => d);
+	});
+
 };

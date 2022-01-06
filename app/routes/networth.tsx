@@ -11,6 +11,7 @@ import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import networthStyles from "~/styles/networth/networth.css";
 
 export type AccountBalanceChartData = Array<{
@@ -67,7 +68,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
 
 	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances();
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());

@@ -5,6 +5,7 @@ import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
+import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -20,7 +21,11 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+	const x = await validateUserIsLoggedIn(request);
+	if (x instanceof Boolean === false) {
+		return x
+	}
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentAccounts = filterForInvestmentAccounts(balances);
@@ -33,17 +38,17 @@ export const loader: LoaderFunction = async () => {
 };
 
 const Dashboard = () => {
-    const investmentData = useLoaderData<BalancesHoldingsSecurities>();
+	const investmentData = useLoaderData<BalancesHoldingsSecurities>();
 	const { holdings, securities, balances } = investmentData;
 
-    return (
+	return (
 		<div className="dashboard">
 			<Positions securities={securities} holdings={holdings} />
 
 			<h1>Your Portfolio Balance</h1>
 			<InvestmentAccounts balances={balances} />
 		</div>
-    );
+	);
 
 };
 

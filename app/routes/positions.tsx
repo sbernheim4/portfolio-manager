@@ -1,4 +1,5 @@
 import { AccountBase, Holding } from "plaid";
+import { Option } from 'excoptional';
 import { useEffect } from "react";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, useActionData, useLoaderData, useSubmit } from "remix";
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
@@ -7,6 +8,7 @@ import { SectorWeight } from "~/components/SectorWeight";
 import { updateLastAccessed } from "~/helpers/db";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import { HoldingsSecurities } from '~/types/index';
 import { PositionsLoaderData } from "~/types/positions.types";
 
@@ -55,7 +57,7 @@ export const getInvestmentsAndAccountBalances = async () => {
 
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentTransactions = await getInvestmentTransactions();
@@ -79,7 +81,6 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const formData = await request.formData();
 	const action = formData.get("_action");
-	console.log({ action });
 
 	switch (action) {
 		case "search":
@@ -110,8 +111,7 @@ export const action: ActionFunction = async ({ request }) => {
 			return json({ filteredHoldings });
 
 		case "updateLastAccessed":
-			console.log("IN THE RIGHT ACTION HANDLER");
-			const lastAccessed = formData.get("lastAccessed");
+			const lastAccessed = Option.of(formData.get("lastAccessed")?.toString());
 			await updateLastAccessed(lastAccessed);
 			return null;
 	}
