@@ -1,4 +1,4 @@
-import { isToday } from "date-fns";
+import { isAfter, isToday } from "date-fns";
 import { AccountBase } from "plaid";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianAxis, Tooltip, XAxis, YAxis } from "recharts";
@@ -44,7 +44,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 	const lastEntry = historicalBalanceData[historicalBalanceData.length - 1];
 	const noEntriesExist = lastEntry === undefined;
 
-	if(noEntriesExist) {
+	if (noEntriesExist) {
 
 		return [{
 			date: new Date().toISOString(),
@@ -74,7 +74,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
 	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(balances);
-	const [ accountIdsToName, todaysBalanceData ] = NetworthHelpers.getPerAccountBalancesForToday(balances);
+	const [accountIdsToName, todaysBalanceData] = NetworthHelpers.getPerAccountBalancesForToday(balances);
 
 	const mergedAccountBalancesChartData = mergeHistoricalAndTodaysBalanceData(
 		// @ts-ignore
@@ -119,8 +119,8 @@ const Networth = () => {
 	const submit = useSubmit();
 
 	// Auto Submit today's balance when JS is enabled via useEffect
-    // The DB handler takes care of only storing todays balance if it hasn't yet
-    // been stored
+	// The DB handler takes care of only storing todays balance if it hasn't yet
+	// been stored
 	useEffect(() => {
 
 		const formData = new FormData();
@@ -131,17 +131,20 @@ const Networth = () => {
 	}, []);
 
 	const [accountsToShow, setAccountsToShow] = useState(accountIdsToName);
+	const [filteredAccountBalancesChartData, setFilteredAccountBalancesChartData] = useState(accountBalancesChartData);
 
 	const handleClick = () => {
 		const checkBoxes = document.querySelectorAll('input[type=checkbox]');
 		const checkedValues = Array.from(checkBoxes).filter(el => el.checked).map(el => el.name);
 		const allUnchecked = Array.from(checkBoxes).reduce((acc, curr) => acc && !curr.checked, true)
 
-		const x = allUnchecked ?
+		const updatedAccountIdsToShow = allUnchecked ?
 			accountIdsToName :
 			accountIdsToName.filter(x => checkedValues.includes(x.name));
 
-		setAccountsToShow(x);
+		setAccountsToShow(updatedAccountIdsToShow);
+
+		// const accountIdsToShow = updatedAccountIdsToShow.map(x => x.accountId);
 	};
 
 	return (
@@ -163,19 +166,27 @@ const Networth = () => {
 			<div className="networth__chart">
 
 				<>
-                    <h4>Accounts To Display</h4>
-					{accountIdsToName.map(entry => {
-						return (
-							<div className="networth__chart__checkbox-container" key={entry.accountId}>
-                                <input onClick={handleClick} id={entry.name} type="checkbox" name={entry.name} />
-								<label htmlFor={entry.name}>{entry.name}</label>
-							</div>
-						);
-					})}
+					<h4>Accounts To Display</h4>
+					<Form method="post">
+						{accountIdsToName.map(entry => {
+							return (
+								<div className="networth__chart__checkbox-container" key={entry.accountId}>
+									<input value="on" onClick={handleClick} id={entry.name} type="checkbox" name={entry.name} />
+									<label htmlFor={entry.name}>{entry.name}</label>
+								</div>
+							);
+						})}
+
+						{
+							!isClientSideJSEnabled() ?
+								<input type="submit" value="submit" /> :
+								null
+						}
+					</Form>
 				</>
 				<br />
 
-				<AreaChart margin={{ left: 50, top: 30 }} width={730} height={240} data={accountBalancesChartData}>
+				<AreaChart margin={{ left: 50, top: 30 }} width={730} height={240} data={filteredAccountBalancesChartData}>
 
 					<CartesianAxis />
 
@@ -187,7 +198,7 @@ const Networth = () => {
 
 					<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
 
-					{accountsToShow.map((acc, index ) => {
+					{accountsToShow.map((acc, index) => {
 						return <Area
 							type="monotone"
 							fillOpacity={.5}

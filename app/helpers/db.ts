@@ -10,6 +10,7 @@ const client = new MongoClient(uri);
 
 let activeConnection: Promise<MongoClient> | undefined;
 
+type AccountId = string;
 type UserInfo = {
 	lastAccessed: string;
 	user: string;
@@ -18,9 +19,8 @@ type UserInfo = {
 	accountBalances: Array<{
 		// @ts-ignore
 		"date": string,
-
 		"totalBalance": number;
-		[key: string]: number
+		[key: AccountId]: number
 	}>; // Array<AccountBalance>
 };
 
@@ -103,8 +103,8 @@ const getUserInfoCollection = async () => {
 		throw new Error("Could not connect to DB");
 	}
 
-	return activeConnection.then(x => {
-		return x.db().collection(collectionName);
+	return activeConnection.then(mongoClient => {
+		return mongoClient.db().collection(collectionName);
 	});
 };
 
@@ -156,7 +156,6 @@ export const saveNewAccessToken = async (accessToken: string, itemId: string) =>
 
 };
 
-type AccountId = string;
 type AccountBalance = number;
 export const saveAccountBalancesToDB = (
 	accountRecords: Record<AccountId, AccountBalance>,
