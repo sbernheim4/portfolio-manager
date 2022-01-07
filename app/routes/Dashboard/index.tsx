@@ -22,10 +22,6 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const x = await validateUserIsLoggedIn(request);
-	if (x instanceof Boolean === false) {
-		return x
-	}
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentAccounts = filterForInvestmentAccounts(balances);
