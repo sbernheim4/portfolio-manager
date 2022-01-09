@@ -85,8 +85,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	return json({
 		accountBalancesChartData: mergedAccountBalancesChartData,
+		// Used by the client to update the historical info in the DB
 		todaysBalanceData,
+		// Helper for filtering what charts for accounts to show - checkboxes
+		// display names but the chart data relies on account ids
 		accountIdsAndNames,
+		// Provided to the InvestmentAccounts component rendered by this route
 		balances,
 		todaysBalance
 	});
@@ -98,6 +102,8 @@ export const action: ActionFunction = async ({ request }) => {
 	const action = formData.get("_action");
 
 	switch (action) {
+		// User clicks to save today's balance information to their historical
+		// record.
 		case "saveBalance":
 			const balance = parseFloat(formData.get("totalBalance") as string);
 			const accountRecords = JSON.parse(formData.get("accountsBalance") as string) as Record<string, number>;
@@ -107,10 +113,14 @@ export const action: ActionFunction = async ({ request }) => {
 
 			return null;
 		case "filterBalanceChart":
+			// User decides to filter the chart to only show a given set of
+			// accounts.
 
-			// Construct a list of accounts to include by the account name based
-			// on which checkboxes were checked and included in the form
-			// submission
+			/*
+			 * 1. Construct a list of accounts to include by the account name
+			 * based on which checkboxes were checked and included in the form
+			 * submission.
+			 */
 			let accountNamesIncludedInForm = [] as Array<string>;
 
 			for (const pair of formData) {
@@ -122,12 +132,23 @@ export const action: ActionFunction = async ({ request }) => {
 
 			}
 
-			// Get all the user's accounts
+			/*
+			 * 2. Get all the user's accounts.
+			 */
 			const accountInfo = await getPlaidAccounts();
 
-			// Filter to only include the accounts in the constructed list above
-			const selectedAccountsFromFormSubmission = accountInfo
+			/*
+			 * 3. Filter to only include the accounts in the constructed list
+			 * above.
+			 */
+			const selectedAccountsFromFormSubmission: AccountIdsAndNames = accountInfo
 				.filter(x => accountNamesIncludedInForm.includes(x.name))
+				// We can't just return the result of the filter - it's type is
+				// AccountBase - which uses the name account_id instead of
+				// accountId which is what the client side JS is expecting.
+				// The other potential sources only include the accountId and
+				// name so we stick to just the data the client needs without
+				// over fetching.
 				.map(account => {
 					return {
 						accountId: account.account_id,
@@ -135,9 +156,7 @@ export const action: ActionFunction = async ({ request }) => {
 					}
 				});
 
-			return {
-				selectedAccountsFromFormSubmission: selectedAccountsFromFormSubmission as AccountIdsAndNames
-			};
+			return { selectedAccountsFromFormSubmission };
 
 		default:
 			return null
@@ -231,6 +250,23 @@ const Networth = () => {
 
 				<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
 
+				{
+					/* Successively test all 3 versions of the account data to
+					 * render into the chart. The order is intended.
+					 *
+					 * If JS is *disabled* and form is submitted defer to form
+					 * result (selectedAccountsFromFormSubmission) above all
+					 * else.
+					 *
+					 * If JS is *enabled*, defer to state variable
+					 * (accountsToShow) as this value is connected to the
+					 * checkbox click handler.
+					 *
+					 * If JS is *disabled* AND the form has not yet been
+					 * submitted (inital render), defer to loader value
+					 * (accountIdsAndNames).
+					*/
+				}
 				{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
 					return <Area
 						type="monotone"
@@ -253,7 +289,9 @@ const Networth = () => {
 			<InvestmentAccounts balances={balances} />
 
 			{
-				// If JS is disabled allow the user to store the data
+				// If JS is disabled, allow the user to store today's balances
+				// in their history
+				// TODO: Could this just be done automatically by the loader?
 				!isClientSideJSEnabled() ?
 					<Form>
 						<input type="submit" value="Save Balance" />
@@ -266,33 +304,32 @@ const Networth = () => {
 			<br />
 			<div className="networth__chart">
 
-				<>
-					<h4>Accounts To Display</h4>
-					<Form method="post">
-						{accountIdsAndNames.map(entry => {
-							return (
-								<div className="networth__chart__checkbox-container" key={entry.accountId}>
-									<input
-										name={entry.name}
-										value="on"
-										onClick={handleClick}
-										id={entry.name}
-										type="checkbox"
-									/>
-									<label htmlFor={entry.name}>{entry.name}</label>
-								</div>
-							);
-						})}
+				<h4>Accounts To Display</h4>
+				<Form method="post">
+					{accountIdsAndNames.map(entry => {
+						return (
+							<div className="networth__chart__checkbox-container" key={entry.accountId}>
+								<input
+									name={entry.name}
+									value="on"
+									onClick={handleClick}
+									id={entry.name}
+									type="checkbox"
+								/>
+								<label htmlFor={entry.name}>{entry.name}</label>
+							</div>
+						);
+					})}
 
-						<input name="_action" value="filterBalanceChart" type="hidden" />
+					<input name="_action" value="filterBalanceChart" type="hidden" />
 
-						{
-							!isClientSideJSEnabled() ?
-								<input type="submit" value="submit" /> :
-								null
-						}
-					</Form>
-				</>
+					{
+						!isClientSideJSEnabled() ?
+							<input type="submit" value="submit" /> :
+							null
+					}
+				</Form>
+
 				<br />
 
 				{chart}
