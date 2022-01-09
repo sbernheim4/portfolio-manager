@@ -241,7 +241,7 @@ const Networth = () => {
 
 				<>
 					<h4>Accounts To Display</h4>
-					<Form reloadDocument={false} method="post">
+					<Form method="post">
 						{accountIdsAndNames.map(entry => {
 							return (
 								<div className="networth__chart__checkbox-container" key={entry.accountId}>
