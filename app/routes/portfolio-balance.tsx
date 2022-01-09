@@ -1,7 +1,7 @@
 import { isAfter, isToday } from "date-fns";
 import { AccountBase } from "plaid";
 import { useEffect, useState } from "react";
-import { Area, AreaChart, CartesianAxis, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ActionFunction, Form, json, LinksFunction, LoaderFunction, useLoaderData, useSubmit } from "remix";
 
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
@@ -144,7 +144,6 @@ const Networth = () => {
 
 		setAccountsToShow(updatedAccountIdsToShow);
 
-		// const accountIdsToShow = updatedAccountIdsToShow.map(x => x.accountId);
 	};
 
 	return (
@@ -186,31 +185,33 @@ const Networth = () => {
 				</>
 				<br />
 
-				<AreaChart margin={{ left: 50, top: 30 }} width={730} height={240} data={filteredAccountBalancesChartData}>
+				<ResponsiveContainer width={"70%"} height={240}>
+					<AreaChart margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
 
-					<CartesianAxis />
+						<CartesianAxis />
 
-					<XAxis dataKey="date" />
+						<XAxis dataKey="date" />
 
-					<YAxis domain={['dataMin', 'dataMax']} />
+						<YAxis domain={[0, 'dataMax']} />
 
-					<Tooltip formatter={tooltipFormatter} />
+						<Tooltip formatter={tooltipFormatter} />
 
-					<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+						<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
 
-					{accountsToShow.map((acc, index) => {
-						return <Area
-							type="monotone"
-							fillOpacity={.5}
-							fill={COLORS[index % COLORS.length]}
-							stroke={COLORS[index % COLORS.length]}
-							name={acc.name}
-							key={acc.accountId}
-							dataKey={acc.accountId}
-						/>
-					})}
+						{accountsToShow.map((accountInfo, index) => {
+							return <Area
+								type="monotone"
+								fillOpacity={.5}
+								fill={COLORS[index % COLORS.length]}
+								stroke={COLORS[index % COLORS.length]}
+								name={accountInfo.name}
+								key={accountInfo.accountId}
+								dataKey={accountInfo.accountId}
+							/>
+						})}
 
-				</AreaChart>
+					</AreaChart>
+				</ResponsiveContainer >
 			</div>
 
 		</div>
