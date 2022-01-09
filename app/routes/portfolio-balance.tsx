@@ -193,7 +193,7 @@ const Networth = () => {
 
 				<CartesianAxis />
 
-				<XAxis dataKey="date" />
+				<XAxis interval={1} minTickGap={10} dataKey="date" />
 
 				<YAxis domain={[0, 'dataMax']} />
 
@@ -223,7 +223,7 @@ const Networth = () => {
 
 				<CartesianAxis />
 
-				<XAxis dataKey="date" />
+				<XAxis interval={1} dataKey="date" />
 
 				<YAxis domain={[0, 'dataMax']} />
 
