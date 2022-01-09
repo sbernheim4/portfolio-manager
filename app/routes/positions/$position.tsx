@@ -45,6 +45,9 @@ const IndividualInvestmentInformation = () => {
 
 	// const holdings = holdings.filter(holding => holding.security_id === securityId);
 
+	/*
+	 * AccountId -> # shares
+	 */
 	const accountIdToNumberOfShares = holdings
 		.filter(holding => holding.security_id === securityId)
 		.reduce((acc, curr) => {
@@ -62,6 +65,9 @@ const IndividualInvestmentInformation = () => {
 			}
 		}, {} as Record<string, number>);
 
+	/*
+	 * Helper function to retrieve an account's name given its ID
+	 */
 	const getAccountNameById = (accountId: string) => {
 		const account = balances.find(account => account.account_id === accountId);
 
@@ -71,6 +77,9 @@ const IndividualInvestmentInformation = () => {
 			"Account Name not found";
 	};
 
+	/*
+	 * The total number of shares of a single stock held across all accounts
+     */
 	const totalNumberShares = decimalFormatter.format(
 		holdingsOfCurrentSecurity
 			.reduce((acc, curr) => acc + curr.quantity, 0)
