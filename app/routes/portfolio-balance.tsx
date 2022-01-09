@@ -1,4 +1,4 @@
-import { isAfter, isToday } from "date-fns";
+import { isToday } from "date-fns";
 import { AccountBase } from "plaid";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -11,7 +11,6 @@ import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import networthStyles from "~/styles/networth/networth.css";
 
 export type AccountBalanceChartData = Array<{
@@ -188,37 +187,65 @@ const Networth = () => {
 
 	};
 
-	const areaChart = <AreaChart width={600} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
+	const PositionsBalanceChartWithSize = () => {
+		return (
+			<AreaChart width={800} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
 
-		<CartesianAxis />
+				<CartesianAxis />
 
-		<XAxis dataKey="date" />
+				<XAxis dataKey="date" />
 
-		<YAxis domain={[0, 'dataMax']} />
+				<YAxis domain={[0, 'dataMax']} />
 
-		<Tooltip formatter={tooltipFormatter} />
+				<Tooltip formatter={tooltipFormatter} />
 
-		<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+				<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
 
-		{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
-			return <Area
-				type="monotone"
-				fillOpacity={.5}
-				fill={COLORS[index % COLORS.length]}
-				stroke={COLORS[index % COLORS.length]}
-				name={account.name}
-				key={account.accountId}
-				dataKey={account.accountId}
-			/>
-		})}
+				{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
+					return <Area
+						type="monotone"
+						fillOpacity={.5}
+						fill={COLORS[index % COLORS.length]}
+						stroke={COLORS[index % COLORS.length]}
+						name={account.name}
+						key={account.accountId}
+						dataKey={account.accountId}
+					/>
+				})}
 
-	</AreaChart>
+			</AreaChart>
+		);
+	};
 
 	const chart = isClientSideJSEnabled() ?
-		<ResponsiveContainer width="90%" height={250}>
-			{areaChart}
+		<ResponsiveContainer width="100%" height={250}>
+			<AreaChart data={accountBalancesChartData}>
+
+				<CartesianAxis />
+
+				<XAxis dataKey="date" />
+
+				<YAxis domain={[0, 'dataMax']} />
+
+				<Tooltip formatter={tooltipFormatter} />
+
+				<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+
+				{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
+					return <Area
+						type="monotone"
+						fillOpacity={.5}
+						fill={COLORS[index % COLORS.length]}
+						stroke={COLORS[index % COLORS.length]}
+						name={account.name}
+						key={account.accountId}
+						dataKey={account.accountId}
+					/>
+				})}
+
+			</AreaChart>
 		</ResponsiveContainer> :
-		areaChart;
+		<PositionsBalanceChartWithSize />;
 
 	return (
 		<div className="networth">
