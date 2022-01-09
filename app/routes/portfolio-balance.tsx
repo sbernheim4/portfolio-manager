@@ -127,9 +127,18 @@ export const action: ActionFunction = async ({ request }) => {
 			const accountInfo = await getPlaidAccounts();
 
 			// Filter to only include the accounts in the constructed list above
-			const selectedAccountsFromFormSubmission = accountInfo.filter(x => accountNamesIncludedInForm.includes(x.name))
+			const selectedAccountsFromFormSubmission = accountInfo
+				.filter(x => accountNamesIncludedInForm.includes(x.name))
+				.map(account => {
+					return {
+						accountId: account.account_id,
+						name: account.name
+					}
+				});
 
-			return { selectedAccountsFromFormSubmission };
+			return {
+				selectedAccountsFromFormSubmission: selectedAccountsFromFormSubmission as AccountIdsAndNames
+			};
 
 		default:
 			return null
@@ -161,7 +170,7 @@ const Networth = () => {
 		submit(formData, { method: "post" });
 	}, []);
 
-	const actionResponse = useActionData<{ selectedAccountsFromFormSubmission: AccountBase[] }>();
+	const actionResponse = useActionData<{ selectedAccountsFromFormSubmission: AccountIdsAndNames }>();
 	const selectedAccountsFromFormSubmission = actionResponse?.selectedAccountsFromFormSubmission;
 
 	const [accountsToShow, setAccountsToShow] = useState(accountIdsAndNames);
@@ -179,7 +188,7 @@ const Networth = () => {
 
 	};
 
-	const areaChart = <AreaChart width={500} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
+	const areaChart = <AreaChart width={600} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
 
 		<CartesianAxis />
 
@@ -191,15 +200,15 @@ const Networth = () => {
 
 		<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
 
-		{(selectedAccountsFromFormSubmission ?? accountsToShow).map((accountInfo, index) => {
+		{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
 			return <Area
 				type="monotone"
 				fillOpacity={.5}
 				fill={COLORS[index % COLORS.length]}
 				stroke={COLORS[index % COLORS.length]}
-				name={accountInfo.name}
-				key={accountInfo.accountId}
-				dataKey={accountInfo.accountId}
+				name={account.name}
+				key={account.accountId}
+				dataKey={account.accountId}
 			/>
 		})}
 
@@ -210,7 +219,6 @@ const Networth = () => {
 			{areaChart}
 		</ResponsiveContainer> :
 		areaChart;
-
 
 	return (
 		<div className="networth">
@@ -233,7 +241,7 @@ const Networth = () => {
 
 				<>
 					<h4>Accounts To Display</h4>
-					<Form method="post">
+					<Form reloadDocument={false} method="post">
 						{accountIdsAndNames.map(entry => {
 							return (
 								<div className="networth__chart__checkbox-container" key={entry.accountId}>
