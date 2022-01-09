@@ -131,7 +131,6 @@ const Networth = () => {
 	}, []);
 
 	const [accountsToShow, setAccountsToShow] = useState(accountIdsToName);
-	const [filteredAccountBalancesChartData, setFilteredAccountBalancesChartData] = useState(accountBalancesChartData);
 
 	const handleClick = () => {
 		const checkBoxes = document.querySelectorAll('input[type=checkbox]');
