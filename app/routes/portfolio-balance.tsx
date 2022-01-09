@@ -10,7 +10,7 @@ import { saveAccountBalancesToDB } from "~/helpers/db";
 import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
-import { filterForInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import networthStyles from "~/styles/networth/networth.css";
 
@@ -79,7 +79,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const [accountIdsAndNames, todaysBalanceData] = NetworthHelpers.getPerAccountBalancesForToday(balances);
 
 	const mergedAccountBalancesChartData = mergeHistoricalAndTodaysBalanceData(
-		// @ts-ignore
 		accountBalancesChartData,
 		todaysBalance,
 		todaysBalanceData
@@ -110,42 +109,27 @@ export const action: ActionFunction = async ({ request }) => {
 			return null;
 		case "filterBalanceChart":
 
-			const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());
-			const [accountIdsAndNames] = NetworthHelpers.getPerAccountBalancesForToday(balances);
-
-			let accountNamesToInclude = [] as Array<string>;
+			// Construct a list of accounts to include by the account name based
+			// on which checkboxes were checked and included in the form
+			// submission
+			let accountNamesIncludedInForm = [] as Array<string>;
 
 			for (const pair of formData) {
 				const accountName = pair[0]
 				const isOn = pair[1] === "on";
 				if (isOn) {
-					accountNamesToInclude.push(accountName);
+					accountNamesIncludedInForm.push(accountName);
 				}
 
 			}
 
-			accountIdsAndNames.filter(x => accountNamesToInclude.includes(x.name))
+			// Get all the user's accounts
+			const accountInfo = await getPlaidAccounts();
 
-			const foo = accountNamesToInclude.map(accountName => {
+			// Filter to only include the accounts in the constructed list above
+			const selectedAccountsFromFormSubmission = accountInfo.filter(x => accountNamesIncludedInForm.includes(x.name))
 
-				const res = accountIdsAndNames.find(x => x.name === accountName);
-				const accountId = res?.accountId
-
-				if (accountId) {
-					return {
-						accountId,
-						name: accountName
-					}
-				} else {
-					return false;
-				}
-
-			}).filter(x => x !== false);
-
-			return {
-				accountNamesToInclude: foo as AccountIdsAndNames
-			};
-
+			return { selectedAccountsFromFormSubmission };
 
 		default:
 			return null
@@ -177,8 +161,8 @@ const Networth = () => {
 		submit(formData, { method: "post" });
 	}, []);
 
-	const x = useActionData<{ accountNamesToInclude: AccountIdsAndNames }>();
-	const accountNamesToInclude = x?.accountNamesToInclude;
+	const actionResponse = useActionData<{ selectedAccountsFromFormSubmission: AccountBase[] }>();
+	const selectedAccountsFromFormSubmission = actionResponse?.selectedAccountsFromFormSubmission;
 
 	const [accountsToShow, setAccountsToShow] = useState(accountIdsAndNames);
 
@@ -194,6 +178,39 @@ const Networth = () => {
 		setAccountsToShow(updatedAccountIdsToShow);
 
 	};
+
+	const areaChart = <AreaChart width={500} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
+
+		<CartesianAxis />
+
+		<XAxis dataKey="date" />
+
+		<YAxis domain={[0, 'dataMax']} />
+
+		<Tooltip formatter={tooltipFormatter} />
+
+		<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+
+		{(selectedAccountsFromFormSubmission ?? accountsToShow).map((accountInfo, index) => {
+			return <Area
+				type="monotone"
+				fillOpacity={.5}
+				fill={COLORS[index % COLORS.length]}
+				stroke={COLORS[index % COLORS.length]}
+				name={accountInfo.name}
+				key={accountInfo.accountId}
+				dataKey={accountInfo.accountId}
+			/>
+		})}
+
+	</AreaChart>
+
+	const chart = isClientSideJSEnabled() ?
+		<ResponsiveContainer width="90%" height={250}>
+			{areaChart}
+		</ResponsiveContainer> :
+		areaChart;
+
 
 	return (
 		<div className="networth">
@@ -243,31 +260,7 @@ const Networth = () => {
 				</>
 				<br />
 
-				<AreaChart width={500} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
-
-					<CartesianAxis />
-
-					<XAxis dataKey="date" />
-
-					<YAxis domain={[0, 'dataMax']} />
-
-					<Tooltip formatter={tooltipFormatter} />
-
-					<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
-
-					{(accountNamesToInclude ?? accountsToShow ?? accountIdsAndNames).map((accountInfo, index) => {
-						return <Area
-							type="monotone"
-							fillOpacity={.5}
-							fill={COLORS[index % COLORS.length]}
-							stroke={COLORS[index % COLORS.length]}
-							name={accountInfo.name}
-							key={accountInfo.accountId}
-							dataKey={accountInfo.accountId}
-						/>
-					})}
-
-				</AreaChart>
+				{chart}
 			</div>
 
 		</div>

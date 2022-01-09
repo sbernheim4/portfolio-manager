@@ -47,7 +47,7 @@ export const getHistoricalPerAccountBalances = async () => {
 	const historicalAccountBalances = await getAccountBalancesFromDB();
 
 	const formattedHistoricalAccountBalances = historicalAccountBalances.map(dataPoint => {
-			return {
+		return {
 			...dataPoint,
 			date: format(new Date(dataPoint.date), "MM/dd/yyyy"),
 		};

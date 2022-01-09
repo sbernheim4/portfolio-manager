@@ -1,4 +1,4 @@
-import {  AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
+import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
 import { retrieveItemIdToAccessTokenMap, retrieveStoredAccessTokens } from "./db";
@@ -41,7 +41,7 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 	}
 };
 
-export const getInvestmentHoldings = async (): Promise<{holdings: Holding[]; securities: Security[]}>=> {
+export const getInvestmentHoldings = async (): Promise<{ holdings: Holding[]; securities: Security[] }> => {
 
 	const accessTokens = await retrieveStoredAccessTokens();
 
@@ -114,6 +114,31 @@ export const filterForNonInvestmentAccounts = (accounts: Array<AccountBase>) => 
 	const validInvestmentAccounts = ["investment", "brokerage"];
 
 	return accounts.filter(account => !validInvestmentAccounts.includes(account.type));
+};
+
+export const getPlaidAccounts = async () => {
+
+	try {
+
+		const accessTokens = await retrieveStoredAccessTokens();
+
+		const accountInfoPromises = accessTokens.map(token => {
+			return client.accountsGet({ access_token: token });
+		});
+
+		const accountInfo = await Promise.allSettled(accountInfoPromises);
+		const resolvedAccountInfo = accountInfo.filter(isFilled).flatMap(x => x.value.data.accounts)
+
+		return resolvedAccountInfo;
+
+	} catch (err) {
+
+		console.log("getAccounts: ", err);
+
+		return [];
+
+	}
+
 };
 
 export const getPlaidAccountBalances = async () => {
@@ -201,7 +226,7 @@ export const getPlaidLinkedInstitutions = async () => {
 				}
 			});
 
-			return results;
+		return results;
 
 	} catch (err) {
 
