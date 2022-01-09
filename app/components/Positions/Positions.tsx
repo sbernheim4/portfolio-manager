@@ -63,8 +63,8 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 			// cost_basis:
 		};
 
-        // Remove the existing holding entry from the list - it will be replaced
-        // by `updatedHoldingEntry`
+		// Remove the existing holding entry from the list - it will be replaced
+		// by `updatedHoldingEntry`
 		const cleanedHoldingArray = [
 			...holdingList.slice(0, entryIndex),
 			...holdingList.slice(entryIndex + 1)
@@ -151,6 +151,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
 				<Form action="/positions" method="post">
 					<input className="positions__search" name="search" type="search" placeholder="Search by ticker" />
+					<input className="positions__search" type="submit" value="Search" />
 					<input type="hidden" name="_action" value="search" readOnly />
 				</Form>
 			</noscript>
