@@ -2,11 +2,11 @@ import { Option, Some } from "excoptional";
 import { CountryCode, Institution, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { ActionFunction, LinksFunction, LoaderFunction, MetaFunction, json, useLoaderData, useSubmit } from "remix";
+import { ActionFunction, LinksFunction, LoaderFunction, MetaFunction, json, useLoaderData, useSubmit, redirect } from "remix";
 import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, unlinkPlaidItem } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
+import { isLoggedOut } from "./login";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -32,6 +32,9 @@ type ManageAccountsLoader = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+	if (await isLoggedOut(request)) {
+		return redirect("/login");
+	}
 
 	const linkedInstitutions = await getPlaidLinkedInstitutions();
 

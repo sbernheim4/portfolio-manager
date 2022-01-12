@@ -2,6 +2,7 @@ import { ActionFunction, Form, Link, redirect } from "remix";
 import { getSession, destroySession } from "~/helpers/session";
 
 export const action: ActionFunction = async ({ request }) => {
+
 	const session = await getSession(
 		request.headers.get("Cookie")
 	);

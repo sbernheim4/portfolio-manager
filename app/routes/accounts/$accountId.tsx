@@ -3,7 +3,6 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
 import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {

@@ -4,7 +4,6 @@ import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData,
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import investmentStyles from '~/styles/investment.css';
 
 export const meta: MetaFunction = () => {
