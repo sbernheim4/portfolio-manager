@@ -2,7 +2,7 @@ import { isToday } from "date-fns";
 import { AccountBase } from "plaid";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ActionFunction, Form, json, LinksFunction, LoaderFunction, useActionData, useLoaderData, useSubmit } from "remix";
+import { ActionFunction, Form, json, LinksFunction, LoaderFunction, redirect, useActionData, useLoaderData, useSubmit } from "remix";
 
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
@@ -12,6 +12,7 @@ import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import networthStyles from "~/styles/networth/networth.css";
+import { isLoggedOut } from "./login";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -70,6 +71,9 @@ const mergeHistoricalAndTodaysBalanceData = (
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+	if (await isLoggedOut(request)) {
+		return redirect("/login");
+	}
 
 	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances();
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());

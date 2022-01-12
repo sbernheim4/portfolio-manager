@@ -1,10 +1,10 @@
 import { AccountBase } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
+import { json, LinksFunction, LoaderFunction, MetaFunction, redirect, useLoaderData } from "remix";
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { sumAccountBalances } from "~/helpers/sumAccountBalances";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
+import { isLoggedOut } from "../login";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -19,6 +19,10 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+
+	if (await isLoggedOut(request)) {
+		return redirect("/login");
+	}
 
 	const balances = await getPlaidAccountBalances();
 	const investmentAccounts = filterForInvestmentAccounts(balances);

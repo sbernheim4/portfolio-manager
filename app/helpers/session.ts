@@ -6,7 +6,6 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
 		name: "__session",
 
 		// all of these are optional
-		domain: "remix.run",
 		expires: new Date(Date.now() + 60),
 		httpOnly: true,
 		maxAge: 60,

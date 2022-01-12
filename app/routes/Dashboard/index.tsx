@@ -1,11 +1,12 @@
-import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
+import { json, LinksFunction, LoaderFunction, MetaFunction, redirect, useLoaderData } from "remix"
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
+import { isLoggedOut } from "../login";
+import { getSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -22,6 +23,10 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+
+	if (await isLoggedOut(request)) {
+		return redirect("/login");
+	}
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentAccounts = filterForInvestmentAccounts(balances);

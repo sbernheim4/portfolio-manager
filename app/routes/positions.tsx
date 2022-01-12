@@ -1,16 +1,16 @@
 import { AccountBase, Holding } from "plaid";
 import { Option } from 'excoptional';
 import { useEffect } from "react";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, useActionData, useLoaderData, useSubmit } from "remix";
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, redirect, useActionData, useLoaderData, useSubmit } from "remix";
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 // import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
 import { updateLastAccessed } from "~/helpers/db";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { validateUserIsLoggedIn } from "~/helpers/validateUserIsLoggedIn";
 import { HoldingsSecurities } from '~/types/index';
 import { PositionsLoaderData } from "~/types/positions.types";
+import { isLoggedOut } from "./login";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -57,7 +57,11 @@ export const getInvestmentsAndAccountBalances = async () => {
 
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+
+	if (await isLoggedOut(request)) {
+		return redirect("/login");
+	}
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
 	const investmentTransactions = await getInvestmentTransactions();
