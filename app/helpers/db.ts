@@ -255,7 +255,7 @@ export const getAccountBalancesFromDB = async (username: string) => {
 
 };
 
-export const updateLastAccessed = async (username: string, date: Option<string>) => {
+export const updatePositionsLastUpdatedAt = async (username: string, date: Option<string>) => {
 
 	date.map(d => {
 		updateDB(username, "positionsLastUpdatedAt", d, () => d);
