@@ -125,6 +125,7 @@ export const action: ActionFunction = async ({ request }) => {
 			return json({ filteredHoldings });
 
 		case "positionsLastUpdatedAt":
+			// This will help to calculate xirr from the time the user first signed up to the current day
 			// User checks in that their account balances were last updated
 			// today.
 			const lastAccessed = Option.of(formData.get("positionsLastUpdatedAt")?.toString());
