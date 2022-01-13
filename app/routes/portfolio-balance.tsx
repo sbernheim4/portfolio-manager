@@ -6,7 +6,7 @@ import { ActionFunction, Form, json, LinksFunction, LoaderFunction, redirect, us
 
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
-import { saveAccountBalancesToDB } from "~/helpers/db";
+import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
 import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
@@ -29,7 +29,8 @@ type NetworthLoaderData = {
 	balances: Array<AccountBase>;
 	accountIdsAndNames: AccountIdsAndNames
 	todaysBalanceData: Record<string, number>;
-	accountBalancesChartData: AccountBalanceChartData
+	accountBalancesChartData: AccountBalanceChartData;
+	mostRecentAccountBalancesEntryDate: string;
 };
 
 export const links: LinksFunction = () => {
@@ -77,6 +78,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 	}
 
 	const username = await getUserNameFromSession(request);
+	const mostRecentAccountBalancesEntryDate = await getMostRecentAccountBalancesEntryDate(username);
+	console.log({ mostRecentAccountBalancesEntryDate });
 	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances(username);
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances(username));
 
@@ -89,17 +92,21 @@ export const loader: LoaderFunction = async ({ request }) => {
 		todaysBalanceData
 	);
 
-	return json({
-		accountBalancesChartData: mergedAccountBalancesChartData,
-		// Used by the client to update the historical info in the DB
-		todaysBalanceData,
-		// Helper for filtering what charts for accounts to show - checkboxes
-		// display names but the chart data relies on account ids
-		accountIdsAndNames,
-		// Provided to the InvestmentAccounts component rendered by this route
-		balances,
-		todaysBalance
-	});
+	return json(
+		{
+			mostRecentAccountBalancesEntryDate,
+			accountBalancesChartData: mergedAccountBalancesChartData,
+			// Used by the client to update the historical info in the DB
+			todaysBalanceData,
+			// Helper for filtering what charts for accounts to show - checkboxes
+			// display names but the chart data relies on account ids
+			accountIdsAndNames,
+			// Provided to the InvestmentAccounts component rendered by this route
+			balances,
+			todaysBalance
+		},
+		{ headers: { "Cache-Control": "max-age=43200" } }
+	);
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -179,7 +186,8 @@ const Networth = () => {
 		accountIdsAndNames,
 		todaysBalanceData,
 		todaysBalance,
-		balances
+		balances,
+		mostRecentAccountBalancesEntryDate
 	} = useLoaderData<NetworthLoaderData>();
 
 	const submit = useSubmit();
@@ -188,10 +196,14 @@ const Networth = () => {
 	// The DB handler takes care of only storing todays balance if it hasn't yet
 	// been stored
 	useEffect(() => {
+		if (isToday(new Date(mostRecentAccountBalancesEntryDate))) {
+			return;
+		}
 
 		const formData = new FormData();
 		formData.set("totalBalance", todaysBalance.toString());
 		formData.set("accountsBalance", JSON.stringify(todaysBalanceData));
+		formData.set("_action", "saveBalance");
 
 		submit(formData, { method: "post" });
 	}, []);
@@ -300,10 +312,11 @@ const Networth = () => {
 				// If JS is disabled, allow the user to store today's balances
 				// in their history
 				// TODO: Could this just be done automatically by the loader?
-				!isClientSideJSEnabled() ?
+				!isClientSideJSEnabled() && !isToday(new Date(mostRecentAccountBalancesEntryDate)) ?
 					<Form>
 						<input type="submit" value="Save Balance" />
-						<input type="hidden" name="balance" value={todaysBalance} readOnly />
+						<input type="hidden" name="totalBalance" value={todaysBalance} readOnly />
+						<input type="hidden" name="accountsBalance" value={JSON.stringify(todaysBalanceData)} readOnly />
 						<input type="hidden" name="_action" value="saveBalance" readOnly />
 					</Form> :
 					null
