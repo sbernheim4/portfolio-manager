@@ -11,6 +11,7 @@ import { dollarFormatter } from "~/helpers/formatters";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
+import { getUserNameFromSession } from "~/helpers/session";
 import networthStyles from "~/styles/networth/networth.css";
 import { isLoggedOut } from "./login";
 
@@ -75,7 +76,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 		return redirect("/login");
 	}
 
-	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances();
+	const username = await getUserNameFromSession(request);
+	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances(username);
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances());
 
 	const todaysBalance = NetworthHelpers.calculateTodaysTotalBalance(balances);

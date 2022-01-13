@@ -5,8 +5,7 @@ import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
-import { isLoggedOut } from "../login";
-import { getSession } from "~/helpers/session";
+import { loaderWithLogin } from "~/remix-helpers";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -22,19 +21,19 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async (args) => {
 
-	if (await isLoggedOut(request)) {
-		return redirect("/login");
-	}
+	return loaderWithLogin(async () => {
 
-	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
-	const investmentAccounts = filterForInvestmentAccounts(balances);
+		const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
+		const investmentAccounts = filterForInvestmentAccounts(balances);
 
-	return json(
-		{ balances: investmentAccounts, holdings, securities },
-		{ headers: { "Cache-Control": "max-age=43200" } }
-	);
+		return json(
+			{ balances: investmentAccounts, holdings, securities },
+			{ headers: { "Cache-Control": "max-age=43200" } }
+		);
+
+	})(args);
 
 };
 
