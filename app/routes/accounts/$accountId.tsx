@@ -3,6 +3,7 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
 import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { getUserNameFromSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -21,8 +22,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	const accountId = params.accountId;
 
-	const accountData = await getPlaidAccountBalances();
-	const { holdings, securities } = await getInvestmentHoldings();
+	const username = await getUserNameFromSession(request);
+	const accountData = await getPlaidAccountBalances(username);
+	const { holdings, securities } = await getInvestmentHoldings(username);
 
 	const holdingsInCurrentAccount = holdings.filter(holding => holding.account_id === accountId)
 	const account = accountData.find(acc => acc.account_id === accountId)

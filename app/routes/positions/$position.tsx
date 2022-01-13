@@ -4,6 +4,7 @@ import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData,
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { getUserNameFromSession } from "~/helpers/session";
 import investmentStyles from '~/styles/investment.css';
 
 export const meta: MetaFunction = () => {
@@ -22,7 +23,8 @@ export const links: LinksFunction = () => {
 };
 export const loader: LoaderFunction = async ({ request }) => {
 
-	const balances = await getPlaidAccountBalances();
+	const username = await getUserNameFromSession(request);
+	const balances = await getPlaidAccountBalances(username);
 
 	return json(
 		{ balances },
@@ -78,7 +80,7 @@ const IndividualInvestmentInformation = () => {
 
 	/*
 	 * The total number of shares of a single stock held across all accounts
-     */
+	 */
 	const totalNumberShares = decimalFormatter.format(
 		holdingsOfCurrentSecurity
 			.reduce((acc, curr) => acc + curr.quantity, 0)

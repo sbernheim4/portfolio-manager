@@ -7,6 +7,7 @@ import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinked
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 import { isLoggedOut } from "./login";
+import { getUserNameFromSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -36,7 +37,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 		return redirect("/login");
 	}
 
-	const linkedInstitutions = await getPlaidLinkedInstitutions();
+	const username = await getUserNameFromSession(request);
+	const linkedInstitutions = await getPlaidLinkedInstitutions(username);
 
 	// The logged in user's unique id
 	// const { id: clientUserId } = await User.find(...);

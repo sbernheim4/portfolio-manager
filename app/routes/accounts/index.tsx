@@ -3,6 +3,7 @@ import { json, LinksFunction, LoaderFunction, MetaFunction, redirect, useLoaderD
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { getUserNameFromSession } from "~/helpers/session";
 import { sumAccountBalances } from "~/helpers/sumAccountBalances";
 import { loaderWithLogin } from "~/remix-helpers";
 
@@ -21,7 +22,8 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async (args) => {
 
 	return loaderWithLogin(async () => {
-		const balances = await getPlaidAccountBalances();
+		const username = await getUserNameFromSession(args.request);
+		const balances = await getPlaidAccountBalances(username);
 		const investmentAccounts = filterForInvestmentAccounts(balances);
 		const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
 

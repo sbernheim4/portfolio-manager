@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { AccountBase } from "plaid";
 import { positiveAccountTypes } from "~/components/NetworthComponent";
 import { getAccountBalancesFromDB } from "~/helpers/db";
-import { AccountBalanceChartData } from "~/routes/networth";
+import { AccountBalanceChartData } from "~/routes/portfolio-balance";
 
 export const calculateTodaysTotalBalance = (accounts: AccountBase[]) => {
     return accounts

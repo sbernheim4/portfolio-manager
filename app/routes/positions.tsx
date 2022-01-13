@@ -11,6 +11,7 @@ import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalanc
 import { HoldingsSecurities } from '~/types/index';
 import { PositionsLoaderData } from "~/types/positions.types";
 import { isLoggedOut } from "./login";
+import { getUserNameFromSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -25,13 +26,13 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const getInvestmentsAndAccountBalances = async () => {
+export const getInvestmentsAndAccountBalances = async (username: string) => {
 	const promises: [
 		Promise<HoldingsSecurities>,
 		Promise<Array<AccountBase>>
 	] = [
-			getInvestmentHoldings(),
-			getPlaidAccountBalances()
+			getInvestmentHoldings(username),
+			getPlaidAccountBalances(username)
 		];
 
 	const results = await Promise.allSettled(promises);
@@ -63,8 +64,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 		return redirect("/login");
 	}
 
-	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
-	const investmentTransactions = await getInvestmentTransactions();
+	const username = await getUserNameFromSession(request);
+	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
+	const investmentTransactions = await getInvestmentTransactions(username);
 	const dates = investmentTransactions.map(tx => tx.date);
 	const cashflows = investmentTransactions.map(tx => tx.amount - (tx.fees ?? 0));
 
@@ -85,6 +87,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const formData = await request.formData();
 	const action = formData.get("_action");
+	const username = await getUserNameFromSession(request);
 
 	switch (action) {
 		case "search":
@@ -97,8 +100,9 @@ export const action: ActionFunction = async ({ request }) => {
 				return json({});
 			}
 
+
 			// Get the user's investment holdings
-			const { securities, holdings } = await getInvestmentsAndAccountBalances();
+			const { securities, holdings } = await getInvestmentsAndAccountBalances(username);
 			const aggregatedPositions = aggregateHoldings(holdings); // Dedupe holdings
 
 			// Construct Ticker Symbol -> Security ID object/map
@@ -124,7 +128,7 @@ export const action: ActionFunction = async ({ request }) => {
 			// User checks in that their account balances were last updated
 			// today.
 			const lastAccessed = Option.of(formData.get("updateLastAccessed")?.toString());
-			await updateLastAccessed(lastAccessed);
+			await updateLastAccessed(username, lastAccessed);
 			return null;
 	}
 
