@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
-import { isToday } from 'date-fns';
+import { isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
 
 const collectionName = "userInfo";
@@ -178,6 +178,31 @@ export const saveNewAccessToken = async (username: string, accessToken: string, 
 	});
 
 };
+
+export const getMostRecentAccountBalancesEntryDate = async (username: string) => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+
+	const { accountBalances } = userInfo;
+
+	if (accountBalances.length) {
+
+		const lastEntry = accountBalances[accountBalances.length - 1];
+		const mostRecentEntry = new Date(lastEntry.date)
+
+		return mostRecentEntry;
+
+	} else {
+
+		const today = new Date();
+
+		return subDays(today, 1);
+
+	}
+
+};
+
 
 type AccountBalance = number;
 
