@@ -1,7 +1,6 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
-import { dollarFormatter } from "~/helpers/formatters";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
 

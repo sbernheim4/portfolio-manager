@@ -69,6 +69,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const body = await request.formData();
 	const action = body.get("_action");
+	const username = await getUserNameFromSession(request);
 
 	switch (action) {
 		case "linkAccount":
@@ -84,12 +85,12 @@ export const action: ActionFunction = async ({ request }) => {
 			// Can also get item_id here
 			const { access_token, item_id } = await exchangePublicTokenForAccessToken(publicToken);
 
-			await saveNewAccessToken(access_token, item_id);
+			await saveNewAccessToken(username, access_token, item_id);
 
 			return null;
 		case "unlinkAccount":
 			const itemId = body.get("itemId") as string;
-			unlinkPlaidItem(itemId);
+			unlinkPlaidItem(username, itemId);
 			return null;
 		default:
 			console.log("whoops, uncaught action type");
