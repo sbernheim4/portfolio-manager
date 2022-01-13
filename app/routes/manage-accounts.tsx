@@ -58,10 +58,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	const createTokenResponse = await createPlaidLinkToken(plaidRequest);
 
-	return {
-		linkedInstitutions,
-		linkToken: createTokenResponse
-	};
+	return json(
+		{
+			linkedInstitutions,
+			linkToken: createTokenResponse
+		},
+		{ headers: { "Cache-Control": "max-age=43200" } }
+	);
 
 };
 
