@@ -1,21 +1,36 @@
 import { ActionFunction, Form, json, LoaderFunction, redirect, useLoaderData } from "remix";
-import { userId } from "~/helpers/db";
+import { getUserInfoCollection, UserInfo } from "~/helpers/db";
 import { getSession, commitSession } from "~/helpers/session";
+import bcrypt from 'bcryptjs';
 
 const validateCredentials = async (
 	username: FormDataEntryValue | null,
 	password: FormDataEntryValue | null
 ) => {
 
-	// throw new Error("Function not implemented.");
-	// TODO:
-	// 1. find a user with username
-	// 2. hash the password
-	// 3. validate the hashed password matches the found user's hashed password
-	// 4. if true return the user's id
-	// 5. if false return null -- Or send to account creation page with data
-	// filled out?
-	return userId;
+	try {
+
+		const userInfoCollection = await getUserInfoCollection();
+		const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+		const { salt } = userInfo;
+		const hashedPassword = bcrypt.hashSync(password as string, salt)
+
+		if (userInfo === null) {
+			// No user with that ID found
+			return null
+		} else if (userInfo.password !== hashedPassword) {
+			// Incorrect Password
+			return null;
+		} else {
+			return userInfo.user;
+		}
+
+	} catch (err) {
+
+		console.log("error:", err)
+
+	}
+
 }
 
 export const isLoggedIn = async (request: Request) => {
@@ -39,18 +54,14 @@ export const isLoggedOut = async (request: Request) => {
 export const loader: LoaderFunction = async ({ request }) => {
 	const session = await getSession(request.headers.get("Cookie"));
 
-	// for (const keyname of request.headers.keys()) {
-	// 	console.log(keyname)
-	// }
-
 	// Logged in user can proceed to the hompage
 	if (session.has("userId")) {
 		return redirect("/");
 	}
 
+	// User is logged out
 	const error = session.get("error");
 
-	// User is logged out
 	const data = {
 		error
 	};
@@ -97,11 +108,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 	return redirect(
 		"/",
-		{
-			headers: {
-				"Set-Cookie": cookie
-			}
-		}
+		{ headers: { "Set-Cookie": cookie } }
 	);
 
 };
@@ -109,11 +116,6 @@ export const action: ActionFunction = async ({ request }) => {
 const Login = () => {
 
 	const { currentUser, error } = useLoaderData();
-
-	console.log({
-		currentUser,
-		error
-	});
 
 	return (
 		<>

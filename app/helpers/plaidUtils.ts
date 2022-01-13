@@ -242,9 +242,9 @@ export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 		throw new Error("Could not remove access token after 5 tries");
 	}
 
-	const x = await retrieveItemIdToAccessTokenMap();
+	const itemIdToAccessTokens = await retrieveItemIdToAccessTokenMap();
 
-	const accessToken = x[itemId];
+	const accessToken = itemIdToAccessTokens[itemId];
 
 	try {
 
@@ -254,7 +254,9 @@ export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 		// await client.itemRemove({ access_token: accessToken });
 
 	} catch (error) {
+
 		unlinkPlaidItem(itemId, numTries++);
+
 	}
 
 };

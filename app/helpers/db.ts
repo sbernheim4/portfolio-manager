@@ -11,18 +11,35 @@ const client = new MongoClient(uri);
 let activeConnection: Promise<MongoClient> | undefined;
 
 type AccountId = string;
-type UserInfo = {
-	lastAccessed: string;
-	user: string;
-	itemIdToAccessToken: Record<string, string>;
-	balances: Array<{ date: string, balances: number }>
+export type UserInfo = {
 	accountBalances: Array<{
 		// @ts-ignore
 		"date": string,
 		"totalBalance": number;
 		[key: AccountId]: number
 	}>; // Array<AccountBalance>
+	balances: Array<{ date: string, balances: number }>
+	itemIdToAccessToken: Record<string, string>;
+	lastAccessed: string;
+	password: string;
+	salt: string;
+	user: string;
 };
+
+/**
+ * Used when a new user is singing up for an account
+ */
+export const getNewUserInfo = (username: string, password: string, salt: string): UserInfo => {
+	return {
+		accountBalances: [],
+		balances: [],
+		itemIdToAccessToken: {},
+		lastAccessed: "",
+		password,
+		salt,
+		user: username
+	};
+}
 
 try {
 
@@ -95,7 +112,7 @@ export const retrieveStoredAccessTokens = async () => {
 
 };
 
-const getUserInfoCollection = async () => {
+export const getUserInfoCollection = async () => {
 
 	// const connection = await getDBConnection();
 
@@ -157,6 +174,7 @@ export const saveNewAccessToken = async (accessToken: string, itemId: string) =>
 };
 
 type AccountBalance = number;
+
 export const saveAccountBalancesToDB = (
 	accountRecords: Record<AccountId, AccountBalance>,
 	totalBalance: number
@@ -194,10 +212,10 @@ export const saveAccountBalancesToDB = (
 
 };
 
-export const getAccountBalancesFromDB = async () => {
+export const getAccountBalancesFromDB = async (username: string) => {
 
 	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: userId }) as unknown as UserInfo;
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
 
 	const { accountBalances } = userInfo;
 

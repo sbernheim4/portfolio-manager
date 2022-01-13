@@ -4,7 +4,7 @@ import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { sumAccountBalances } from "~/helpers/sumAccountBalances";
-import { isLoggedOut } from "../login";
+import { loaderWithLogin } from "~/remix-helpers";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -18,23 +18,21 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async (args) => {
 
-	if (await isLoggedOut(request)) {
-		return redirect("/login");
-	}
+	return loaderWithLogin(async () => {
+		const balances = await getPlaidAccountBalances();
+		const investmentAccounts = filterForInvestmentAccounts(balances);
+		const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
 
-	const balances = await getPlaidAccountBalances();
-	const investmentAccounts = filterForInvestmentAccounts(balances);
-	const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
-
-	return json(
-		{
-			investmentAccounts,
-			nonInvestmentAccounts
-		},
-		{ headers: { "Cache-Control": "max-age=43200" } }
-	);
+		return json(
+			{
+				investmentAccounts,
+				nonInvestmentAccounts
+			},
+			{ headers: { "Cache-Control": "max-age=43200" } }
+		);
+	})(args);
 
 };
 
