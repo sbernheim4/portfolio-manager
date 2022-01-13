@@ -41,9 +41,9 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 	}
 };
 
-export const getInvestmentHoldings = async (): Promise<{ holdings: Holding[]; securities: Security[] }> => {
+export const getInvestmentHoldings = async (username: string): Promise<{ holdings: Holding[]; securities: Security[] }> => {
 
-	const accessTokens = await retrieveStoredAccessTokens();
+	const accessTokens = await retrieveStoredAccessTokens(username);
 
 	try {
 
@@ -78,11 +78,11 @@ export const getInvestmentHoldings = async (): Promise<{ holdings: Holding[]; se
 
 };
 
-export const getPlaidLinkedAccounts = async () => {
+export const getPlaidLinkedAccounts = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens();
+		const accessTokens = await retrieveStoredAccessTokens(username);
 
 		const accountInformationPromises = accessTokens.map(token => {
 			return client.accountsGet({ access_token: token });
@@ -116,11 +116,11 @@ export const filterForNonInvestmentAccounts = (accounts: Array<AccountBase>) => 
 	return accounts.filter(account => !validInvestmentAccounts.includes(account.type));
 };
 
-export const getPlaidAccounts = async () => {
+export const getPlaidAccounts = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens();
+		const accessTokens = await retrieveStoredAccessTokens(username);
 
 		const accountInfoPromises = accessTokens.map(token => {
 			return client.accountsGet({ access_token: token });
@@ -141,11 +141,11 @@ export const getPlaidAccounts = async () => {
 
 };
 
-export const getPlaidAccountBalances = async () => {
+export const getPlaidAccountBalances = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens();
+		const accessTokens = await retrieveStoredAccessTokens(username);
 
 		const balancesPromises = accessTokens.map(token => {
 			return client.accountsBalanceGet({ access_token: token });
@@ -166,11 +166,11 @@ export const getPlaidAccountBalances = async () => {
 
 };
 
-export const getPlaidLinkedInstitutions = async () => {
+export const getPlaidLinkedInstitutions = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens();
+		const accessTokens = await retrieveStoredAccessTokens(username);
 
 		const itemPromises = accessTokens.map(token => {
 			return client.itemGet({ access_token: token });
@@ -261,7 +261,7 @@ export const unlinkPlaidItem = async (itemId: string, numTries = 0) => {
 
 };
 
-export const getInvestmentTransactions = async (offset = 0, count = 200) => {
+export const getInvestmentTransactions = async (username: string, offset = 0, count = 200) => {
 
 	const today = new Date();
 	const currentYear = today.getFullYear();
@@ -270,7 +270,7 @@ export const getInvestmentTransactions = async (offset = 0, count = 200) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens();
+		const accessTokens = await retrieveStoredAccessTokens(username);
 
 		const transactionPromises = accessTokens.map(token => {
 			return client.investmentsTransactionsGet({

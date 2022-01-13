@@ -19,9 +19,10 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
 export { getSession, commitSession, destroySession };
 
 export const getUserNameFromSession = async (request: Request) => {
+
     const session = await getSession(request.headers.get("Cookie"));
 
-    const username = session.get("userId");
+    const username = session.get("userId") as string;
 
     return username;
 
