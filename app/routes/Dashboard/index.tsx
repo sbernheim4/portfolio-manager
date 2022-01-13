@@ -1,4 +1,4 @@
-import { json, LinksFunction, LoaderFunction, MetaFunction, redirect, useLoaderData } from "remix"
+import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
@@ -6,6 +6,7 @@ import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { loaderWithLogin } from "~/remix-helpers";
+import { getUserNameFromSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -25,7 +26,8 @@ export const loader: LoaderFunction = async (args) => {
 
 	return loaderWithLogin(async () => {
 
-		const { balances, holdings, securities } = await getInvestmentsAndAccountBalances();
+		const username = await getUserNameFromSession(args.request);
+		const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
 		const investmentAccounts = filterForInvestmentAccounts(balances);
 
 		return json(
