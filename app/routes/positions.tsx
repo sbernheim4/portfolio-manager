@@ -5,7 +5,7 @@ import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outl
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 // import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
-import { updateLastAccessed } from "~/helpers/db";
+import { updatePositionsLastUpdatedAt } from "~/helpers/db";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { HoldingsSecurities } from '~/types/index';
@@ -124,11 +124,11 @@ export const action: ActionFunction = async ({ request }) => {
 
 			return json({ filteredHoldings });
 
-		case "updateLastAccessed":
+		case "positionsLastUpdatedAt":
 			// User checks in that their account balances were last updated
 			// today.
-			const lastAccessed = Option.of(formData.get("updateLastAccessed")?.toString());
-			await updateLastAccessed(username, lastAccessed);
+			const lastAccessed = Option.of(formData.get("positionsLastUpdatedAt")?.toString());
+			await updatePositionsLastUpdatedAt(username, lastAccessed);
 			return null;
 	}
 
@@ -143,8 +143,8 @@ export const useCheckIn = () => {
 		const today = new Date().toISOString();
 
 		const data = new FormData();
-		data.set("updateLastAccessed", today);
-		data.set("_action", "updateLastAccessed");
+		data.set("positionsLastUpdatedAt", today);
+		data.set("_action", "positionsLastUpdatedAt");
 
 		submit(data, { method: "post", action: "/positions" });
 
