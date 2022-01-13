@@ -135,7 +135,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 };
 
-export const useCheckIn = () => {
+const useCheckIn = () => {
 
 	const submit = useSubmit();
 
@@ -166,8 +166,9 @@ const Holdings = () => {
 	const holdingsToDisplay = actionData?.filteredHoldings ?? holdings;
 
 	// Checkpoint today as most recent time when the users'
-	// positions balance was updated
-	useCheckIn();
+	// positions balance was updated - will be used when
+	// calculating xirr
+	// useCheckIn();
 
 	return (
 		<>
