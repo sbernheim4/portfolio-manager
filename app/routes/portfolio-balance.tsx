@@ -120,8 +120,8 @@ export const action: ActionFunction = async ({ request }) => {
 		// User clicks to save today's balance information to their historical
 		// record.
 		case "saveBalance":
-			const balance = parseFloat(formData.get("totalBalance") as string);
 			const accountRecords = JSON.parse(formData.get("accountsBalance") as string) as Record<string, number>;
+			const balance = parseFloat(formData.get("totalBalance") as string);
 
 			// Fire and forget
 			saveAccountBalancesToDB(username, accountRecords, balance);
