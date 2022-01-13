@@ -3,7 +3,6 @@ import { Option } from "excoptional";
 import { isToday } from 'date-fns';
 import { MONGODB_PWD } from "../env";
 
-export const userId = "sams-unique-user-id-12345";
 const collectionName = "userInfo";
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -144,7 +143,7 @@ const updateDB = async <T>(
 
         // New User
         return userInfoCollection.insertOne({
-            user: userId,
+            user: username,
             [name]: initialValue
         });
 
@@ -154,7 +153,7 @@ const updateDB = async <T>(
         const valueToInsert = fn(userInfo);
 
         return userInfoCollection.findOneAndUpdate(
-            { user: userId },
+            { user: username },
             { $set: { [name]: valueToInsert } }
         );
 
