@@ -5,7 +5,7 @@ import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outl
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 // import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
-import { updatePositionsLastUpdatedAt } from "~/helpers/db";
+import { getPositionsLastUpdatedAt, updatePositionsLastUpdatedAt } from "~/helpers/db";
 import { isFilled } from "~/helpers/isFilled";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { HoldingsSecurities } from '~/types/index';
@@ -66,7 +66,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	const username = await getUserNameFromSession(request);
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
-	const investmentTransactions = await getInvestmentTransactions(username);
+
+	const fetchTransactionsFrom = new Date(await getPositionsLastUpdatedAt(username));
+
+	// Used for calculating XIRR
+	const investmentTransactions = await getInvestmentTransactions(username, fetchTransactionsFrom);
 	const dates = investmentTransactions.map(tx => tx.date);
 	const cashflows = investmentTransactions.map(tx => tx.amount - (tx.fees ?? 0));
 
