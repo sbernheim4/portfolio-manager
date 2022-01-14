@@ -1,3 +1,5 @@
+type ValueOf<T> = T[keyof T];
+
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isToday, subDays } from 'date-fns';
@@ -9,17 +11,19 @@ const client = new MongoClient(uri);
 
 let activeConnection: Promise<MongoClient> | undefined;
 
-type AccountId = string;
+type UserInfoKeys = keyof UserInfo;
+type UserInfoValues = ValueOf<UserInfo>;
+
 export type UserInfo = {
 	accountBalances: Array<{
 		// @ts-ignore
 		"date": string,
 		"totalBalance": number;
-		[key: AccountId]: number
+		[key: string]: number
 	}>; // Array<AccountBalance>
 	balances: Array<{ date: string, balances: number }>
 	itemIdToAccessToken: Record<string, string>;
-	lastAccessed: string;
+	positionsLastUpdatedAt: string;
 	password: string;
 	salt: string;
 	user: string;
@@ -33,7 +37,7 @@ export const getNewUserInfo = (username: string, password: string, salt: string)
 		accountBalances: [],
 		balances: [],
 		itemIdToAccessToken: {},
-		lastAccessed: "",
+		positionsLastUpdatedAt: "",
 		password,
 		salt,
 		user: username
@@ -85,7 +89,6 @@ export const retrieveItemIdToAccessTokenMap = async (username: string) => {
 
 };
 
-// TODO Update call sites to pass in username
 export const retrieveStoredAccessTokens = async (username: string) => {
 
 	try {
@@ -208,7 +211,7 @@ type AccountBalance = number;
 
 export const saveAccountBalancesToDB = (
 	username: string,
-	accountRecords: Record<AccountId, AccountBalance>,
+	accountRecords: Record<string, AccountBalance>,
 	totalBalance: number
 ) => {
 
@@ -244,17 +247,6 @@ export const saveAccountBalancesToDB = (
 
 };
 
-export const getAccountBalancesFromDB = async (username: string) => {
-
-	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
-
-	const { accountBalances } = userInfo;
-
-	return accountBalances;
-
-};
-
 export const updatePositionsLastUpdatedAt = async (username: string, date: Option<string>) => {
 
 	date.map(d => {
@@ -262,3 +254,26 @@ export const updatePositionsLastUpdatedAt = async (username: string, date: Optio
 	});
 
 };
+
+const getValueFromDB = async (username: string, property: UserInfoKeys): Promise<UserInfoValues> => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+
+	const value = userInfo[property];
+
+	return value;
+};
+
+export const getAccountBalancesFromDB = async (username: string) => {
+
+	return getValueFromDB(username, 'accountBalances');
+
+};
+
+export const getPositionsLastUpdatedAt = async (username: string) => {
+
+	return getValueFromDB(username, 'positionsLastUpdatedAt') as Promise<string>;
+
+};
+
