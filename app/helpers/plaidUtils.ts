@@ -1,7 +1,7 @@
 import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { getItemIdToAccessTokenMapFromDB, getAccessTokensFromDB } from "./db";
+import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB } from "./db";
 import { client } from "./plaidClient";
 import { format } from "date-fns";
 
@@ -242,7 +242,7 @@ export const unlinkPlaidItem = async (username: string, itemId: string, numTries
 		throw new Error("Could not remove access token after 5 tries");
 	}
 
-	const itemIdToAccessTokens = await getItemIdToAccessTokenMapFromDB(username);
+	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
 
 	const accessToken = itemIdToAccessTokens[itemId];
 

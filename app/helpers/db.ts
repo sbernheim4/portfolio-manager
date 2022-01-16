@@ -2,9 +2,8 @@ import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
-import { AccountBalances, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
+import { AccountBalances, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
 
-const collectionName = "userInfo";
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
@@ -28,7 +27,6 @@ try {
 
 }
 
-
 /**
  * Used when a new user is singing up for an account
  */
@@ -42,6 +40,18 @@ export const getNewUserInfo = (username: string, password: string, salt: string)
 		salt,
 		user: username
 	};
+};
+
+export const getUserInfoCollection = async () => {
+	const collectionName = "userInfo";
+
+	if (activeConnection === undefined) {
+		throw new Error("Could not connect to DB");
+	}
+
+	return activeConnection.then(mongoClient => {
+		return mongoClient.db().collection(collectionName);
+	});
 };
 
 /**
@@ -60,9 +70,9 @@ const getValueFromDB = async <T extends UserInfoValues>(username: string, proper
 /**
  * Update top level properties in the DB for a given user
  */
-const updateDB = async <T>(
+const updateDB = async <T extends UserInfoValues>(
 	username: string,
-	name: string,
+	name: UserInfoKeys,
 	initialValue: T,
 	fn: (userInfo: UserInfo) => T
 ) => {
@@ -70,7 +80,6 @@ const updateDB = async <T>(
 	const userInfoCollection = await getUserInfoCollection();
 	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
 
-	// @ts-ignore
 	const value = userInfo[name];
 
 	if (userInfo === null || value === null || value === undefined) {
@@ -95,25 +104,18 @@ const updateDB = async <T>(
 
 };
 
-export const getItemIdToAccessTokenMapFromDB = async (username: string) => {
+export const getItemIdToAccessTokenFromDB = async (username: string) => {
 
 	try {
 
-		const userInfoCollection = await getUserInfoCollection();
-		const userInfo = await userInfoCollection.findOne({ user: username });
+		const itemIdToAccessToken = await getValueFromDB<ItemIdToAccessToken>(username, 'itemIdToAccessToken');
 
-		if (userInfo === null) {
-			return {};
-		}
-
-		const { itemIdToAccessToken } = userInfo;
-
-		return itemIdToAccessToken as Record<string, string[]>;
+		return itemIdToAccessToken;
 
 
 	} catch (err) {
 
-		console.log("ERR", err);
+		console.log("getItemIdToAccessTokenMapFromDB", err);
 
 		return {};
 
@@ -121,11 +123,11 @@ export const getItemIdToAccessTokenMapFromDB = async (username: string) => {
 
 };
 
-export const getAccessTokensFromDB = async (username: string) => {
+export const getAccessTokensFromDB = async (username: string): Promise<Array<string>> => {
 
 	try {
 
-		const itemIdToAccessToken = await getItemIdToAccessTokenMapFromDB(username);
+		const itemIdToAccessToken = await getItemIdToAccessTokenFromDB(username);
 
 		const accessTokens = Object.values(itemIdToAccessToken).flatMap(x => x);
 
@@ -141,32 +143,27 @@ export const getAccessTokensFromDB = async (username: string) => {
 
 };
 
-export const getUserInfoCollection = async () => {
-
-	if (activeConnection === undefined) {
-		throw new Error("Could not connect to DB");
-	}
-
-	return activeConnection.then(mongoClient => {
-		return mongoClient.db().collection(collectionName);
-	});
-};
-
 export const saveNewAccessToken = async (username: string, accessToken: string, itemId: string) => {
 
-	updateDB(username, 'itemIdToAccessToken', { [itemId]: accessToken }, (userInfo) => {
+	updateDB(
+		username,
+		'itemIdToAccessToken',
+		{ [itemId]: [accessToken] },
+		(userInfo) => {
 
-		// Existing User
-		const { itemIdToAccessToken } = userInfo;
+			const { itemIdToAccessToken } = userInfo;
 
-		const newItemIdToAccessToken = {
-			...itemIdToAccessToken,
-			[itemId]: accessToken
-		};
+			const accessTokensForItemId = itemIdToAccessToken[itemId];
+			const newAccessTokenList = [...accessTokensForItemId, accessToken];
 
-		return newItemIdToAccessToken;
+			const newItemIdToAccessToken = {
+				...itemIdToAccessToken,
+				[itemId]: newAccessTokenList
+			};
 
-	});
+			return newItemIdToAccessToken;
+		}
+	);
 
 };
 
@@ -234,13 +231,14 @@ export const saveAccountBalancesToDB = async (
 
 			const updateAccountBalances = () => {
 				return accountBalances.length > 0 ?
-					[ ...newEntry, ...accountBalances ] :
+					[...newEntry, ...accountBalances] :
 					newEntry;
 			};
 
 			updateDB(
 				username,
 				'accountBalances',
+				// @ts-ignore
 				newEntry,
 				updateAccountBalances
 			);
