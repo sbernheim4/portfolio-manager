@@ -1,17 +1,17 @@
-import { AccountBase, Holding } from "plaid";
-import { Option } from 'excoptional';
-import { useEffect } from "react";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, redirect, useActionData, useLoaderData, useSubmit } from "remix";
-import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 // import { RateOfReturn } from "~/components/RateOfReturn";
-import { SectorWeight } from "~/components/SectorWeight";
-import { getPositionsLastUpdatedAt, updatePositionsLastUpdatedAt } from "~/helpers/db";
-import { isFilled } from "~/helpers/isFilled";
-import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+// import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
+import { AccountBase, Holding } from "plaid";
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, redirect, useActionData, useLoaderData } from "remix";
+import { Option } from 'excoptional';
 import { HoldingsSecurities } from '~/types/index';
+import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 import { PositionsLoaderData } from "~/types/positions.types";
-import { isLoggedOut } from "./login";
+import { SectorWeight } from "~/components/SectorWeight";
+import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
+import { getPositionsLastUpdatedAt, updatePositionsLastUpdatedAt } from "~/helpers/db";
 import { getUserNameFromSession } from "~/helpers/session";
+import { isFilled } from "~/helpers/isFilled";
+import { isLoggedOut } from "./login";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -139,24 +139,6 @@ export const action: ActionFunction = async ({ request }) => {
 
 };
 
-const useCheckIn = () => {
-
-	const submit = useSubmit();
-
-	useEffect(() => {
-
-		const today = new Date().toISOString();
-
-		const data = new FormData();
-		data.set("positionsLastUpdatedAt", today);
-		data.set("_action", "positionsLastUpdatedAt");
-
-		submit(data, { method: "post", action: "/positions" });
-
-	}, []);
-
-};
-
 const Holdings = () => {
 
 	const {
@@ -172,7 +154,7 @@ const Holdings = () => {
 	// Checkpoint today as most recent time when the users'
 	// positions balance was updated - will be used when
 	// calculating xirr
-	// useCheckIn();
+	// useCheckInForXIRR();
 
 	return (
 		<>
