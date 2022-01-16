@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
-import { AccountBalances, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
+import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
 
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -154,12 +154,9 @@ export const getMostRecentAccountBalancesEntryDate = async (username: string) =>
 
 };
 
-
-type AccountBalance = number;
-
 export const saveAccountBalancesToDB = async (
 	username: string,
-	accountRecords: Record<string, AccountBalance>,
+	accountRecords: AccountIdToValue,
 	totalBalance: number
 ) => {
 
@@ -211,30 +208,17 @@ export const saveAccountBalancesToDB = async (
 export const getItemIdToAccessTokenFromDB = async (username: string) => {
 
 	return getValueFromDB<ItemIdToAccessToken>(username, 'itemIdToAccessToken')
-		.catch(err => {
-			console.log("getItemIdToAccessTokenMapFromDB", err);
-			return {};
-		})
 
 };
 
 export const getAccessTokensFromDB = async (username: string): Promise<Array<string>> => {
 
-	try {
+	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
 
-		const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
+	const accessTokens = Object.values(itemIdToAccessTokens).flatMap(x => x);
 
-		const accessTokens = Object.values(itemIdToAccessTokens).flatMap(x => x);
+	return accessTokens;
 
-		return accessTokens;
-
-	} catch (err) {
-
-		console.log("getAccessTokensFromDB", err);
-
-		return [];
-
-	}
 
 };
 

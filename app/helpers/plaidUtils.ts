@@ -244,14 +244,14 @@ export const unlinkPlaidItem = async (username: string, itemId: string, numTries
 
 	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
 
-	const accessToken = itemIdToAccessTokens[itemId];
+	const accessTokens = itemIdToAccessTokens[itemId];
 
 	try {
 
-		console.log("removing account with access token", accessToken);
+		console.log("removing account with access token", accessTokens);
 
 		// TODO: Uncomment to go live
-		// await client.itemRemove({ access_token: accessToken });
+		// accessTokens.map(token => client.itemRemove({ access_token: token }));
 
 	} catch (error) {
 
