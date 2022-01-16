@@ -33,7 +33,6 @@ try {
 export const getNewUserInfo = (username: string, password: string, salt: string): UserInfo => {
 	return {
 		accountBalances: [],
-		balances: [],
 		itemIdToAccessToken: {},
 		positionsLastUpdatedAt: "",
 		password,
@@ -104,45 +103,6 @@ const updateDB = async <T extends UserInfoValues>(
 
 };
 
-export const getItemIdToAccessTokenFromDB = async (username: string) => {
-
-	try {
-
-		const itemIdToAccessToken = await getValueFromDB<ItemIdToAccessToken>(username, 'itemIdToAccessToken');
-
-		return itemIdToAccessToken;
-
-
-	} catch (err) {
-
-		console.log("getItemIdToAccessTokenMapFromDB", err);
-
-		return {};
-
-	}
-
-};
-
-export const getAccessTokensFromDB = async (username: string): Promise<Array<string>> => {
-
-	try {
-
-		const itemIdToAccessToken = await getItemIdToAccessTokenFromDB(username);
-
-		const accessTokens = Object.values(itemIdToAccessToken).flatMap(x => x);
-
-		return accessTokens;
-
-	} catch (err) {
-
-		console.log("getAccessTokensFromDB", err);
-
-		return [];
-
-	}
-
-};
-
 export const saveNewAccessToken = async (username: string, accessToken: string, itemId: string) => {
 
 	updateDB(
@@ -207,7 +167,7 @@ export const saveAccountBalancesToDB = async (
 		...accountRecords,
 		totalBalance,
 		date: new Date().toISOString()
-	}];
+	}] as AccountBalances;
 
 	const accountBalances = await getValueFromDB<AccountBalances>(username, 'accountBalances');
 
@@ -238,7 +198,6 @@ export const saveAccountBalancesToDB = async (
 			updateDB(
 				username,
 				'accountBalances',
-				// @ts-ignore
 				newEntry,
 				updateAccountBalances
 			);
@@ -246,6 +205,36 @@ export const saveAccountBalancesToDB = async (
 		}
 
 	});
+
+};
+
+export const getItemIdToAccessTokenFromDB = async (username: string) => {
+
+	return getValueFromDB<ItemIdToAccessToken>(username, 'itemIdToAccessToken')
+		.catch(err => {
+			console.log("getItemIdToAccessTokenMapFromDB", err);
+			return {};
+		})
+
+};
+
+export const getAccessTokensFromDB = async (username: string): Promise<Array<string>> => {
+
+	try {
+
+		const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
+
+		const accessTokens = Object.values(itemIdToAccessTokens).flatMap(x => x);
+
+		return accessTokens;
+
+	} catch (err) {
+
+		console.log("getAccessTokensFromDB", err);
+
+		return [];
+
+	}
 
 };
 
