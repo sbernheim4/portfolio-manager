@@ -1,18 +1,19 @@
-import { isToday } from "date-fns";
 import { AccountBase } from "plaid";
-import { useEffect, useState } from "react";
-import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ActionFunction, Form, json, LinksFunction, LoaderFunction, redirect, useActionData, useLoaderData, useSubmit } from "remix";
+import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { isToday } from "date-fns";
+import { useEffect, useState } from "react";
 
-import { InvestmentAccounts } from "~/components/InvestmentAccounts";
-import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
-import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
-import { dollarFormatter } from "~/helpers/formatters";
-import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
-import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
-import { getUserNameFromSession } from "~/helpers/session";
 import networthStyles from "~/styles/networth/networth.css";
+import { AccountIdToValue } from "~/types/UserInfo.types";
+import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
+import { InvestmentAccounts } from "~/components/InvestmentAccounts";
+import { dollarFormatter } from "~/helpers/formatters";
+import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
+import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
+import { getUserNameFromSession } from "~/helpers/session";
+import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import { isLoggedOut } from "./login";
 
 export type AccountBalanceChartData = Array<{
@@ -121,11 +122,11 @@ export const action: ActionFunction = async ({ request }) => {
 		// User clicks to save today's balance information to their historical
 		// record.
 		case "saveBalance":
-			const accountRecords = JSON.parse(formData.get("accountsBalance") as string) as Record<string, number>;
-			const balance = parseFloat(formData.get("totalBalance") as string);
+			const accountRecords = JSON.parse(formData.get("accountsBalance") as string) as AccountIdToValue
+			const totalBalance = parseFloat(formData.get("totalBalance") as string);
 
 			// Fire and forget
-			saveAccountBalancesToDB(username, accountRecords, balance);
+			saveAccountBalancesToDB(username, accountRecords, totalBalance);
 
 			return null;
 		case "filterBalanceChart":

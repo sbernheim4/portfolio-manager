@@ -1,7 +1,8 @@
 import { ActionFunction, Form, redirect, useActionData } from "remix";
 import bcrypt from 'bcryptjs';
-import { getNewUserInfo, getUserInfoCollection, UserInfo } from "~/helpers/db";
+import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db";
 import { commitSession, getSession } from "~/helpers/session";
+import { UserInfo } from "~/types/UserInfo.types";
 
 const hashPassword = async (
 	password: string

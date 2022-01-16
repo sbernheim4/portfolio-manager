@@ -5,7 +5,7 @@ export type AccountBalances = Array<AccountIdToValue & {
 	"totalBalance": number;
 }>
 
-type AccountIdToValue = Record<string, number>
+export type AccountIdToValue = Record<string, number>
 
 export type ItemIdToAccessToken = Record<string, string[]>;
 
