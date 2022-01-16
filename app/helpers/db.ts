@@ -23,7 +23,7 @@ export const getNewUserInfo = (username: string, password: string, salt: string)
 		salt,
 		user: username
 	};
-}
+};
 
 try {
 
@@ -43,7 +43,6 @@ try {
 
 }
 
-// TODO Update call sites to pass in username
 export const retrieveItemIdToAccessTokenMap = async (username: string) => {
 
 	try {

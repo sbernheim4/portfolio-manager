@@ -98,8 +98,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 			accountBalancesChartData: mergedAccountBalancesChartData,
 			// Used by the client to update the historical info in the DB
 			todaysBalanceData,
-			// Helper for filtering what charts for accounts to show - checkboxes
-			// display names but the chart data relies on account ids
+			// Helper for filtering what charts for accounts to show -
+			// checkboxes in the UI display account names but the chart data
+			// relies on account ids
 			accountIdsAndNames,
 			// Provided to the InvestmentAccounts component rendered by this route
 			balances,
@@ -193,8 +194,6 @@ const Networth = () => {
 	const submit = useSubmit();
 
 	// Auto Submit today's balance when JS is enabled via useEffect
-	// The DB handler takes care of only storing todays balance if it hasn't yet
-	// been stored
 	useEffect(() => {
 		if (isToday(new Date(mostRecentAccountBalancesEntryDate))) {
 			return;

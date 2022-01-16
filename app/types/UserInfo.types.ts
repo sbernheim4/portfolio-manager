@@ -10,7 +10,7 @@ export type AccountBalances = Array<{
 export type UserInfo = {
 	accountBalances: AccountBalances;
 	balances: Array<{ date: string, balances: number }>
-	itemIdToAccessToken: Record<string, string>;
+	itemIdToAccessToken: Record<string, string[]>;
 	positionsLastUpdatedAt: string;
 	password: string;
 	salt: string;
