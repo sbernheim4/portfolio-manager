@@ -4,7 +4,7 @@ import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
-import { sumAccountBalances } from "~/helpers/sumAccountBalances";
+import { positiveAccountTypes } from "~/components/NetworthComponent";
 import { loaderWithLogin } from "~/remix-helpers";
 
 export const meta: MetaFunction = () => {
@@ -35,6 +35,26 @@ export const loader: LoaderFunction = async (args) => {
 			{ headers: { "Cache-Control": "max-age=43200" } }
 		);
 	})(args);
+
+};
+
+/**
+ * Sum the balances of the passed in accounts accounting for credit and loan
+ * accounts
+ */
+const sumAccountBalances = (accounts: AccountBase[]) => {
+
+	const totalBalance = accounts.reduce(
+		(acc, account) => {
+			const isPositive = positiveAccountTypes.includes(account.type);
+			return isPositive ?
+				acc + (account.balances.current ?? 0) :
+				acc - (account.balances.current ?? 0)
+		},
+		0
+	);
+
+	return totalBalance;
 
 };
 

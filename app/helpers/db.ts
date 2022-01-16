@@ -1,33 +1,14 @@
-type ValueOf<T> = T[keyof T];
-
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
+import { AccountBalances, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
 
 const collectionName = "userInfo";
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
 let activeConnection: Promise<MongoClient> | undefined;
-
-type UserInfoKeys = keyof UserInfo;
-type UserInfoValues = ValueOf<UserInfo>;
-
-export type UserInfo = {
-	accountBalances: Array<{
-		// @ts-ignore
-		"date": string,
-		"totalBalance": number;
-		[key: string]: number
-	}>; // Array<AccountBalance>
-	balances: Array<{ date: string, balances: number }>
-	itemIdToAccessToken: Record<string, string>;
-	positionsLastUpdatedAt: string;
-	password: string;
-	salt: string;
-	user: string;
-};
 
 /**
  * Used when a new user is singing up for an account
@@ -255,25 +236,25 @@ export const updatePositionsLastUpdatedAt = async (username: string, date: Optio
 
 };
 
-const getValueFromDB = async (username: string, property: UserInfoKeys): Promise<UserInfoValues> => {
+const getValueFromDB = async <T extends UserInfoValues>(username: string, property: UserInfoKeys): Promise<T> => {
 
 	const userInfoCollection = await getUserInfoCollection();
 	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
 
 	const value = userInfo[property];
 
-	return value;
+	return value as T;
 };
 
 export const getAccountBalancesFromDB = async (username: string) => {
 
-	return getValueFromDB(username, 'accountBalances');
+	return getValueFromDB<AccountBalances>(username, 'accountBalances');
 
 };
 
 export const getPositionsLastUpdatedAt = async (username: string) => {
 
-	return getValueFromDB(username, 'positionsLastUpdatedAt') as Promise<string>;
+	return getValueFromDB<string>(username, 'positionsLastUpdatedAt')
 
 };
 

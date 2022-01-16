@@ -2,7 +2,7 @@ import { Holding, Security } from 'plaid';
 import { Form, LinksFunction } from 'remix';
 import { dollarFormatter } from '~/helpers/formatters';
 import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
-import { useSearchHoldings } from '~/hooks/useSearch';
+import { useSearchHoldings } from '~/hooks/useSearchHoldings';
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
 import positionsStyles from './styles/positions.css';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
