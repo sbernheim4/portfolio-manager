@@ -1,7 +1,7 @@
 import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { retrieveItemIdToAccessTokenMap, retrieveStoredAccessTokens } from "./db";
+import { getItemIdToAccessTokenMapFromDB, getAccessTokensFromDB } from "./db";
 import { client } from "./plaidClient";
 import { format } from "date-fns";
 
@@ -43,7 +43,7 @@ export const createPlaidLinkToken = async (request: LinkTokenCreateRequest) => {
 
 export const getInvestmentHoldings = async (username: string): Promise<{ holdings: Holding[]; securities: Security[] }> => {
 
-	const accessTokens = await retrieveStoredAccessTokens(username);
+	const accessTokens = await getAccessTokensFromDB(username);
 
 	try {
 
@@ -82,7 +82,7 @@ export const getPlaidLinkedAccounts = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens(username);
+		const accessTokens = await getAccessTokensFromDB(username);
 
 		const accountInformationPromises = accessTokens.map(token => {
 			return client.accountsGet({ access_token: token });
@@ -120,7 +120,7 @@ export const getPlaidAccounts = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens(username);
+		const accessTokens = await getAccessTokensFromDB(username);
 
 		const accountInfoPromises = accessTokens.map(token => {
 			return client.accountsGet({ access_token: token });
@@ -145,7 +145,7 @@ export const getPlaidAccountBalances = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens(username);
+		const accessTokens = await getAccessTokensFromDB(username);
 
 		const balancesPromises = accessTokens.map(token => {
 			return client.accountsBalanceGet({ access_token: token });
@@ -170,7 +170,7 @@ export const getPlaidLinkedInstitutions = async (username: string) => {
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens(username);
+		const accessTokens = await getAccessTokensFromDB(username);
 
 		const itemPromises = accessTokens.map(token => {
 			return client.itemGet({ access_token: token });
@@ -242,7 +242,7 @@ export const unlinkPlaidItem = async (username: string, itemId: string, numTries
 		throw new Error("Could not remove access token after 5 tries");
 	}
 
-	const itemIdToAccessTokens = await retrieveItemIdToAccessTokenMap(username);
+	const itemIdToAccessTokens = await getItemIdToAccessTokenMapFromDB(username);
 
 	const accessToken = itemIdToAccessTokens[itemId];
 
@@ -274,7 +274,7 @@ export const getInvestmentTransactions = async (
 
 	try {
 
-		const accessTokens = await retrieveStoredAccessTokens(username);
+		const accessTokens = await getAccessTokensFromDB(username);
 
 		const transactionPromises = accessTokens.map(token => {
 			return client.investmentsTransactionsGet({

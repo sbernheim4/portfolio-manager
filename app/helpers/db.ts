@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
-import { isToday, subDays } from 'date-fns';
+import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
 import { AccountBalances, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
 
@@ -9,21 +9,6 @@ const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongo
 const client = new MongoClient(uri);
 
 let activeConnection: Promise<MongoClient> | undefined;
-
-/**
- * Used when a new user is singing up for an account
- */
-export const getNewUserInfo = (username: string, password: string, salt: string): UserInfo => {
-	return {
-		accountBalances: [],
-		balances: [],
-		itemIdToAccessToken: {},
-		positionsLastUpdatedAt: "",
-		password,
-		salt,
-		user: username
-	};
-};
 
 try {
 
@@ -43,7 +28,74 @@ try {
 
 }
 
-export const retrieveItemIdToAccessTokenMap = async (username: string) => {
+
+/**
+ * Used when a new user is singing up for an account
+ */
+export const getNewUserInfo = (username: string, password: string, salt: string): UserInfo => {
+	return {
+		accountBalances: [],
+		balances: [],
+		itemIdToAccessToken: {},
+		positionsLastUpdatedAt: "",
+		password,
+		salt,
+		user: username
+	};
+};
+
+/**
+ * Retrieve top level properties from the DB for a given user
+ */
+const getValueFromDB = async <T extends UserInfoValues>(username: string, property: UserInfoKeys): Promise<T> => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+
+	const value = userInfo[property];
+
+	return value as T;
+};
+
+/**
+ * Update top level properties in the DB for a given user
+ */
+const updateDB = async <T>(
+	username: string,
+	name: string,
+	initialValue: T,
+	fn: (userInfo: UserInfo) => T
+) => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+
+	// @ts-ignore
+	const value = userInfo[name];
+
+	if (userInfo === null || value === null || value === undefined) {
+
+		// New User
+		return userInfoCollection.insertOne({
+			user: username,
+			[name]: initialValue
+		});
+
+	} else {
+
+		// Existing User
+		const valueToInsert = fn(userInfo);
+
+		return userInfoCollection.findOneAndUpdate(
+			{ user: username },
+			{ $set: { [name]: valueToInsert } }
+		);
+
+	}
+
+};
+
+export const getItemIdToAccessTokenMapFromDB = async (username: string) => {
 
 	try {
 
@@ -69,26 +121,19 @@ export const retrieveItemIdToAccessTokenMap = async (username: string) => {
 
 };
 
-export const retrieveStoredAccessTokens = async (username: string) => {
+export const getAccessTokensFromDB = async (username: string) => {
 
 	try {
 
-		const userInfoCollection = await getUserInfoCollection();
-		const userInfo = await userInfoCollection.findOne({ user: username });
+		const itemIdToAccessToken = await getItemIdToAccessTokenMapFromDB(username);
 
-		if (userInfo === null) {
-			return [];
-		}
+		const accessTokens = Object.values(itemIdToAccessToken).flatMap(x => x);
 
-		const { itemIdToAccessToken } = userInfo;
-
-		const res = Object.values(itemIdToAccessToken);
-
-		return res as string[];
+		return accessTokens;
 
 	} catch (err) {
 
-		console.log("ERR", err);
+		console.log("getAccessTokensFromDB", err);
 
 		return [];
 
@@ -98,8 +143,6 @@ export const retrieveStoredAccessTokens = async (username: string) => {
 
 export const getUserInfoCollection = async () => {
 
-	// const connection = await getDBConnection();
-
 	if (activeConnection === undefined) {
 		throw new Error("Could not connect to DB");
 	}
@@ -107,41 +150,6 @@ export const getUserInfoCollection = async () => {
 	return activeConnection.then(mongoClient => {
 		return mongoClient.db().collection(collectionName);
 	});
-};
-
-const updateDB = async <T>(
-	username: string,
-	name: string,
-	initialValue: T,
-	fn: (userInfo: UserInfo) => T
-) => {
-
-	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
-
-	// @ts-ignore
-	const nestedData = userInfo[name];
-
-	if (userInfo === null || nestedData === null || nestedData === undefined) {
-
-		// New User
-		return userInfoCollection.insertOne({
-			user: username,
-			[name]: initialValue
-		});
-
-	} else {
-
-		// Existing User
-		const valueToInsert = fn(userInfo);
-
-		return userInfoCollection.findOneAndUpdate(
-			{ user: username },
-			{ $set: { [name]: valueToInsert } }
-		);
-
-	}
-
 };
 
 export const saveNewAccessToken = async (username: string, accessToken: string, itemId: string) => {
@@ -162,34 +170,37 @@ export const saveNewAccessToken = async (username: string, accessToken: string, 
 
 };
 
+/**
+ * Meant to be used only in the portfolio-balance routeLoader
+ */
 export const getMostRecentAccountBalancesEntryDate = async (username: string) => {
 
-	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+	const accountBalances = await getValueFromDB<AccountBalances>(username, 'accountBalances');
 
-	const { accountBalances } = userInfo;
+	const mostRecentEntry = accountBalances
+		.map(x => x.date)
+		.map(dateString => new Date(dateString))
+		.sort((a, b) => {
+			if (isSameDay(a, b)) {
+				return 0;
+			} else if (isBefore(a, b)) {
+				return -1
+			} else {
+				return 1;
+			}
+		})
+		.at(0)
 
-	if (accountBalances.length) {
+	const today = new Date();
 
-		const lastEntry = accountBalances[accountBalances.length - 1];
-		const mostRecentEntry = new Date(lastEntry.date)
-
-		return mostRecentEntry;
-
-	} else {
-
-		const today = new Date();
-
-		return subDays(today, 1);
-
-	}
+	return mostRecentEntry ?? subDays(today, 1);
 
 };
 
 
 type AccountBalance = number;
 
-export const saveAccountBalancesToDB = (
+export const saveAccountBalancesToDB = async (
 	username: string,
 	accountRecords: Record<string, AccountBalance>,
 	totalBalance: number
@@ -201,29 +212,42 @@ export const saveAccountBalancesToDB = (
 		date: new Date().toISOString()
 	}];
 
-	updateDB(username, 'accountBalances', newEntry, (userInfo) => {
+	const accountBalances = await getValueFromDB<AccountBalances>(username, 'accountBalances');
 
-		const { accountBalances } = userInfo;
+	Option.of(
+		accountBalances
+			.map(x => x.date)
+			.map(dateString => new Date(dateString))
+			.sort((a, b) => {
+				if (isSameDay(a, b)) {
+					return 0;
+				} else if (isBefore(a, b)) {
+					return -1
+				} else {
+					return 1;
+				}
+			})
+			.at(0)
+	).map(mostRecentEntryDate => {
 
-		if (accountBalances.length) {
-			const lastEntry = accountBalances[accountBalances.length - 1];
-			const mostRecentEntry = new Date(lastEntry.date)
+		if (!isToday(mostRecentEntryDate)) {
 
-			return isToday(mostRecentEntry) ?
-				accountBalances :
-				[
-					...accountBalances,
-					...newEntry
-				];
+			const updateAccountBalances = () => {
+				return accountBalances.length > 0 ?
+					[ ...newEntry, ...accountBalances ] :
+					newEntry;
+			};
 
-		} else {
-
-			return newEntry;
+			updateDB(
+				username,
+				'accountBalances',
+				newEntry,
+				updateAccountBalances
+			);
 
 		}
 
 	});
-
 
 };
 
@@ -233,16 +257,6 @@ export const updatePositionsLastUpdatedAt = async (username: string, date: Optio
 		updateDB(username, "positionsLastUpdatedAt", d, () => d);
 	});
 
-};
-
-const getValueFromDB = async <T extends UserInfoValues>(username: string, property: UserInfoKeys): Promise<T> => {
-
-	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
-
-	const value = userInfo[property];
-
-	return value as T;
 };
 
 export const getAccountBalancesFromDB = async (username: string) => {
@@ -256,4 +270,3 @@ export const getPositionsLastUpdatedAt = async (username: string) => {
 	return getValueFromDB<string>(username, 'positionsLastUpdatedAt')
 
 };
-
