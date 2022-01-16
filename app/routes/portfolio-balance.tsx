@@ -80,7 +80,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	const username = await getUserNameFromSession(request);
 	const mostRecentAccountBalancesEntryDate = await getMostRecentAccountBalancesEntryDate(username);
-	console.log({ mostRecentAccountBalancesEntryDate });
 	const accountBalancesChartData = await NetworthHelpers.getHistoricalPerAccountBalances(username);
 	const balances = filterForInvestmentAccounts(await getPlaidAccountBalances(username));
 
