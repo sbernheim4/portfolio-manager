@@ -1,17 +1,17 @@
 import { ValueOf } from ".";
 
-export type AccountBalances = Array<{
-	// @ts-ignore
+export type AccountBalances = Array<AccountIdToValue & {
 	"date": string,
 	"totalBalance": number;
-	[key: string]: number
 }>
+
+type AccountIdToValue = Record<string, number>
 
 export type ItemIdToAccessToken = Record<string, string[]>;
 
+
 export type UserInfo = {
 	accountBalances: AccountBalances;
-	balances: Array<{ date: string, balances: number }>
 	itemIdToAccessToken: ItemIdToAccessToken,
 	positionsLastUpdatedAt: string;
 	password: string;
@@ -21,5 +21,3 @@ export type UserInfo = {
 
 export type UserInfoKeys = keyof UserInfo;
 export type UserInfoValues = ValueOf<UserInfo>;
-
-
