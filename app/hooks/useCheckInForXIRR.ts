@@ -13,7 +13,7 @@ export const useCheckInForXIRR = (
 		const today = new Date();
 		const data = new FormData();
 
-		data.set("positionsLastUpdatedAt", today.toString());
+		data.set("xirrDataLastUpdatedOn", today.toString());
 		data.set("todaysInvestmentAccountBalances", todaysInvestmentAccountBalances.toString());
 		data.set("todaysXirr", xirr.toString());
 

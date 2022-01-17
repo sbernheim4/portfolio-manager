@@ -10,8 +10,8 @@ export type AccountIdToValue = Record<string, number>
 export type ItemIdToAccessToken = Record<string, string[]>;
 
 export type XirrData = {
-	positionsLastUpdatedAt: string;
-	balance: number;
+	xirrDataLastUpdatedOn: string | undefined;
+	balance: number | undefined;
 	xirr: number | null;
 };
 
