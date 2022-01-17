@@ -145,8 +145,7 @@ export const getMostRecentAccountBalancesEntryDate = async (username: string) =>
 			} else {
 				return 1;
 			}
-		})
-		.at(0)
+		})[0];
 
 	const today = new Date();
 
