@@ -197,7 +197,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 		xirrFromDB,
 		balance,
 		todaysInvestmentBalances,
-		new Date(xirrDataLastUpdatedOn),
+		xirrDataLastUpdatedOn === undefined ? today : new Date(xirrDataLastUpdatedOn),
 		investmentTransactions
 	);
 
