@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { MONGODB_PWD } from "../env";
-import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues } from '~/types/UserInfo.types';
+import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
 
 const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -34,10 +34,14 @@ export const getNewUserInfo = (username: string, password: string, salt: string)
 	return {
 		accountBalances: [],
 		itemIdToAccessToken: {},
-		positionsLastUpdatedAt: "",
 		password,
 		salt,
-		user: username
+		user: username,
+		xirrData: {
+			positionsLastUpdatedAt: undefined,
+			balance: 0,
+			xirr: null
+		}
 	};
 };
 
@@ -221,11 +225,20 @@ export const getAccessTokensFromDB = async (username: string): Promise<Array<str
 
 };
 
-export const updatePositionsLastUpdatedAt = async (username: string, date: Option<string>) => {
+export const updatePositionsLastUpdatedAt = (
+	username: string,
+	date: string,
+	balance: number,
+	xirr: number
+) => {
 
-	date.map(d => {
-		updateDB(username, "positionsLastUpdatedAt", d, () => d);
-	});
+	const updatedXirrData = {
+		positionsLastUpdatedAt: date,
+		balance,
+		xirr
+	};
+
+	updateDB(username, "xirrData", updatedXirrData, () => updatedXirrData);
 
 };
 
@@ -235,8 +248,8 @@ export const getAccountBalancesFromDB = async (username: string) => {
 
 };
 
-export const getPositionsLastUpdatedAt = async (username: string) => {
+export const getXirrData = async (username: string) => {
 
-	return getValueFromDB<string>(username, 'positionsLastUpdatedAt')
+	return await getValueFromDB<XirrData>(username, 'xirrData');
 
 };

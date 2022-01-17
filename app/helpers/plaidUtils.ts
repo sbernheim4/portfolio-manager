@@ -265,7 +265,7 @@ export const getInvestmentTransactions = async (
 	username: string,
 	fromDate: Date,
 	offset = 0,
-	count = 200
+	count = 100
 ) => {
 
 	const today = new Date();
