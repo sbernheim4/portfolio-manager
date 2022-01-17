@@ -72,6 +72,8 @@ const calculateNewXirr = (
 
 	const today = new Date();
 
+	// Reformat the transactions to be ready to be consumed by the xirr
+	// function.
 	const cashflowsSinceCheckPointDate = transactionsSinceCheckpointDate.map(tx => {
 		return {
 			// Need to multiply by -1 since Plaid considers selling shares a
@@ -86,6 +88,9 @@ const calculateNewXirr = (
 
 	if (noPreviousXirr) {
 
+		// If we have never calculated an xirr value (as in this is the user's
+		// first time hitting the positions page since making their account)
+		// calculate it
 		const xirrValue = calculateXirr([
 			{
 				amount: balanceAsOfCheckpointDate * -1,
@@ -104,7 +109,38 @@ const calculateNewXirr = (
 
 	} else {
 
-		// Dates and date related values
+		// The user has a previous XIRR value
+		//
+		// We will use this previous XIRR value to calculate the new XIRR value.
+		//
+		// To do so, we need to discount the associated balance for the
+		// previously calculated XIRR data to be equivalent as if that
+		// discounted value was the lump sum initial investment on January 1st
+		// at the start of the year.
+		//
+		// We do this by using the following equation solving for
+		// discountPresentValuePercent:
+		//
+		// (discountPresentValuePercent + 1) ^ 12 = 1 + previousXirr
+		//
+		// Once we have the value for discountPresentValuePercent, we use this
+		// to correctly discount the associated balance for the previously
+		// stored XIRR data to its value at the start of the year on Janyary 1st
+		// using the Net Present Value equation:
+		//
+		// 1 / [ (1 + discountPresentValuePercent)^monsthsSinceCheckPointDate ] * balanceAsOfCheckpointDate
+		//
+		// All the variables in the above are known:
+		//
+		// * discountPresentValuePercent was previously solved
+		//
+		// * monsthsSinceCheckPointDate is the difference in months between
+		//   today and the checkpoint date when XIRR was last calculated
+		//
+		// * balanceAsOfCheckpointDate is stored from when XIRR was last
+		//   calculated
+
+		// Dates and date related helper values
 		const currentYear = today.getFullYear();
 		const startOfYear = new Date(currentYear, 0, 1);
 		const monsthsSinceCheckPointDate = differenceInMonths(today, checkpointDate);
@@ -227,12 +263,12 @@ export const action: ActionFunction = async ({ request }) => {
 			// @ts-ignore
 			const xirrValue = parseFloat(formData.get("todaysXirr").toString());
 
-			// updatePositionsLastUpdatedAt(
-			//	username,
-			//	positionsLastUpdatedAt,
-			//	todaysInvestmentAccountBalances,
-			//	xirrValue
-			// );
+			updatePositionsLastUpdatedAt(
+				username,
+				positionsLastUpdatedAt,
+				todaysInvestmentAccountBalances,
+				xirrValue
+			);
 
 			return null;
 	}
