@@ -1,17 +1,18 @@
-// import { RateOfReturn } from "~/components/RateOfReturn";
-// import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
-import { AccountBase, Holding } from "plaid";
+import { AccountBase, Holding, InvestmentTransaction } from "plaid";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, redirect, useActionData, useLoaderData } from "remix";
-import { Option } from 'excoptional';
 import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles, aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 import { PositionsLoaderData } from "~/types/positions.types";
+import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
+import { differenceInMonths } from "date-fns";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { getPositionsLastUpdatedAt, updatePositionsLastUpdatedAt } from "~/helpers/db";
+import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { isLoggedOut } from "./login";
+import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
+import { xirr as calculateXirr } from "@webcarrot/xirr";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -56,6 +57,71 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
 		securities
 	};
 
+}
+
+/**
+ * Calculate the new XIRR value using the previous XIRR values
+ */
+const calculateNewXirr = (
+	previousXirr: null | number,
+	balanceAsOfCheckpointDate: number,
+	currentBalance: number,
+	checkpointDate: Date,
+	transactionsSinceCheckpointDate: InvestmentTransaction[]
+) => {
+
+	const today = new Date();
+
+	const cashflowsSinceCheckPointDate = transactionsSinceCheckpointDate.map(tx => {
+		return {
+			// Need to multiply by -1 since Plaid considers selling shares a
+			// positive value (and buying shares a negative) whereas xirr
+			// calculates these in the opposite way
+			amount: (tx.amount - (tx.fees ?? 0)) * -1,
+			date: new Date(tx.date)
+		}
+	});
+
+	const noPreviousXirr = previousXirr === null;
+
+	if (noPreviousXirr) {
+
+		const xirrValue = calculateXirr([
+			{
+				amount: balanceAsOfCheckpointDate * -1,
+				date: checkpointDate
+			},
+
+			...cashflowsSinceCheckPointDate,
+
+			{
+				amount: currentBalance,
+				date: today
+			}
+		]);
+
+		return parseFloat(xirrValue.toFixed(4));
+
+	} else {
+
+		// Dates and date related values
+		const currentYear = today.getFullYear();
+		const startOfYear = new Date(currentYear, 0, 1);
+		const monsthsSinceCheckPointDate = differenceInMonths(today, checkpointDate);
+
+		const discountPresentValuePercent = Math.pow((1 + previousXirr), 1 / 12) - 1
+		const discountedPresentValue = 1 / Math.pow((1 + discountPresentValuePercent), monsthsSinceCheckPointDate) * balanceAsOfCheckpointDate;
+
+		const newXirr = calculateXirr([
+			{ amount: discountedPresentValue * -1, date: startOfYear },
+			...cashflowsSinceCheckPointDate,
+			{ amount: currentBalance, date: today }
+		]);
+
+		return parseFloat(newXirr.toFixed(4));
+
+	}
+
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -67,20 +133,41 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const username = await getUserNameFromSession(request);
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
 
-	const fetchTransactionsFrom = new Date(await getPositionsLastUpdatedAt(username));
+	const {
+		xirr: xirrFromDB,
+		balance,
+		positionsLastUpdatedAt
+	} = await getXirrData(username)
+
+	const today = new Date();
+	const fetchTransactionsFrom = new Date(positionsLastUpdatedAt || today);
 
 	// Used for calculating XIRR
+	// TODO: This may not return all transactions for the given period -- need
+	// to add some additional logic in the function to continue looping if there
+	// are more transactions than what was requested
 	const investmentTransactions = await getInvestmentTransactions(username, fetchTransactionsFrom);
-	const dates = investmentTransactions.map(tx => tx.date);
-	const cashflows = investmentTransactions.map(tx => tx.amount - (tx.fees ?? 0));
+
+	const todaysInvestmentBalances = balances.reduce((acc, curr) => {
+		return curr.type === "investment" || curr.type === "brokerage" ?
+			acc + (curr.balances.current ?? 0) :
+			acc
+	}, 0);
+
+	const newXirr = calculateNewXirr(
+		xirrFromDB,
+		balance,
+		todaysInvestmentBalances,
+		new Date(positionsLastUpdatedAt),
+		investmentTransactions
+	);
 
 	return json(
 		{
-			cashflowData: [cashflows, dates],
-			balances,
 			holdings,
 			securities,
-			investmentTransactions
+			todaysInvestmentBalances,
+			xirr: newXirr
 		},
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
@@ -128,12 +215,25 @@ export const action: ActionFunction = async ({ request }) => {
 
 			return json({ filteredHoldings });
 
-		case "positionsLastUpdatedAt":
+		case "saveNewXirrData":
+
 			// This will help to calculate xirr from the time the user first signed up to the current day
-			// User checks in that their account balances were last updated
-			// today.
-			const lastAccessed = Option.of(formData.get("positionsLastUpdatedAt")?.toString());
-			await updatePositionsLastUpdatedAt(username, lastAccessed);
+			// User checks in that their account balances were last updated today.
+
+			// @ts-ignore
+			const positionsLastUpdatedAt = formData.get("positionsLastUpdatedAt").toString();
+			// @ts-ignore
+			const todaysInvestmentAccountBalances = parseFloat(formData.get("todaysInvestmentAccountBalances").toString());
+			// @ts-ignore
+			const xirrValue = parseFloat(formData.get("todaysXirr").toString());
+
+			// updatePositionsLastUpdatedAt(
+			//	username,
+			//	positionsLastUpdatedAt,
+			//	todaysInvestmentAccountBalances,
+			//	xirrValue
+			// );
+
 			return null;
 	}
 
@@ -142,8 +242,8 @@ export const action: ActionFunction = async ({ request }) => {
 const Holdings = () => {
 
 	const {
-		// cashflowData,
-		// investmentTransactions,
+		xirr,
+		todaysInvestmentBalances,
 		holdings,
 		securities,
 	} = useLoaderData<PositionsLoaderData>();
@@ -152,15 +252,14 @@ const Holdings = () => {
 	const holdingsToDisplay = actionData?.filteredHoldings ?? holdings;
 
 	// Checkpoint today as most recent time when the users'
-	// positions balance was updated - will be used when
-	// calculating xirr
-	// useCheckInForXIRR();
+	// xirr data was updated
+	useCheckInForXIRR(todaysInvestmentBalances, xirr);
 
 	return (
 		<>
 			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
-			{ /* <RateOfReturn investmentTransactions={investmentTransactions} cashflowData={cashflowData} /> */}
+			<RateOfReturn xirr={xirr} />
 			<Positions securities={securities} holdings={holdingsToDisplay} />
 			<SectorWeight securities={securities} holdings={holdings} />
 		</>

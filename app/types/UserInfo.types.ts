@@ -9,14 +9,19 @@ export type AccountIdToValue = Record<string, number>
 
 export type ItemIdToAccessToken = Record<string, string[]>;
 
+export type XirrData = {
+	positionsLastUpdatedAt: string;
+	balance: number;
+	xirr: number | null;
+};
 
 export type UserInfo = {
 	accountBalances: AccountBalances;
 	itemIdToAccessToken: ItemIdToAccessToken,
-	positionsLastUpdatedAt: string;
 	password: string;
 	salt: string;
 	user: string;
+	xirrData: XirrData;
 };
 
 export type UserInfoKeys = keyof UserInfo;
