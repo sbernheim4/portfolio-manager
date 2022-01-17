@@ -4,7 +4,7 @@ export const RateOfReturn = (props: {
 
 	return (
 		<>
-			<h1>XIRR: {props.xirr}</h1>
+			<h2>Your total portfolio Internal Rate of Return is: {props.xirr}</h2>
 		</>
 	);
 
