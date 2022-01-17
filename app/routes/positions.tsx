@@ -64,7 +64,7 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
  */
 const calculateNewXirr = (
 	previousXirr: null | number,
-	balanceAsOfCheckpointDate: number,
+	balanceAsOfCheckpointDate: number | undefined,
 	currentBalance: number,
 	checkpointDate: Date,
 	transactionsSinceCheckpointDate: InvestmentTransaction[]
@@ -84,30 +84,9 @@ const calculateNewXirr = (
 		}
 	});
 
-	const noPreviousXirr = previousXirr === null;
+	const previousXirrDataExists = previousXirr !== null && balanceAsOfCheckpointDate !== undefined;
 
-	if (noPreviousXirr) {
-
-		// If we have never calculated an xirr value (as in this is the user's
-		// first time hitting the positions page since making their account)
-		// calculate it
-		const xirrValue = calculateXirr([
-			{
-				amount: balanceAsOfCheckpointDate * -1,
-				date: checkpointDate
-			},
-
-			...cashflowsSinceCheckPointDate,
-
-			{
-				amount: currentBalance,
-				date: today
-			}
-		]);
-
-		return parseFloat(xirrValue.toFixed(4));
-
-	} else {
+	if (previousXirrDataExists) {
 
 		// The user has a previous XIRR value
 		//
@@ -156,6 +135,30 @@ const calculateNewXirr = (
 
 		return parseFloat(newXirr.toFixed(4));
 
+
+	} else {
+
+		// If we have never calculated an XIRR value (as in this is the user's
+		// first time hitting the positions page since making their account)
+		// calculate it.
+
+		const xirrValue = calculateXirr([
+			{
+				amount: (balanceAsOfCheckpointDate || currentBalance) * -1,
+				date: today
+			},
+
+			...cashflowsSinceCheckPointDate,
+
+			{
+				amount: currentBalance,
+				date: today
+			}
+		]);
+
+		return parseFloat(xirrValue.toFixed(4));
+
+
 	}
 
 };
@@ -172,11 +175,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const {
 		xirr: xirrFromDB,
 		balance,
-		positionsLastUpdatedAt
+		xirrDataLastUpdatedOn
 	} = await getXirrData(username)
 
 	const today = new Date();
-	const fetchTransactionsFrom = new Date(positionsLastUpdatedAt || today);
+	const fetchTransactionsFrom = new Date(xirrDataLastUpdatedOn || today);
 
 	// Used for calculating XIRR
 	// TODO: This may not return all transactions for the given period -- need
@@ -194,7 +197,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 		xirrFromDB,
 		balance,
 		todaysInvestmentBalances,
-		new Date(positionsLastUpdatedAt),
+		new Date(xirrDataLastUpdatedOn),
 		investmentTransactions
 	);
 
@@ -257,7 +260,7 @@ export const action: ActionFunction = async ({ request }) => {
 			// User checks in that their account balances were last updated today.
 
 			// @ts-ignore
-			const positionsLastUpdatedAt = formData.get("positionsLastUpdatedAt").toString();
+			const xirrDataLastUpdatedOn = formData.get("xirrDataLastUpdatedOn").toString();
 			// @ts-ignore
 			const todaysInvestmentAccountBalances = parseFloat(formData.get("todaysInvestmentAccountBalances").toString());
 			// @ts-ignore
@@ -265,7 +268,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 			updatePositionsLastUpdatedAt(
 				username,
-				positionsLastUpdatedAt,
+				xirrDataLastUpdatedOn,
 				todaysInvestmentAccountBalances,
 				xirrValue
 			);

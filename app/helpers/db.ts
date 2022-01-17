@@ -38,8 +38,8 @@ export const getNewUserInfo = (username: string, password: string, salt: string)
 		salt,
 		user: username,
 		xirrData: {
-			positionsLastUpdatedAt: undefined,
-			balance: 0,
+			xirrDataLastUpdatedOn: undefined,
+			balance: undefined,
 			xirr: null
 		}
 	};
@@ -233,7 +233,7 @@ export const updatePositionsLastUpdatedAt = (
 ) => {
 
 	const updatedXirrData = {
-		positionsLastUpdatedAt: date,
+		xirrDataLastUpdatedOn: date,
 		balance,
 		xirr
 	};
