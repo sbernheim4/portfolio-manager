@@ -261,7 +261,7 @@ const Networth = () => {
 
 				<CartesianAxis />
 
-				<XAxis interval={1} dataKey="date" />
+				<XAxis interval={6} dataKey="date" />
 
 				<YAxis domain={[0, 'dataMax']} />
 

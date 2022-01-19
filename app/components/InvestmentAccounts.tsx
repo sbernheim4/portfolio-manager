@@ -21,8 +21,8 @@ export const InvestmentAccounts = (
 
 	return (
 		<>
-            {props.children}
-            <h3>Account Balances: {dollarFormatter.format(totalBalance)}</h3>
+			{props.children}
+			<h3>Account Balances: {dollarFormatter.format(totalBalance)}</h3>
 
 			{
 				balances.map((account) => {
