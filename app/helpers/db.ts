@@ -217,15 +217,12 @@ export const saveAccountBalancesToDB = async (
 
 	try {
 
-		const accountBalances = await getValueFromDB<AccountBalances>(
-			username,
-			'accountBalances'
-		);
+		const accountBalances = await getAccountBalancesFromDB(username);
 
 		console.log({ accountBalances });
 
 		Option.of(
-			accountBalances
+			(accountBalances
 				.map(x => x.date)
 				.map(dateString => new Date(dateString))
 				.sort((a, b) => {
@@ -236,8 +233,7 @@ export const saveAccountBalancesToDB = async (
 					} else {
 						return -1;
 					}
-				})
-				.at(0)
+				})[0]) ?? undefined
 		).map(mostRecentEntryDate => {
 
 			if (!isToday(mostRecentEntryDate)) {
