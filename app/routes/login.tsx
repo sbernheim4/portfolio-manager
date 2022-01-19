@@ -11,6 +11,10 @@ import { getSession, commitSession } from "~/helpers/session";
 import bcrypt from 'bcryptjs';
 import { UserInfo } from "~/types/UserInfo.types";
 
+/**
+ * Callers of this function expect to receive null if there is an issue
+ * validating the credentials. Otherwise the user's id should be returned
+ */
 const validateCredentials = async (
 	username: FormDataEntryValue | null,
 	passwordFromForm: FormDataEntryValue | null
@@ -20,14 +24,18 @@ const validateCredentials = async (
 
 		const userInfoCollection = await getUserInfoCollection();
 		const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
-		const { salt, password } = userInfo;
-		const hashedPassword = bcrypt.hashSync(passwordFromForm as string, salt)
+
 		const noUserFound = userInfo === null;
-		const incorrectPassword = password !== hashedPassword
 
 		if (noUserFound) {
 			return null
-		} else if (incorrectPassword) {
+		}
+
+		const { salt, password } = userInfo;
+		const hashedPassword = bcrypt.hashSync(passwordFromForm as string, salt)
+		const incorrectPassword = password !== hashedPassword
+
+		if (incorrectPassword) {
 			return null;
 		} else {
 			return userInfo.user;
@@ -37,9 +45,11 @@ const validateCredentials = async (
 
 		console.log("error:", err)
 
+		return null;
+
 	}
 
-}
+};
 
 export const isLoggedIn = async (request: Request) => {
 	return !isLoggedOut(request);
