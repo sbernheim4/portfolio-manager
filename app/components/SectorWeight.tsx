@@ -1,7 +1,9 @@
 import { Holding, Security } from "plaid";
 import { dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 
-export const SectorWeight = (props: { securities: Security[], holdings: Holding[] }) => {
+export const SectorWeight = (
+	props: { securities: Security[], holdings: Holding[] }
+) => {
 
 	const { securities, holdings } = props;
 
@@ -35,13 +37,17 @@ export const SectorWeight = (props: { securities: Security[], holdings: Holding[
 
 	}, {} as Record<string, number>);
 
-	const totalInvested = holdings.reduce((acc, curr) => acc + curr.institution_value, 0);
+	const totalInvested = holdings.reduce(
+		(acc, curr) => acc + curr.institution_value,
+		0
+	);
 
 	return (
 		<>
 			<h1>Portfolio by Weights</h1>
 
 			<h3>Accounts by Type</h3>
+
 			{
 				Object.keys(investmentTypeToValue).map(type => {
 

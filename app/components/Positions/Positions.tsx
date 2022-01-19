@@ -1,11 +1,13 @@
 import { Holding, Security } from 'plaid';
-import { Form, LinksFunction } from 'remix';
-import { dollarFormatter } from '~/helpers/formatters';
-import { isClientSideJSEnabled } from '~/helpers/isClientSideJSEnabled';
-import { useSearchHoldings } from '~/hooks/useSearchHoldings';
-import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
+import { LinksFunction } from 'remix';
 import positionsStyles from './styles/positions.css';
+import {
+	StockInvestmentSummary,
+	links as stockInvestmentSummaryStyles
+} from '~/components/StockInvestmentSummary/StockInvestmentSummary';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
+import { dollarFormatter } from '~/helpers/formatters';
+import { useSearchHoldings } from '~/hooks/useSearchHoldings';
 
 export const links: LinksFunction = () => {
 	return [
@@ -50,7 +52,11 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 export const aggregateHoldings = (holdings: Holding[]) => {
 
 
-	const consolidateHolding = (holdingList: Holding[], holding: Holding, entryIndex: number) => {
+	const consolidateHolding = (
+		holdingList: Holding[],
+		holding: Holding,
+		entryIndex: number
+	) => {
 
 		const existingHoldingEntry = holdingList[entryIndex];
 
@@ -95,14 +101,20 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 
 };
 
-export const Positions = (props: { securities: Security[]; holdings: Holding[] }) => {
+export const Positions = (
+	props: { securities: Security[]; holdings: Holding[] }
+) => {
 
 	const { securities, holdings } = props;
 
-	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(securities);
+	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(
+		securities
+	);
 
 	// Curried for use in the useSearchHoldings hook
-	const toMatchedSecurityIds = (searchTerm: string) => Object.keys(tickerSymbolToSecurityId)
+	const toMatchedSecurityIds = (searchTerm: string) => Object.keys(
+		tickerSymbolToSecurityId
+	)
 		.map(ticker => ticker.toUpperCase()) // Normalize
 		.filter(ticker => ticker.includes(searchTerm)) // Filter
 		.map(ticker => tickerSymbolToSecurityId[ticker]); // convert tickers to security id
@@ -112,6 +124,7 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 	// means that if the same stock is held in two accounts, it will appear
 	// twice in the holdings list. We don't care about that however as we're
 	// focused on the total investment risk NOT the risk of each account.
+	// To dedupe these, we use this helper aggregateHoldings function
 	const aggregatedHoldings = aggregateHoldings(holdings);
 
 	const [searchTerm, setSearchTerm, holdingsToDisplay] = useSearchHoldings(
@@ -119,7 +132,10 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 		(searchTerm: string) => (holding: Holding) => toMatchedSecurityIds(searchTerm).includes(holding.security_id),
 	);
 
-	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(securities);
+	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(
+		securities
+	);
+
 	const totalInvested = aggregatedHoldings.reduce((acc, curr) => acc + curr.institution_value, 0);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,30 +148,14 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 
 			<h3>Balance: {dollarFormatter.format(totalInvested)}</h3>
 
-			{
-				/* Client side searching when JS is enabled */
-				isClientSideJSEnabled() ?
-					<input
-						className="positions__search"
-						value={searchTerm}
-						onChange={(e) => handleSearch(e)}
-						name="search"
-						type="search"
-						placeholder="Search by ticker"
-					/> :
-					null
-			}
-
-			{/* Support searching server side when JS is disabled */}
-			<noscript>
-				<p className="noJS">⚠️ Enabling JavaScript will improve the search speed</p>
-				<Form action="/positions" method="post">
-					<input className="positions__search" name="search" type="search" placeholder="Search by ticker" />
-					<input className="positions__search" type="submit" value="Search" />
-					<input type="hidden" name="_action" value="search" readOnly />
-				</Form>
-			</noscript>
-
+			<input
+				className="positions__search"
+				value={searchTerm}
+				onChange={(e) => handleSearch(e)}
+				name="search"
+				type="search"
+				placeholder="Search by ticker"
+			/>
 
 			<table className="investment-line-items">
 				<thead>
@@ -169,16 +169,18 @@ export const Positions = (props: { securities: Security[]; holdings: Holding[] }
 				</thead>
 				<tbody>
 					{
-						holdingsToDisplay.sort((a, b) => a.institution_value > b.institution_value ? -1 : 1).map((holding, i) => {
-							return (
-								<StockInvestmentSummary
-									ticker={securityIdToTickerSymbol[holding.security_id]}
-									totalInvested={totalInvested}
-									holding={holding}
-									key={securities[i].security_id}
-								/>
-							);
-						})
+						holdingsToDisplay
+							.sort((a, b) => b.institution_value - a.institution_value)
+							.map((holding, i) => {
+								return (
+									<StockInvestmentSummary
+										ticker={securityIdToTickerSymbol[holding.security_id]}
+										totalInvested={totalInvested}
+										holding={holding}
+										key={securities[i].security_id}
+									/>
+								);
+							})
 					}
 				</tbody>
 			</table>

@@ -43,7 +43,7 @@ export const calculateNewXirr = (
 
 	if (previousXirrDataExists) {
 
-		// The user has a previous XIRR value
+		// The user has a previous XIRR value and associated account balance
 		//
 		// We will use this previous XIRR value to calculate the new XIRR value.
 		//
@@ -93,6 +93,9 @@ export const calculateNewXirr = (
 
 	} else {
 
+		// The user *does not* have a previous XIRR value and associated account
+		// balance
+		//
 		// If we have never calculated an XIRR value (as in this is the user's
 		// first time hitting the positions page since making their account)
 		// calculate it.
@@ -103,6 +106,8 @@ export const calculateNewXirr = (
 				date: today
 			},
 
+			// On the off chance a user has placed transactions today and
+			// they're being picked up by plaid.
 			...cashflowsSinceCheckPointDate,
 
 			{

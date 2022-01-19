@@ -1,4 +1,11 @@
-import { ActionFunction, Form, json, LoaderFunction, redirect, useLoaderData } from "remix";
+import {
+	ActionFunction,
+	Form,
+	json,
+	LoaderFunction,
+	redirect,
+	useLoaderData
+} from "remix";
 import { getUserInfoCollection } from "~/helpers/db";
 import { getSession, commitSession } from "~/helpers/session";
 import bcrypt from 'bcryptjs';
@@ -6,21 +13,21 @@ import { UserInfo } from "~/types/UserInfo.types";
 
 const validateCredentials = async (
 	username: FormDataEntryValue | null,
-	password: FormDataEntryValue | null
+	passwordFromForm: FormDataEntryValue | null
 ) => {
 
 	try {
 
 		const userInfoCollection = await getUserInfoCollection();
 		const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
-		const { salt } = userInfo;
-		const hashedPassword = bcrypt.hashSync(password as string, salt)
+		const { salt, password } = userInfo;
+		const hashedPassword = bcrypt.hashSync(passwordFromForm as string, salt)
+		const noUserFound = userInfo === null;
+		const incorrectPassword = password !== hashedPassword
 
-		if (userInfo === null) {
-			// No user with that ID found
+		if (noUserFound) {
 			return null
-		} else if (userInfo.password !== hashedPassword) {
-			// Incorrect Password
+		} else if (incorrectPassword) {
 			return null;
 		} else {
 			return userInfo.user;
@@ -81,7 +88,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-	const session = await getSession(request.headers.get("Cookie"));
+	const session = await getSession(
+		request.headers.get("Cookie")
+	);
 
 	const form = await request.formData();
 

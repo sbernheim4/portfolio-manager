@@ -5,6 +5,9 @@ import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB } from "./db";
 import { client } from "./plaidClient";
 import { format } from "date-fns";
 
+/**
+ *
+ */
 export const exchangePublicTokenForAccessToken = async (public_token: string) => {
 
 	try {
