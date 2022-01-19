@@ -194,9 +194,9 @@ export const getMostRecentAccountBalancesEntryDate = async (
 			if (isSameDay(a, b)) {
 				return 0;
 			} else if (isBefore(a, b)) {
-				return -1
+				return 1
 			} else {
-				return 1;
+				return -1;
 			}
 		})[0];
 
@@ -225,7 +225,7 @@ export const saveAccountBalancesToDB = async (
 			'accountBalances'
 		);
 
-		console.log({accountBalances});
+		console.log({ accountBalances });
 
 		Option.of(
 			accountBalances
@@ -235,9 +235,9 @@ export const saveAccountBalancesToDB = async (
 					if (isSameDay(a, b)) {
 						return 0;
 					} else if (isBefore(a, b)) {
-						return -1
+						return 1
 					} else {
-						return 1;
+						return -1;
 					}
 				})
 				.at(0)
