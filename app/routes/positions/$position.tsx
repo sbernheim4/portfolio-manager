@@ -1,6 +1,15 @@
 
 import { AccountBase, Holding, Security } from "plaid";
-import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData, useOutletContext, useParams } from "remix";
+import {
+	json,
+	Link,
+	LinksFunction,
+	LoaderFunction,
+	MetaFunction,
+	useLoaderData,
+	useOutletContext,
+	useParams
+} from "remix";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -35,7 +44,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 const IndividualInvestmentInformation = () => {
 	const { balances } = useLoaderData<{ balances: AccountBase[] }>();
-	const { securities, holdings } = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
+
+	const {
+		securities,
+		holdings
+	} = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
 
 	const params = useParams();
 	const securityId = params.position ?? "";
@@ -46,24 +59,19 @@ const IndividualInvestmentInformation = () => {
 
 	// const holdings = holdings.filter(holding => holding.security_id === securityId);
 
-	/*
-	 * AccountId -> # shares
-	 */
 	const accountIdToNumberOfShares = holdings
 		.filter(holding => holding.security_id === securityId)
 		.reduce((acc, curr) => {
 
-			if (acc[curr.account_id]) {
-				return {
-					...acc,
-					[curr.account_id]: acc[curr.account_id] + curr.quantity
-				}
-			} else {
-				return {
-					...acc,
-					[curr.account_id]: curr.quantity
-				}
-			}
+			const newQuantity = acc[curr.account_id] ?
+				acc[curr.account_id] + curr.quantity :
+				curr.quantity
+
+			return {
+				...acc,
+				[curr.account_id]: newQuantity
+			};
+
 		}, {} as Record<string, number>);
 
 	/*

@@ -38,7 +38,11 @@ const hashPassword = async (
 
 };
 
-const saveNewUser = async (username: string, hashedPassword: string, salt: string) => {
+const saveNewUser = async (
+	username: string,
+	hashedPassword: string,
+	salt: string
+) => {
 
 	const initalUserData = getNewUserInfo(username, hashedPassword, salt);
 
@@ -51,7 +55,9 @@ const saveNewUser = async (username: string, hashedPassword: string, salt: strin
 const usernameAlreadyExists = async (username: string) => {
 
 	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo | null;
+	const userInfo = await userInfoCollection.findOne({
+		user: username
+	}) as unknown as UserInfo | null;
 
 	// userInfo is null iff no user with the given username is found
 
@@ -74,7 +80,13 @@ export const action: ActionFunction = async ({ request }) => {
 		}
 	}
 
-	const { isError, error, errorMessage, hashedPassword, salt } = await hashPassword(password);
+	const {
+		isError,
+		error,
+		errorMessage,
+		hashedPassword,
+		salt
+	} = await hashPassword(password);
 
 	if (isError) {
 		return {
@@ -86,6 +98,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 	// Save the user in the DB
 	await saveNewUser(username, hashedPassword as string, salt as string);
+
 	// Save the new user in the session
 	const session = await getSession(request.headers.get("Cookie"));
 	const cookie = await commitSession(session);
@@ -100,7 +113,11 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const CreateAccount = () => {
-	const actionData = useActionData<{ isError: boolean, error: string | Error, errorMessage: string }>();
+	const actionData = useActionData<{
+		isError: boolean,
+		error: string | Error,
+		errorMessage: string
+	}>();
 
 	if (actionData?.isError === false) {
 		return redirect("/")
@@ -109,7 +126,12 @@ const CreateAccount = () => {
 	return (
 		<>
 			<h2>Sign Up</h2>
-			{actionData?.isError === true ? <h1>{actionData?.errorMessage}</h1> : null}
+
+			{
+				actionData?.isError === true ?
+					<h1>{actionData?.errorMessage}</h1> :
+					null
+			}
 
 			<Form method="post">
 				<label>
@@ -117,8 +139,7 @@ const CreateAccount = () => {
 				</label>
 
 				<label>
-					Password:{" "}
-					<input type="password" name="password" />
+					Password: <input type="password" name="password" />
 				</label>
 
 				<input type="submit" name="Submit" />

@@ -9,32 +9,45 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const LinkedInstitutions = (props: { linkedInstitutions: LinkedInstitutionsResponse }) => {
+export const LinkedInstitutions = (
+	props: { linkedInstitutions: LinkedInstitutionsResponse }
+) => {
 
 	const { linkedInstitutions } = props;
 
 	return (
 		<>
 			{
-				linkedInstitutions.map((acc) => <LinkedInstitution key={acc.institution.institution_id} itemId={acc.itemId} linkedInstitution={acc.institution} />)
+				linkedInstitutions.map((institution) => {
+					return <LinkedInstitution
+						key={institution.institution.institution_id}
+						itemId={institution.itemId}
+						linkedInstitution={institution.institution}
+					/>
+				})
 			}
 		</>
 	);
 
 };
 
-const LinkedInstitution = (props: { itemId: string, linkedInstitution: Institution }) => {
+const LinkedInstitution = (
+	props: { itemId: string, linkedInstitution: Institution }
+) => {
 
 	const { linkedInstitution, itemId } = props;
 
 	return (
 		<div className="manage-accounts__container__modify">
+
 			<p>{linkedInstitution.name}</p>
+
 			<Form action="/manage-accounts" method="post">
 				<input type="submit" value="Unlink Instituion" />
 				<input type="hidden" name="_action" value="unlinkAccount" readOnly />
 				<input type="hidden" value={itemId} name="itemId" readOnly />
 			</Form>
+
 		</div>
 	);
 

@@ -30,7 +30,11 @@ try {
 /**
  * Used when a new user is singing up for an account
  */
-export const getNewUserInfo = (username: string, password: string, salt: string): UserInfo => {
+export const getNewUserInfo = (
+	username: string,
+	password: string,
+	salt: string
+): UserInfo => {
 	return {
 		accountBalances: [],
 		itemIdToAccessToken: {},
@@ -58,9 +62,13 @@ export const getUserInfoCollection = async () => {
 };
 
 /**
- * Retrieve top level properties from the DB for a given user
+ * Retrieve a top level property from the DB for a given
+ * user
  */
-const getValueFromDB = async <T extends UserInfoValues>(username: string, property: UserInfoKeys): Promise<T> => {
+const getValueFromDB = async <T extends UserInfoValues>(
+	username: string,
+	property: UserInfoKeys
+): Promise<T> => {
 
 	const userInfoCollection = await getUserInfoCollection();
 	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
@@ -68,6 +76,34 @@ const getValueFromDB = async <T extends UserInfoValues>(username: string, proper
 	const value = userInfo[property];
 
 	return value as T;
+};
+
+/**
+ * helper function to retrieve multiple top level properties
+ * from the db
+ */
+export const getValuesFromDB = async (
+	username: string,
+	properties: UserInfoKeys[]
+): Promise<Record<UserInfoKeys, UserInfoValues>> => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
+
+
+
+	const data = properties.reduce((acc, prop) => {
+
+		const value = userInfo[prop];
+
+		return {
+			...acc,
+			[prop]: value
+		}
+
+	}, {} as Record<UserInfoKeys, UserInfoValues>);
+
+	return data;
 };
 
 /**
@@ -107,7 +143,14 @@ const updateDB = async <T extends UserInfoValues>(
 
 };
 
-export const saveNewAccessToken = async (username: string, accessToken: string, itemId: string) => {
+/**
+ * Saves an access token for an institutional account to the db
+ */
+export const saveNewAccessToken = async (
+	username: string,
+	accessToken: string,
+	itemId: string
+) => {
 
 	updateDB(
 		username,
@@ -132,11 +175,17 @@ export const saveNewAccessToken = async (username: string, accessToken: string, 
 };
 
 /**
- * Meant to be used only in the portfolio-balance routeLoader
+ * Meant to be used only in the portfolio-balance
+ * routeLoader
  */
-export const getMostRecentAccountBalancesEntryDate = async (username: string) => {
+export const getMostRecentAccountBalancesEntryDate = async (
+	username: string
+) => {
 
-	const accountBalances = await getValueFromDB<AccountBalances>(username, 'accountBalances');
+	const accountBalances = await getValueFromDB<AccountBalances>(
+		username,
+		'accountBalances'
+	);
 
 	const mostRecentEntry = accountBalances
 		.map(x => x.date)
@@ -169,7 +218,10 @@ export const saveAccountBalancesToDB = async (
 		date: new Date().toISOString()
 	}] as AccountBalances;
 
-	const accountBalances = await getValueFromDB<AccountBalances>(username, 'accountBalances');
+	const accountBalances = await getValueFromDB<AccountBalances>(
+		username,
+		'accountBalances'
+	);
 
 	Option.of(
 		accountBalances
@@ -195,6 +247,7 @@ export const saveAccountBalancesToDB = async (
 					newEntry;
 			};
 
+			// Fire and forget
 			updateDB(
 				username,
 				'accountBalances',
@@ -214,7 +267,9 @@ export const getItemIdToAccessTokenFromDB = async (username: string) => {
 
 };
 
-export const getAccessTokensFromDB = async (username: string): Promise<Array<string>> => {
+export const getAccessTokensFromDB = async (
+	username: string
+): Promise<Array<string>> => {
 
 	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
 
@@ -238,18 +293,31 @@ export const updatePositionsLastUpdatedAt = (
 		xirr
 	};
 
-	updateDB(username, "xirrData", updatedXirrData, () => updatedXirrData);
+	updateDB(
+		username,
+		"xirrData",
+		updatedXirrData,
+		() => updatedXirrData
+	);
 
 };
 
-export const getAccountBalancesFromDB = async (username: string) => {
+export const getAccountBalancesFromDB = async (
+	username: string
+) => {
 
-	return getValueFromDB<AccountBalances>(username, 'accountBalances');
+	return getValueFromDB<AccountBalances>(
+		username,
+		'accountBalances'
+	);
 
 };
 
 export const getXirrData = async (username: string) => {
 
-	return await getValueFromDB<XirrData>(username, 'xirrData');
+	return await getValueFromDB<XirrData>(
+		username,
+		'xirrData'
+	);
 
 };
