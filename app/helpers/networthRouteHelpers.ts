@@ -16,12 +16,14 @@ export const calculateTodaysTotalBalance = (accounts: AccountBase[]) => {
 
 export const getPerAccountBalancesForToday = (accounts: AccountBase[]) => {
 
-	const accountIdsToName = accounts.filter(x => !!x.balances.current || !!x.balances.available).map(acc => {
-		return {
-			accountId: acc.account_id,
-			name: acc.name
-		};
-	});
+	const accountIdsToName = accounts
+		.filter(x => !!x.balances.current || !!x.balances.available)
+		.map(acc => {
+			return {
+				accountId: acc.account_id,
+				name: acc.name
+			};
+		});
 
 	const todaysPerAccountBalances = accounts.reduce((acc, curr) => {
 		return !!curr.balances.current || !!curr.balances.available ?

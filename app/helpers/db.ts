@@ -218,46 +218,57 @@ export const saveAccountBalancesToDB = async (
 		date: new Date().toISOString()
 	}] as AccountBalances;
 
-	const accountBalances = await getValueFromDB<AccountBalances>(
-		username,
-		'accountBalances'
-	);
+	try {
 
-	Option.of(
-		accountBalances
-			.map(x => x.date)
-			.map(dateString => new Date(dateString))
-			.sort((a, b) => {
-				if (isSameDay(a, b)) {
-					return 0;
-				} else if (isBefore(a, b)) {
-					return -1
-				} else {
-					return 1;
-				}
-			})
-			.at(0)
-	).map(mostRecentEntryDate => {
+		const accountBalances = await getValueFromDB<AccountBalances>(
+			username,
+			'accountBalances'
+		);
 
-		if (!isToday(mostRecentEntryDate)) {
+		console.log({accountBalances});
 
-			const updateAccountBalances = () => {
-				return accountBalances.length > 0 ?
-					[...newEntry, ...accountBalances] :
-					newEntry;
-			};
+		Option.of(
+			accountBalances
+				.map(x => x.date)
+				.map(dateString => new Date(dateString))
+				.sort((a, b) => {
+					if (isSameDay(a, b)) {
+						return 0;
+					} else if (isBefore(a, b)) {
+						return -1
+					} else {
+						return 1;
+					}
+				})
+				.at(0)
+		).map(mostRecentEntryDate => {
 
-			// Fire and forget
-			updateDB(
-				username,
-				'accountBalances',
-				newEntry,
-				updateAccountBalances
-			);
+			if (!isToday(mostRecentEntryDate)) {
 
-		}
+				const updateAccountBalances = () => {
+					return accountBalances.length > 0 ?
+						[...newEntry, ...accountBalances] :
+						newEntry;
+				};
 
-	});
+				// Fire and forget
+				updateDB(
+					username,
+					'accountBalances',
+					newEntry,
+					updateAccountBalances
+				);
+
+			}
+
+		});
+
+	} catch (err) {
+
+		console.log("ERROR PULLING DATA FROM DB");
+		throw err;
+
+	}
 
 };
 
