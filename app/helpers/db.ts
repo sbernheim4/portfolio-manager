@@ -205,12 +205,12 @@ export const getMostRecentAccountBalancesEntryDate = async (
 
 export const saveAccountBalancesToDB = async (
 	username: string,
-	accountRecords: AccountIdToValue,
+	todaysBalanceData: AccountIdToValue,
 	totalBalance: number
 ) => {
 
 	const newEntry = [{
-		...accountRecords,
+		...todaysBalanceData,
 		totalBalance,
 		date: new Date().toISOString()
 	}] as AccountBalances;
