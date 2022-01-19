@@ -182,10 +182,7 @@ export const getMostRecentAccountBalancesEntryDate = async (
 	username: string
 ) => {
 
-	const accountBalances = await getValueFromDB<AccountBalances>(
-		username,
-		'accountBalances'
-	);
+	const accountBalances = await getAccountBalancesFromDB(username);
 
 	const mostRecentEntry = accountBalances
 		.map(x => x.date)
@@ -266,7 +263,8 @@ export const saveAccountBalancesToDB = async (
 	} catch (err) {
 
 		console.log("ERROR PULLING DATA FROM DB");
-		throw err;
+		// throw err;
+		return null;
 
 	}
 
