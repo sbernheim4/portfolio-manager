@@ -102,6 +102,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	return json(
 		{
+			username,
 			holdings,
 			securities,
 			todaysInvestmentBalances,
@@ -157,6 +158,7 @@ const Holdings = () => {
 		todaysInvestmentBalances,
 		holdings,
 		securities,
+		username
 	} = useLoaderData<PositionsLoaderData>();
 
 	const actionData = useActionData<{ filteredHoldings: Holding[] }>();
@@ -164,7 +166,7 @@ const Holdings = () => {
 
 	// Checkpoint today as most recent time when the users'
 	// xirr data was updated
-	useCheckInForXIRR(todaysInvestmentBalances, xirr);
+	useCheckInForXIRR(username, todaysInvestmentBalances, xirr);
 
 	return (
 		<>
