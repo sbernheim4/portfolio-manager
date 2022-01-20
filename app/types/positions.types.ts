@@ -5,6 +5,5 @@ export type PositionsLoaderData = {
 	securities: Security[];
 	todaysInvestmentBalances: number;
 	xirr: number;
-	username: string;
 	xirrDataLastUpdatedOn: string | undefined;
 };

@@ -103,7 +103,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	return json(
 		{
-			username,
 			holdings,
 			securities,
 			xirrDataLastUpdatedOn,
@@ -160,7 +159,6 @@ const Holdings = () => {
 		todaysInvestmentBalances,
 		holdings,
 		securities,
-		username,
 		xirrDataLastUpdatedOn
 	} = useLoaderData<PositionsLoaderData>();
 
