@@ -1,36 +1,37 @@
 import { isToday } from "date-fns";
 import { useEffect } from "react";
 import { useSubmit } from "remix";
-import { getXirrData } from "~/helpers/db";
+import { Option } from "excoptional";
 
-export const useCheckInForXIRR = async (
-	username: string,
+export const useCheckInForXIRR = (
+	xirrDataLastUpdatedOn: Option<string>,
 	todaysInvestmentAccountBalances: number,
 	xirr: number
 ) => {
 
 	const submit = useSubmit();
 
-	const { xirrDataLastUpdatedOn } = await getXirrData(username);
-
 
 	useEffect(() => {
 
 		// Don't update if we've already updated today
-		if (xirrDataLastUpdatedOn && isToday(new Date(xirrDataLastUpdatedOn))) {
-			return;
-		}
+		xirrDataLastUpdatedOn.map(dateString => {
 
-		const today = new Date();
-		const data = new FormData();
+			if (isToday(new Date(dateString))) {
+				return
+			}
 
-		data.set("xirrDataLastUpdatedOn", today.toString());
-		data.set("todaysInvestmentAccountBalances", todaysInvestmentAccountBalances.toString());
-		data.set("todaysXirr", xirr.toString());
+			const today = new Date();
+			const data = new FormData();
 
-		data.set("_action", "saveNewXirrData");
+			data.set("xirrDataLastUpdatedOn", today.toString());
+			data.set("todaysInvestmentAccountBalances", todaysInvestmentAccountBalances.toString());
+			data.set("todaysXirr", xirr.toString());
 
-		submit(data, { method: "post", action: "/positions" });
+			data.set("_action", "saveNewXirrData");
+
+			submit(data, { method: "post", action: "/positions" });
+		})
 
 	}, []);
 

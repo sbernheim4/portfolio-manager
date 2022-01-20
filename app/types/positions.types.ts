@@ -6,4 +6,5 @@ export type PositionsLoaderData = {
 	todaysInvestmentBalances: number;
 	xirr: number;
 	username: string;
+	xirrDataLastUpdatedOn: string | undefined;
 };
