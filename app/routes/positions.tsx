@@ -12,6 +12,7 @@ import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
 import { calculateNewXirr, searchActionHandler } from "~/helpers/positionRouteHelpers";
 import { isLoggedOut } from "./login";
+import { Option } from "excoptional";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -105,6 +106,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 			username,
 			holdings,
 			securities,
+			xirrDataLastUpdatedOn,
 			todaysInvestmentBalances,
 			xirr: newXirr
 		},
@@ -158,7 +160,8 @@ const Holdings = () => {
 		todaysInvestmentBalances,
 		holdings,
 		securities,
-		username
+		username,
+		xirrDataLastUpdatedOn
 	} = useLoaderData<PositionsLoaderData>();
 
 	const actionData = useActionData<{ filteredHoldings: Holding[] }>();
@@ -166,7 +169,7 @@ const Holdings = () => {
 
 	// Checkpoint today as most recent time when the users'
 	// xirr data was updated
-	useCheckInForXIRR(username, todaysInvestmentBalances, xirr);
+	useCheckInForXIRR(Option.of(xirrDataLastUpdatedOn), todaysInvestmentBalances, xirr);
 
 	return (
 		<>
