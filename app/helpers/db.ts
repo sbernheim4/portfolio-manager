@@ -143,6 +143,21 @@ const updateDB = async <T extends UserInfoValues>(
 
 };
 
+export const removeItemId = async (username: string, itemId: string) => {
+
+	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
+
+	delete itemIdToAccessTokens[itemId]
+
+	return updateDB(
+		username,
+		'itemIdToAccessToken',
+		itemIdToAccessTokens,
+		() => itemIdToAccessTokens
+	);
+
+};
+
 /**
  * Saves an access token for an institutional account to the db
  */
@@ -160,7 +175,8 @@ export const saveNewAccessToken = async (
 
 			const { itemIdToAccessToken } = userInfo;
 
-			const accessTokensForItemId = itemIdToAccessToken[itemId];
+			const accessTokensForItemId = itemIdToAccessToken[itemId] ?? [];
+
 			const newAccessTokenList = [...accessTokensForItemId, accessToken];
 
 			const newItemIdToAccessToken = {

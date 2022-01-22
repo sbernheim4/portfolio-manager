@@ -106,7 +106,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 			balances,
 			todaysBalance
 		},
-		{ headers: { "Cache-Control": "max-age=43200" } }
+		{
+			// Data should only be cached by browsers (not shared caches)
+			// Valid for 4 hours
+			// Stale while revalidate for an additional 8 hours
+			headers: {
+				"Cache-Control": "private, max-age=14400, stale-while-revalidate=28800"
+			}
+		}
 	);
 };
 

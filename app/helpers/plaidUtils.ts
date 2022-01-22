@@ -1,7 +1,7 @@
 import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB } from "./db";
+import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB, removeItemId } from "./db";
 import { client } from "./plaidClient";
 import { format } from "date-fns";
 
@@ -114,9 +114,9 @@ export const filterForInvestmentAccounts = (accounts: Array<AccountBase>) => {
 };
 
 export const filterForNonInvestmentAccounts = (accounts: Array<AccountBase>) => {
-	const validInvestmentAccounts = ["investment", "brokerage"];
+	const invalidInvestmentAccounts = ["investment", "brokerage"];
 
-	return accounts.filter(account => !validInvestmentAccounts.includes(account.type));
+	return accounts.filter(account => !invalidInvestmentAccounts.includes(account.type));
 };
 
 export const getPlaidAccounts = async (username: string) => {
@@ -254,7 +254,11 @@ export const unlinkPlaidItem = async (username: string, itemId: string, numTries
 		console.log("removing account with access token", accessTokens);
 
 		// TODO: Uncomment to go live
-		// accessTokens.map(token => client.itemRemove({ access_token: token }));
+		const promises = accessTokens.map(token => client.itemRemove({ access_token: token }));
+
+		await Promise.all(promises);
+
+		await removeItemId(username, itemId);
 
 	} catch (error) {
 
