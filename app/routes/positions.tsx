@@ -109,7 +109,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 			todaysInvestmentBalances,
 			xirr: newXirr
 		},
-		{ headers: { "Cache-Control": "max-age=43200" } }
+		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
 	);
 
 };
