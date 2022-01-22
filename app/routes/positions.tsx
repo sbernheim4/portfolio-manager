@@ -173,7 +173,7 @@ const Holdings = () => {
 		<>
 			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
-			<RateOfReturn xirr={xirr} />
+			<RateOfReturn xirr={Option.of(xirr.value)} />
 			<Positions securities={securities} holdings={holdingsToDisplay} />
 			<SectorWeight securities={securities} holdings={holdings} />
 		</>

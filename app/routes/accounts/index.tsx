@@ -27,10 +27,13 @@ export const loader: LoaderFunction = async (args) => {
 		const investmentAccounts = filterForInvestmentAccounts(balances);
 		const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
 
+		const totalBalance = sumAccountBalances(balances);
+
 		return json(
 			{
 				investmentAccounts,
-				nonInvestmentAccounts
+				nonInvestmentAccounts,
+				totalBalance
 			},
 			{ headers: { "Cache-Control": "max-age=43200" } }
 		);
@@ -59,22 +62,18 @@ const sumAccountBalances = (accounts: AccountBase[]) => {
 };
 
 const Accounts = () => {
-	const investmentData = useLoaderData<{
+	const data = useLoaderData<{
 		investmentAccounts: AccountBase[],
 		nonInvestmentAccounts: AccountBase[],
+		totalBalance: number
 	}>();
 
 	const {
 		investmentAccounts,
-		nonInvestmentAccounts
-	} = investmentData;
+		nonInvestmentAccounts,
+		totalBalance
+	} = data;
 
-	const allAccounts = [
-		...investmentAccounts,
-		...nonInvestmentAccounts
-	];
-
-	const totalBalance = sumAccountBalances(allAccounts);
 
 	return (
 		<div className="accounts">

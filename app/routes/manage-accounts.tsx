@@ -70,34 +70,51 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {
 
-	const body = await request.formData();
-	const action = body.get("_action");
+	const formData = await request.formData();
+	const action = formData.get("_action");
 	const username = await getUserNameFromSession(request);
 
 	switch (action) {
 		case "linkAccount":
-			const publicToken = body.get("public_token") as string;
+			const publicToken = formData.get("public_token") as string;
 			const { error } = await exchangePublicTokenForAccessToken(publicToken);
 
 			if (error) {
+
+				console.log('error making an access token');
+
 				return json({
 					error: 'error making an access token'
 				});
+
 			}
 
-			// Can also get item_id here
 			const { access_token, item_id } = await exchangePublicTokenForAccessToken(publicToken);
 
 			await saveNewAccessToken(username, access_token, item_id);
 
-			return null;
+			return json(
+				{ added: true },
+				{ headers: { 'Clear-Site-Data': "cache" } }
+			);
 		case "unlinkAccount":
-			const itemId = body.get("itemId") as string;
+
+			const itemId = formData.get("itemId") as string;
+
 			unlinkPlaidItem(username, itemId);
-			return null;
+
+			return json(
+				{ cleared: true },
+				{ headers: { 'Clear-Site-Data': "cache" } }
+			);
+
 		default:
+			console.log({
+				action,
+				request: request.url
+			})
 			console.log("whoops, uncaught action type");
-			break;
+			return null
 	}
 };
 
@@ -141,8 +158,9 @@ const LinkAccount = () => {
 		publicTokenOpt.map(async (publicToken) => {
 
 			const data = new FormData();
+
 			data.set("public_token", publicToken);
-			data.set("_name", "linkAccount");
+			data.set("_action", "linkAccount");
 
 			submit(data, {
 				method: 'post'

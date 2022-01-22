@@ -25,100 +25,116 @@ export const calculateNewXirr = (
 	transactionsSinceCheckpointDate: InvestmentTransaction[]
 ) => {
 
-	const today = new Date();
+	try {
 
-	// Reformat the transactions to be ready to be consumed by the xirr
-	// function.
-	const cashflowsSinceCheckPointDate = transactionsSinceCheckpointDate.map(tx => {
-		return {
-			// Need to multiply by -1 since Plaid considers selling shares a
-			// positive value (and buying shares a negative) whereas xirr
-			// calculates these in the opposite way
-			amount: (tx.amount - (tx.fees ?? 0)) * -1,
-			date: new Date(tx.date)
-		}
-	});
+		const today = new Date();
 
-	const previousXirrDataExists = previousXirr !== null && balanceAsOfCheckpointDate !== undefined;
-
-	if (previousXirrDataExists) {
-
-		// The user has a previous XIRR value and associated account balance
-		//
-		// We will use this previous XIRR value to calculate the new XIRR value.
-		//
-		// To do so, we need to discount the associated balance for the
-		// previously calculated XIRR data to be equivalent as if that
-		// discounted value was the lump sum initial investment on January 1st
-		// at the start of the year.
-		//
-		// We do this by using the following equation solving for
-		// discountPresentValuePercent:
-		//
-		// (discountPresentValuePercent + 1) ^ 12 = 1 + previousXirr
-		//
-		// Once we have the value for discountPresentValuePercent, we use this
-		// to correctly discount the associated balance for the previously
-		// stored XIRR data to its value at the start of the year on Janyary 1st
-		// using the Net Present Value equation:
-		//
-		// 1 / [ (1 + discountPresentValuePercent)^monsthsSinceCheckPointDate ] * balanceAsOfCheckpointDate
-		//
-		// All the variables in the above are known:
-		//
-		// * discountPresentValuePercent was previously solved
-		//
-		// * monsthsSinceCheckPointDate is the difference in months between
-		//   today and the checkpoint date when XIRR was last calculated
-		//
-		// * balanceAsOfCheckpointDate is stored from when XIRR was last
-		//   calculated
-
-		// Dates and date related helper values
-		const currentYear = today.getFullYear();
-		const startOfYear = new Date(currentYear, 0, 1);
-		const monsthsSinceCheckPointDate = differenceInMonths(today, checkpointDate);
-
-		const discountPresentValuePercent = Math.pow((1 + previousXirr), 1 / 12) - 1
-		const discountedPresentValue = 1 / Math.pow((1 + discountPresentValuePercent), monsthsSinceCheckPointDate) * balanceAsOfCheckpointDate;
-
-		const newXirr = calculateXirr([
-			{ amount: discountedPresentValue * -1, date: startOfYear },
-			...cashflowsSinceCheckPointDate,
-			{ amount: currentBalance, date: today }
-		]);
-
-		return parseFloat(newXirr.toFixed(4));
-
-
-	} else {
-
-		// The user *does not* have a previous XIRR value and associated account
-		// balance
-		//
-		// If we have never calculated an XIRR value (as in this is the user's
-		// first time hitting the positions page since making their account)
-		// calculate it.
-
-		const xirrValue = calculateXirr([
-			{
-				amount: (balanceAsOfCheckpointDate || currentBalance) * -1,
-				date: today
-			},
-
-			// On the off chance a user has placed transactions today and
-			// they're being picked up by plaid.
-			...cashflowsSinceCheckPointDate,
-
-			{
-				amount: currentBalance,
-				date: today
+		// Reformat the transactions to be ready to be consumed by the xirr
+		// function.
+		const cashflowsSinceCheckPointDate = transactionsSinceCheckpointDate.map(tx => {
+			return {
+				// Need to multiply by -1 since Plaid considers selling shares a
+				// positive value (and buying shares a negative) whereas xirr
+				// calculates these in the opposite way
+				amount: (tx.amount - (tx.fees ?? 0)) * -1,
+				date: new Date(tx.date)
 			}
-		]);
+		});
 
-		return parseFloat(xirrValue.toFixed(4));
+		const previousXirrDataExists = previousXirr !== null && balanceAsOfCheckpointDate !== undefined;
+
+		if (previousXirrDataExists) {
+
+			// The user has a previous XIRR value and associated account balance
+			//
+			// We will use this previous XIRR value to calculate the new XIRR value.
+			//
+			// To do so, we need to discount the associated balance for the
+			// previously calculated XIRR data to be equivalent as if that
+			// discounted value was the lump sum initial investment on January 1st
+			// at the start of the year.
+			//
+			// We do this by using the following equation solving for
+			// discountPresentValuePercent:
+			//
+			// (discountPresentValuePercent + 1) ^ 12 = 1 + previousXirr
+			//
+			// Once we have the value for discountPresentValuePercent, we use this
+			// to correctly discount the associated balance for the previously
+			// stored XIRR data to its value at the start of the year on Janyary 1st
+			// using the Net Present Value equation:
+			//
+			// 1 / [ (1 + discountPresentValuePercent)^monsthsSinceCheckPointDate ] * balanceAsOfCheckpointDate
+			//
+			// All the variables in the above are known:
+			//
+			// * discountPresentValuePercent was previously solved
+			//
+			// * monsthsSinceCheckPointDate is the difference in months between
+			//   today and the checkpoint date when XIRR was last calculated
+			//
+			// * balanceAsOfCheckpointDate is stored from when XIRR was last
+			//   calculated
+
+			// Dates and date related helper values
+			const currentYear = today.getFullYear();
+			const startOfYear = new Date(currentYear, 0, 1);
+			const monsthsSinceCheckPointDate = differenceInMonths(today, checkpointDate);
+
+			const discountPresentValuePercent = Math.pow((1 + previousXirr), 1 / 12) - 1
+			const discountedPresentValue = 1 / Math.pow((1 + discountPresentValuePercent), monsthsSinceCheckPointDate) * balanceAsOfCheckpointDate;
+
+			const newXirr = calculateXirr([
+				{ amount: discountedPresentValue * -1, date: startOfYear },
+				...cashflowsSinceCheckPointDate,
+				{ amount: currentBalance, date: today }
+			]);
+
+			return {
+				error: undefined,
+				value: parseFloat(newXirr.toFixed(4))
+			}
 
 
+		} else {
+
+			// The user *does not* have a previous XIRR value and associated account
+			// balance
+			//
+			// If we have never calculated an XIRR value (as in this is the user's
+			// first time hitting the positions page since making their account)
+			// calculate it.
+
+			const xirrValue = calculateXirr([
+				{
+					amount: (balanceAsOfCheckpointDate || currentBalance) * -1,
+					date: today
+				},
+
+				// On the off chance a user has placed transactions today and
+				// they're being picked up by plaid.
+				...cashflowsSinceCheckPointDate,
+
+				{
+					amount: currentBalance,
+					date: today
+				}
+			]);
+
+			return {
+				error: undefined,
+				value: parseFloat(xirrValue.toFixed(4))
+			}
+
+		}
+	} catch (err) {
+
+		console.log("ERROR CAUGHT");
+
+		return {
+			error: "Could not calculate new XIRR value",
+			value: undefined
+		}
 	}
 
 };

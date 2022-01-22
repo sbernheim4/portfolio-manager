@@ -2,11 +2,12 @@ import { isToday } from "date-fns";
 import { useEffect } from "react";
 import { useSubmit } from "remix";
 import { Option } from "excoptional";
+import { NewXirrCalculation } from "~/types/positions.types";
 
 export const useCheckInForXIRR = (
 	xirrDataLastUpdatedOn: Option<string>,
 	todaysInvestmentAccountBalances: number,
-	xirr: number
+	xirr: NewXirrCalculation
 ) => {
 
 	const submit = useSubmit();
@@ -14,10 +15,11 @@ export const useCheckInForXIRR = (
 
 	useEffect(() => {
 
-		// Don't update if we've already updated today
+		// Don't update if we've already updated today or if there was an error
+		// calculating the new xirr value
 		xirrDataLastUpdatedOn.map(dateString => {
 
-			if (isToday(new Date(dateString))) {
+			if (isToday(new Date(dateString)) || xirr.error === undefined) {
 				return
 			}
 

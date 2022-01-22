@@ -1,10 +1,14 @@
+import { Option } from "excoptional";
+
 export const RateOfReturn = (props: {
-	xirr: number
+	xirr: Option<number>
 }) => {
+
+	const text = props.xirr.getOrElse("Could not calculate XIRR")
 
 	return (
 		<>
-			<h2>Your total portfolio Internal Rate of Return is: {props.xirr}</h2>
+			<h2>{text}</h2>
 		</>
 	);
 
