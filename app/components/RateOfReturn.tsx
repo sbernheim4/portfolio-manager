@@ -4,7 +4,9 @@ export const RateOfReturn = (props: {
 	xirr: Option<number>
 }) => {
 
-	const text = props.xirr.getOrElse("Could not calculate XIRR")
+	const text = props.xirr
+		.map(val => "Your IRR is " + val).
+		getOrElse("Could not calculate XIRR");
 
 	return (
 		<>
