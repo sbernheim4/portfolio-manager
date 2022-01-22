@@ -1,4 +1,4 @@
-import { differenceInMonths } from "date-fns";
+import { differenceInMonths, subDays } from "date-fns";
 import { xirr as calculateXirr } from "@webcarrot/xirr";
 import { InvestmentTransaction } from "plaid";
 import { json } from "remix";
@@ -98,17 +98,10 @@ export const calculateNewXirr = (
 
 		} else {
 
-			// The user *does not* have a previous XIRR value and associated account
-			// balance
-			//
-			// If we have never calculated an XIRR value (as in this is the user's
-			// first time hitting the positions page since making their account)
-			// calculate it.
-
-			const xirrValue = calculateXirr([
+			const cashflows = [
 				{
 					amount: (balanceAsOfCheckpointDate || currentBalance) * -1,
-					date: today
+					date: !!balanceAsOfCheckpointDate ? checkpointDate : subDays(today, 1)
 				},
 
 				// On the off chance a user has placed transactions today and
@@ -119,7 +112,16 @@ export const calculateNewXirr = (
 					amount: currentBalance,
 					date: today
 				}
-			]);
+			];
+
+			// The user *does not* have a previous XIRR value and associated
+			// account balance
+			//
+			// If we have never calculated an XIRR value (as in this is the
+			// user's first time hitting the positions page since making their
+			// account) calculate it.
+
+			const xirrValue = calculateXirr(cashflows);
 
 			return {
 				error: undefined,
@@ -129,6 +131,7 @@ export const calculateNewXirr = (
 		}
 	} catch (err) {
 
+		console.log(err);
 		console.log("ERROR CAUGHT");
 
 		return {

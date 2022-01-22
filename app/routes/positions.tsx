@@ -167,7 +167,7 @@ const Holdings = () => {
 
 	// Checkpoint today as most recent time when the users'
 	// xirr data was updated
-	useCheckInForXIRR(Option.of(xirrDataLastUpdatedOn), todaysInvestmentBalances, xirr);
+	useCheckInForXIRR(xirrDataLastUpdatedOn, todaysInvestmentBalances, xirr);
 
 	return (
 		<>
