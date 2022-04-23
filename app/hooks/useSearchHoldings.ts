@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useSearchHoldings = <T>(
+export const useSearchableList = <T>(
 	initialList: Array<T>,
 	toFilterFn: (searchTerm: string) => (item: T) => boolean
 ): [string, React.Dispatch<React.SetStateAction<string>>, T[]] => {
