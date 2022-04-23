@@ -7,7 +7,7 @@ import {
 } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 import { dollarFormatter } from '~/helpers/formatters';
-import { useSearchHoldings } from '~/hooks/useSearchHoldings';
+import { useSearchableList } from '~/hooks/useSearchHoldings';
 
 export const links: LinksFunction = () => {
 	return [
@@ -127,7 +127,7 @@ export const Positions = (
 	// To dedupe these, we use this helper aggregateHoldings function
 	const aggregatedHoldings = aggregateHoldings(holdings);
 
-	const [searchTerm, setSearchTerm, holdingsToDisplay] = useSearchHoldings(
+	const [searchTerm, setSearchTerm, holdingsToDisplay] = useSearchableList(
 		aggregatedHoldings,
 		(searchTerm: string) => (holding: Holding) => toMatchedSecurityIds(searchTerm).includes(holding.security_id),
 	);

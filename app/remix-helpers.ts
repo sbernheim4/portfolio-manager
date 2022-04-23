@@ -12,9 +12,16 @@ type LoaderArgs = { request: Request, context: AppLoadContext, params: Params };
 /**
  * HOF for wrapping loader functions that will first perform a logged in check
  * for routes that need it.
- * @param loaderFunction - The loader function to be wrapped - Be sure to pass
- * it directly, not invoked. This can be done by inlining (example 1) or by
- * storing the function in variables (example 2)
+ * @param loaderFunction
+ * The loader function to be wrapped. Be sure to pass it directly, not invoked.
+ * This can be done most simply by directly wrapping the loader function with
+ * loaderWithLogin (example 1), or by inlining (example 2), or by storing the
+ * function in variables (example 3).
+ *
+ * @example
+ * export const loader: LoaderFunction = loaderWithLogin(async (args) => {
+ *     return 42;
+ * });
  *
  * @example
  * export const loader: LoaderFunction = async (args) => {

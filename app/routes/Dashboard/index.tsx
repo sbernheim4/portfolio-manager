@@ -22,22 +22,18 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async (args) => {
+export const loader: LoaderFunction = loaderWithLogin(async (args) => {
 
-	return loaderWithLogin(async () => {
+	const username = await getUserNameFromSession(args.request);
+	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
+	const investmentAccounts = filterForInvestmentAccounts(balances);
 
-		const username = await getUserNameFromSession(args.request);
-		const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
-		const investmentAccounts = filterForInvestmentAccounts(balances);
+	return json(
+		{ balances: investmentAccounts, holdings, securities },
+		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
+	);
 
-		return json(
-			{ balances: investmentAccounts, holdings, securities },
-			{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
-		);
-
-	})(args);
-
-};
+});
 
 const Dashboard = () => {
 	const investmentData = useLoaderData<BalancesHoldingsSecurities>();

@@ -19,27 +19,25 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async (args) => {
+export const loader: LoaderFunction = loaderWithLogin(async (args) => {
 
-	return loaderWithLogin(async () => {
-		const username = await getUserNameFromSession(args.request);
-		const balances = await getPlaidAccountBalances(username);
-		const investmentAccounts = filterForInvestmentAccounts(balances);
-		const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
+	const username = await getUserNameFromSession(args.request);
+	const balances = await getPlaidAccountBalances(username);
+	const investmentAccounts = filterForInvestmentAccounts(balances);
+	const nonInvestmentAccounts = filterForNonInvestmentAccounts(balances);
 
-		const totalBalance = sumAccountBalances(balances);
+	const totalBalance = sumAccountBalances(balances);
 
-		return json(
-			{
-				investmentAccounts,
-				nonInvestmentAccounts,
-				totalBalance
-			},
-			{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
-		);
-	})(args);
+	return json(
+		{
+			investmentAccounts,
+			nonInvestmentAccounts,
+			totalBalance
+		},
+		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
+	);
 
-};
+});
 
 /**
  * Sum the balances of the passed in accounts accounting for credit and loan
@@ -61,6 +59,9 @@ const sumAccountBalances = (accounts: AccountBase[]) => {
 
 };
 
+/**
+ * The route component
+ */
 const Accounts = () => {
 	const data = useLoaderData<{
 		investmentAccounts: AccountBase[],
