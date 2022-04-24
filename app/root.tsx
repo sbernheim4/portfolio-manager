@@ -1,4 +1,6 @@
 import * as React from "react";
+import type { LinksFunction } from "@remix-run/node";
+
 import {
   Links,
   LiveReload,
@@ -7,9 +9,8 @@ import {
   Scripts,
   ScrollRestoration,
   useCatch,
-  useLocation
-} from "remix";
-import type { LinksFunction } from "remix";
+  useLocation,
+} from "@remix-run/react";
 
 import globalStylesUrl from "~/styles/global.css";
 import { Navbar, links as navbarStyles } from "./components/Navbar/Navbar";

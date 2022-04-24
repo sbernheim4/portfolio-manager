@@ -1,15 +1,7 @@
 
 import { AccountBase, Holding, Security } from "plaid";
-import {
-	json,
-	Link,
-	LinksFunction,
-	LoaderFunction,
-	MetaFunction,
-	useLoaderData,
-	useOutletContext,
-	useParams
-} from "remix";
+import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { Link, useLoaderData, useOutletContext, useParams } from "@remix-run/react";
 import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";

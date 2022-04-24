@@ -1,5 +1,6 @@
 import { AccountBase } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
+import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";

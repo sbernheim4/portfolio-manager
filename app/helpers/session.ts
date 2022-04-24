@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from "remix";
+import { createCookieSessionStorage } from "@remix-run/node";
 
 // 1 year
 // 365 days/year * 24 hours/day * 60 min/hour * 60 sec/min

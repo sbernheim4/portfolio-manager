@@ -1,5 +1,6 @@
 import { Holding } from "plaid";
-import { Link, LinksFunction } from "remix";
+import { LinksFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 import { WarningSign } from "./../WarningSign";
 import stockInvestmentSummaryStyles from "./styles/stockInvestmentSummary.css";

@@ -1,4 +1,5 @@
-import { json, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix"
+import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../../styles/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
