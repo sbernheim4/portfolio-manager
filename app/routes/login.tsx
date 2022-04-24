@@ -1,11 +1,5 @@
-import {
-	ActionFunction,
-	Form,
-	json,
-	LoaderFunction,
-	redirect,
-	useLoaderData
-} from "remix";
+import { ActionFunction, json, LoaderFunction, redirect } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
 import { getUserInfoCollection } from "~/helpers/db";
 import { getSession, commitSession } from "~/helpers/session";
 import bcrypt from 'bcryptjs';

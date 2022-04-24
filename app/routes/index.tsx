@@ -1,4 +1,5 @@
-import { Link, LoaderFunction, redirect } from "remix";
+import { LoaderFunction, redirect } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { isLoggedOut } from "./login";
 
 

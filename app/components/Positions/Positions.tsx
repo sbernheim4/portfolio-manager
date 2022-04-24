@@ -1,5 +1,5 @@
 import { Holding, Security } from 'plaid';
-import { LinksFunction } from 'remix';
+import { LinksFunction } from "@remix-run/node";
 import positionsStyles from './styles/positions.css';
 import {
 	StockInvestmentSummary,

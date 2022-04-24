@@ -1,5 +1,15 @@
 import { AccountBase, Holding } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, Outlet, redirect, useActionData, useLoaderData } from "remix";
+
+import {
+    ActionFunction,
+    json,
+    LinksFunction,
+    LoaderFunction,
+    MetaFunction,
+    redirect,
+} from "@remix-run/node";
+
+import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
 import { PositionsLoaderData } from "~/types/positions.types";

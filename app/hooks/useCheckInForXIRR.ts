@@ -1,6 +1,6 @@
 import { isToday } from "date-fns";
 import { useEffect } from "react";
-import { useSubmit } from "remix";
+import { useSubmit } from "@remix-run/react";
 import { NewXirrCalculation } from "~/types/positions.types";
 
 export const useCheckInForXIRR = (

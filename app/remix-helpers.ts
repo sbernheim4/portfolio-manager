@@ -1,4 +1,4 @@
-import { AppLoadContext, LoaderFunction, redirect } from "remix";
+import { AppLoadContext, LoaderFunction, redirect } from "@remix-run/node";
 import { isLoggedOut } from "./routes/login";
 
 // Copied from node_modules/react-router/index.d.ts

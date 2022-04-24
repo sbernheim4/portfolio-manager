@@ -1,6 +1,6 @@
 import { Holding } from "plaid";
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
-import { LinksFunction } from "remix";
+import { LinksFunction } from "@remix-run/node";
 import { dollarFormatter } from "~/helpers/formatters";
 import stockPieChartStyles from "./stockPieChart.css";
 

@@ -1,5 +1,6 @@
 import { Institution } from "plaid";
-import { Form, LinksFunction } from "remix";
+import { LinksFunction } from "@remix-run/node";
+import { Form } from "@remix-run/react";
 import { LinkedInstitutionsResponse } from "~/routes/manage-accounts";
 import linkAccountStyles from './styles/linked-account.css';
 

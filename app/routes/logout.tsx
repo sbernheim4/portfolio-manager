@@ -1,4 +1,5 @@
-import { ActionFunction, Form, Link, redirect } from "remix";
+import { ActionFunction, redirect } from "@remix-run/node";
+import { Form, Link } from "@remix-run/react";
 import { getSession, destroySession } from "~/helpers/session";
 
 export const action: ActionFunction = async ({ request }) => {
