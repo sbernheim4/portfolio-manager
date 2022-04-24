@@ -129,7 +129,7 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 	const config: Parameters<typeof usePlaidLink>[0] = {
 		token: props.linkToken,
 		onSuccess,
-		env: 'sandbox'
+		env: 'development'
 	};
 
 	const { open, ready } = usePlaidLink(config);
