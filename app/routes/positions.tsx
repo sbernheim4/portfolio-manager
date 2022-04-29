@@ -1,5 +1,4 @@
 import { AccountBase, Holding } from "plaid";
-
 import {
     ActionFunction,
     json,
@@ -8,7 +7,6 @@ import {
     MetaFunction,
     redirect,
 } from "@remix-run/node";
-
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
@@ -21,8 +19,8 @@ import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
 import { calculateNewXirr, searchActionHandler } from "~/helpers/positionRouteHelpers";
-import { isLoggedOut } from "./login";
 import { Option } from "excoptional";
+import { isLoggedOut } from "~/helpers/isLoggedOut";
 
 export const meta: MetaFunction = () => {
 	return {

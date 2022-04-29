@@ -2,7 +2,7 @@ import { AccountBase } from "plaid";
 import { ActionFunction, json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { isToday } from "date-fns";
+import { isAfter, isToday } from "date-fns";
 import { useEffect, useState } from "react";
 
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
@@ -15,7 +15,7 @@ import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts 
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
-import { isLoggedOut } from "./login";
+import { isLoggedOut } from "~/helpers/isLoggedOut";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -56,21 +56,36 @@ const mergeHistoricalAndTodaysBalanceData = (
 			date: new Date().toISOString(),
 			totalBalance: todaysBalance,
 			...todaysBalanceData
-		}];
+		}].sort((a, b) => {
+			const dateA = new Date(a.date);
+			const dateB = new Date(b.date);
+
+			return isAfter(dateA, dateB) ? 1 : -1;
+		});
 	}
 
 	const lastEntryDate = new Date(lastEntry.date);
 
 	return isToday(lastEntryDate) ?
-		historicalBalanceData :
-		[
+		(historicalBalanceData.sort((a, b) => {
+			const dateA = new Date(a.date);
+			const dateB = new Date(b.date);
+
+			return isAfter(dateA, dateB) ? 1 : -1;
+		})) :
+		([
 			...historicalBalanceData,
 			{
 				date: new Date().toISOString(),
 				totalBalance: todaysBalance,
 				...todaysBalanceData
 			}
-		];
+		].sort((a, b) => {
+			const dateA = new Date(a.date);
+			const dateB = new Date(b.date);
+
+			return isAfter(dateA, dateB) ? 1 : -1;
+		}));
 
 };
 

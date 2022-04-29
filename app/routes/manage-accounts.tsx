@@ -16,9 +16,8 @@ import { useLoaderData, useSubmit } from "@remix-run/react";
 import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, unlinkPlaidItem } from "~/helpers/plaidUtils";
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
-import { isLoggedOut } from "./login";
 import { getUserNameFromSession } from "~/helpers/session";
-
+import { isLoggedOut } from "~/helpers/isLoggedOut";
 export const meta: MetaFunction = () => {
 	return {
 		title: "View and gain insights into your investments",

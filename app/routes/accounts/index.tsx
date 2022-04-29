@@ -6,7 +6,7 @@ import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
 import { positiveAccountTypes } from "~/components/NetworthComponent";
-import { loaderWithLogin } from "~/remix-helpers";
+import { validateIsLoggedIn } from "~/remix-helpers";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -20,7 +20,9 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = loaderWithLogin(async (args) => {
+export const loader: LoaderFunction = async (args) => {
+
+	await validateIsLoggedIn(args.request);
 
 	const username = await getUserNameFromSession(args.request);
 	const balances = await getPlaidAccountBalances(username);
@@ -38,7 +40,7 @@ export const loader: LoaderFunction = loaderWithLogin(async (args) => {
 		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
 	);
 
-});
+};
 
 /**
  * Sum the balances of the passed in accounts accounting for credit and loan
