@@ -16,8 +16,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => {
-	return [
-	];
+	return [ ];
 };
 
 export const loader: LoaderFunction = async (args) => {
