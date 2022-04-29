@@ -6,7 +6,7 @@ import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
 import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
-import { loaderWithLogin } from "~/remix-helpers";
+import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
 
 export const meta: MetaFunction = () => {
@@ -23,7 +23,9 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = loaderWithLogin(async (args) => {
+export const loader: LoaderFunction = async (args) => {
+
+	await validateIsLoggedIn(args.request);
 
 	const username = await getUserNameFromSession(args.request);
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
@@ -34,7 +36,8 @@ export const loader: LoaderFunction = loaderWithLogin(async (args) => {
 		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
 	);
 
-});
+
+};
 
 const Dashboard = () => {
 	const investmentData = useLoaderData<BalancesHoldingsSecurities>();
