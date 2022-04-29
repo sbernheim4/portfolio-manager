@@ -234,7 +234,7 @@ const Networth = () => {
 	const [accountsToShow, setAccountsToShow] = useState(accountIdsAndNames);
 
 	const handleClick = () => {
-		const checkBoxes = document.querySelectorAll('input[type=checkbox]');
+		const checkBoxes: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[type=checkbox]');
 		const checkedValues = Array.from(checkBoxes).filter(el => el.checked).map(el => el.name);
 		const allUnchecked = Array.from(checkBoxes).reduce((acc, curr) => acc && !curr.checked, true)
 
