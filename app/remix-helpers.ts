@@ -5,4 +5,4 @@ export const validateIsLoggedIn = async (request: Request) => {
 	if (await isLoggedOut(request)) {
 		throw redirect("/login");
 	}
-}
+};
