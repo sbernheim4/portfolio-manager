@@ -1,12 +1,9 @@
-import { LoaderFunction, redirect } from "@remix-run/node";
+import { LoaderFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { isLoggedOut } from "~/helpers/isLoggedOut";
+import { validateIsLoggedIn } from "~/remix-helpers";
 
 export const loader: LoaderFunction = async ({ request }) => {
-
-    if (await isLoggedOut(request)) {
-        return redirect("/login");
-    }
+	await validateIsLoggedIn(request);
 
     return null;
 };

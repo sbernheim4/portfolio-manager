@@ -17,6 +17,7 @@ export const Navbar = () => {
 			<Link to={"/positions"}>Positions</Link>
 			<Link to={"/portfolio-balance"}>Portfolio Balance</Link>
 			<Link to={"/manage-accounts"}>Manage Accounts</Link>
+			<Link to={"/logout"}>Log Out</Link>
 		</nav>
 	)
 

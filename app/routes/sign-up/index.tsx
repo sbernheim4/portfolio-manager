@@ -1,11 +1,41 @@
-import { ActionFunction, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
 import bcrypt from 'bcryptjs';
-import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db";
-import { commitSession, getSession } from "~/helpers/session";
+import signUpStyles from './../../styles/signUp.css'
+import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import { UserInfo } from "~/types/UserInfo.types";
+import { commitSession, getSession } from "~/helpers/session";
+import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db";
 
-const hashPassword = async (
+export const usernameAlreadyExists = async (username: string) => {
+
+	const userInfoCollection = await getUserInfoCollection();
+	const userInfo = await userInfoCollection.findOne({
+		user: username
+	}) as unknown as UserInfo | null;
+
+	// userInfo is null iff no user with the given username is found
+
+	return userInfo === null ?
+		false :
+		true
+
+};
+
+export const saveNewUser = async (
+	username: string,
+	hashedPassword: string,
+	salt: string
+) => {
+
+	const initalUserData = getNewUserInfo(username, hashedPassword, salt);
+
+	const userInfoCollection = await getUserInfoCollection();
+
+	return await userInfoCollection.insertOne(initalUserData);
+
+};
+
+export const hashPassword = async (
 	password: string
 ) => {
 
@@ -39,33 +69,11 @@ const hashPassword = async (
 
 };
 
-const saveNewUser = async (
-	username: string,
-	hashedPassword: string,
-	salt: string
-) => {
 
-	const initalUserData = getNewUserInfo(username, hashedPassword, salt);
-
-	const userInfoCollection = await getUserInfoCollection();
-
-	return await userInfoCollection.insertOne(initalUserData);
-
-};
-
-const usernameAlreadyExists = async (username: string) => {
-
-	const userInfoCollection = await getUserInfoCollection();
-	const userInfo = await userInfoCollection.findOne({
-		user: username
-	}) as unknown as UserInfo | null;
-
-	// userInfo is null iff no user with the given username is found
-
-	return userInfo === null ?
-		false :
-		true
-
+export const links: LinksFunction = () => {
+	return [
+		{ rel: 'stylesheet', href: signUpStyles }
+	];
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -120,13 +128,9 @@ const CreateAccount = () => {
 		errorMessage: string
 	}>();
 
-	if (actionData?.isError === false) {
-		return redirect("/")
-	}
-
 	return (
-		<>
-			<h2>Sign Up</h2>
+		<div className="signup">
+			<h2 className="signup--header">Create Account</h2>
 
 			{
 				actionData?.isError === true ?
@@ -136,17 +140,21 @@ const CreateAccount = () => {
 
 			<Form method="post">
 				<label>
-					Username: <input type="text" name="username" />
+					Username:
+					<br />
+					<input placeholder="johnsmith" type="text" name="username" />
 				</label>
 
 				<label>
-					Password: <input type="password" name="password" />
+					Password:
+					<br />
+					<input type="password" name="password" />
 				</label>
 
-				<input type="submit" name="Submit" />
+				<input className="signup--submit" value="Create Account" type="submit" name="Submit" />
 			</Form>
 
-		</>
+		</div>
 	);
 
 };

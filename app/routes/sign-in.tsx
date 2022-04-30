@@ -1,9 +1,10 @@
-import { ActionFunction, json, LoaderFunction, redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { ActionFunction, json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import { getUserInfoCollection } from "~/helpers/db";
 import { getSession, commitSession } from "~/helpers/session";
 import bcrypt from 'bcryptjs';
 import { UserInfo } from "~/types/UserInfo.types";
+import signInStyles from './../styles/signIn.css';
 
 /**
  * Callers of this function expect to receive null if there is an issue
@@ -43,6 +44,12 @@ const validateCredentials = async (
 
 	}
 
+};
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: 'stylesheet', href: signInStyles }
+	];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -92,7 +99,7 @@ export const action: ActionFunction = async ({ request }) => {
 		session.flash("error", "Invalid username/password");
 
 		// Redirect back to the login page with errors.
-		return redirect("/login", {
+		return redirect("sign-in", {
 			headers: {
 				"Set-Cookie": await commitSession(session)
 			}
@@ -109,41 +116,41 @@ export const action: ActionFunction = async ({ request }) => {
 
 };
 
-const Login = () => {
+const SignIn = () => {
 
-	const { currentUser, error } = useLoaderData();
+	const { error } = useLoaderData();
 
 	return (
-		<>
-			<p>Login below</p>
+		<div className="login">
 
-			{
-				error ?
-					<div className="error">{error}</div> :
-					null
-			}
+			<div className="login--header">
+				<h2 className="login--header--text">Sign In</h2>
+				<p className="login--header--error">{error}</p>
+			</div>
 
 			<Form method="post">
-				<div>
-					<p>Please sign in</p>
-				</div>
 
 				<label>
-					Username: <input type="text" name="username" />
+					Username:
+					<input className="login--username" placeholder="johnsmith" type="text" name="username" />
 				</label>
 
 				<label>
-					Password:{" "}
-					<input type="password" name="password" />
+					Password:
+					<br />
+					<input className="login--password" type="password" name="password" />
 				</label>
 
-				<input type="submit" name="Submit" />
+				<br />
+				<input className="login--submit" value="Sign In" type="submit" name="Submit" />
 			</Form>
 
-		</>
+			<Link to="/sign-up"><p>Create your account</p></Link>
+
+		</div >
 	);
 
 };
 
-export default Login;
+export default SignIn;
 

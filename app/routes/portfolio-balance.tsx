@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { isAfter, isToday } from "date-fns";
@@ -15,7 +15,7 @@ import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts 
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
-import { isLoggedOut } from "~/helpers/isLoggedOut";
+import { validateIsLoggedIn } from "~/remix-helpers";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -90,9 +90,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	if (await isLoggedOut(request)) {
-		return redirect("/login");
-	}
+	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);
 	const mostRecentAccountBalancesEntryDate = await getMostRecentAccountBalancesEntryDate(username);

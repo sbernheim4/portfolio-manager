@@ -8,8 +8,7 @@ import {
     json,
     LinksFunction,
     LoaderFunction,
-    MetaFunction,
-    redirect,
+    MetaFunction
 } from "@remix-run/node";
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
@@ -17,7 +16,7 @@ import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinked
 import { saveNewAccessToken } from "~/helpers/db";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 import { getUserNameFromSession } from "~/helpers/session";
-import { isLoggedOut } from "~/helpers/isLoggedOut";
+import { validateIsLoggedIn } from "~/remix-helpers";
 export const meta: MetaFunction = () => {
 	return {
 		title: "View and gain insights into your investments",
@@ -42,9 +41,7 @@ type ManageAccountsLoader = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	if (await isLoggedOut(request)) {
-		return redirect("/login");
-	}
+	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);
 	const linkedInstitutions = await getPlaidLinkedInstitutions(username);
