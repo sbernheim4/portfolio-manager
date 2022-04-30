@@ -1,6 +1,15 @@
-import { ActionFunction, redirect } from "@remix-run/node";
+import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { getSession, destroySession } from "~/helpers/session";
+import logoutStyles from './../styles/logout.css';
+
+export const links: LinksFunction = () => {
+
+	return [
+		{ rel: 'stylesheet', href: logoutStyles }
+	];
+
+};
 
 export const action: ActionFunction = async ({ request }) => {
 
@@ -8,22 +17,22 @@ export const action: ActionFunction = async ({ request }) => {
 		request.headers.get("Cookie")
 	);
 
-	return redirect("/login", {
+	return redirect("/sign-in", {
 		headers: { "Set-Cookie": await destroySession(session) }
 	});
 };
 
-const LogoutRoute = () => {
+const Logout = () => {
 	return (
-		<>
+		<div className="logout">
 			<p>Are you sure you want to log out?</p>
 			<Form method="post">
-				<button>Logout</button>
+				<button>Log Out</button>
 			</Form>
 
 			<Link to="/">Never mind</Link>
-		</>
+		</div>
 	);
-}
+};
 
-export default LogoutRoute;
+export default Logout;

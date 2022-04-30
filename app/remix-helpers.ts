@@ -3,6 +3,6 @@ import { isLoggedOut } from "./helpers/isLoggedOut";
 
 export const validateIsLoggedIn = async (request: Request) => {
 	if (await isLoggedOut(request)) {
-		throw redirect("/login");
+		throw redirect("/sign-in");
 	}
 };

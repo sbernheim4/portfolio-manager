@@ -79,7 +79,7 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
 export const loader: LoaderFunction = async ({ request }) => {
 
 	if (await isLoggedOut(request)) {
-		return redirect("/login");
+		return redirect("/sign-in");
 	}
 
 	const username = await getUserNameFromSession(request);
