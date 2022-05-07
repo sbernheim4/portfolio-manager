@@ -14,7 +14,7 @@ import { PositionsLoaderData } from "~/types/positions.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db";
+import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";

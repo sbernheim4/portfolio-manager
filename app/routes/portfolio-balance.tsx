@@ -12,7 +12,7 @@ import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
 import { InvestmentAccounts } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
-import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db";
+import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import { validateIsLoggedIn } from "~/remix-helpers";

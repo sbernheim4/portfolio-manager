@@ -13,7 +13,7 @@ import {
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
 import { createPlaidLinkToken, exchangePublicTokenForAccessToken, getPlaidLinkedInstitutions, unlinkPlaidItem } from "~/helpers/plaidUtils";
-import { saveNewAccessToken } from "~/helpers/db";
+import { saveNewAccessToken } from "~/helpers/db.server";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedAccounts/LinkedAccounts";
 import { getUserNameFromSession } from "~/helpers/session";
 import { validateIsLoggedIn } from "~/remix-helpers";

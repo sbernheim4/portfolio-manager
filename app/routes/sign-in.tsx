@@ -1,6 +1,6 @@
 import { ActionFunction, json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
-import { getUserInfoCollection } from "~/helpers/db";
+import { getUserInfoCollection } from "~/helpers/db.server";
 import { getSession, commitSession } from "~/helpers/session";
 import bcrypt from 'bcryptjs';
 import { UserInfo } from "~/types/UserInfo.types";
@@ -23,16 +23,19 @@ const validateCredentials = async (
 		const noUserFound = userInfo === null;
 
 		if (noUserFound) {
+			console.log('No user found');
 			return null
 		}
 
 		const { salt, password } = userInfo;
 		const hashedPassword = bcrypt.hashSync(passwordFromForm as string, salt)
-		const incorrectPassword = password !== hashedPassword
+		const isIncorrectPassword = password !== hashedPassword
 
-		if (incorrectPassword) {
+		if (isIncorrectPassword) {
+			console.log('Incorrect password');
 			return null;
 		} else {
+			console.log('logged in successfully. User is ', userInfo);
 			return userInfo.user;
 		}
 
@@ -94,6 +97,8 @@ export const action: ActionFunction = async ({ request }) => {
 		username,
 		password
 	);
+
+	console.log({ userId });
 
 	if (userId === null) {
 		session.flash("error", "Invalid username/password");

@@ -1,8 +1,8 @@
 import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB, removeItemId } from "./db";
-import { client } from "./plaidClient";
+import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB, removeItemId } from "./db.server";
+import { client } from "./plaidClient.server";
 import { format } from "date-fns";
 
 /**

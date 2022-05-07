@@ -1,10 +1,8 @@
-import { getSession } from "./session";
+import { getUserNameFromSession } from "./session";
 
 export const isLoggedOut = async (request: Request) => {
 
-	const sessionCookie = request.headers.get("Cookie");
-	const session = await getSession(sessionCookie);
-	const userId = session.get("userId");
+	const userId = await getUserNameFromSession(request);
 
 	if (userId === null || userId === undefined) {
 		return true;
