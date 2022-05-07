@@ -4,3 +4,5 @@ node_modules
 /server/build
 /public/build
 .DS_Store
+.vscode
+api/

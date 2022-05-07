@@ -4,7 +4,7 @@ import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { UserInfo } from "~/types/UserInfo.types";
 import { commitSession, getSession } from "~/helpers/session";
-import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db";
+import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db.server";
 
 export const usernameAlreadyExists = async (username: string) => {
 

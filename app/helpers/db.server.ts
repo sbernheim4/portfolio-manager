@@ -1,31 +1,11 @@
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
-import { MONGODB_PWD } from "../env";
 import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
 
-const uri = `mongodb+srv://portfolio-manager:${MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://portfolio-manager:${process.env.MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
-
-let activeConnection: Promise<MongoClient> | undefined;
-
-try {
-
-	if (activeConnection === undefined) {
-
-		console.log("creating new connection");
-
-		activeConnection = client.connect();
-
-	}
-
-} catch (err) {
-
-	if (activeConnection !== undefined) {
-		activeConnection.then(x => x.close());
-	}
-
-}
+const connection = client.connect();
 
 /**
  * Used when a new user is singing up for an account
@@ -52,11 +32,13 @@ export const getNewUserInfo = (
 export const getUserInfoCollection = async () => {
 	const collectionName = "userInfo";
 
-	if (activeConnection === undefined) {
+	const connect = connection;
+
+	if (connect === undefined) {
 		throw new Error("Could not connect to DB");
 	}
 
-	return activeConnection.then(mongoClient => {
+	return connect.then(mongoClient => {
 		return mongoClient.db().collection(collectionName);
 	});
 };

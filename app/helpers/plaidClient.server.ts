@@ -1,12 +1,11 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
-import { PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV } from "../env";
 
 const configuration = new Configuration({
-	basePath: PlaidEnvironments[PLAID_ENV],
+	basePath: PlaidEnvironments[process.env.PLAID_ENV as string],
 	baseOptions: {
 		headers: {
-			'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-			'PLAID-SECRET': PLAID_SECRET
+			'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
+			'PLAID-SECRET': process.env.PLAID_SECRET
 		},
 	},
 });
