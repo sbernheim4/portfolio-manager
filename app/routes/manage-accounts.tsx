@@ -4,11 +4,11 @@ import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
 import {
-    ActionFunction,
-    json,
-    LinksFunction,
-    LoaderFunction,
-    MetaFunction
+	ActionFunction,
+	json,
+	LinksFunction,
+	LoaderFunction,
+	MetaFunction
 } from "@remix-run/node";
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 			client_user_id: clientUserId,
 		},
 		client_name: 'Portfolio Manager',
-		products: [Products.Auth],
+		products: [Products.Auth, Products.Investments, Products.Transactions],
 		language: 'en',
 		webhook: 'https://webhook.example.com',
 		country_codes: [CountryCode.Us],
@@ -126,7 +126,9 @@ export const action: ActionFunction = async ({ request }) => {
 
 const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.SetStateAction<Option<string>>> }) => {
 
-	const onSuccess = useCallback(async (public_token, _metadata) => {
+	const onSuccess = useCallback((public_token, _metadata) => {
+
+		console.log('onSuccessCallback called');
 
 		props.setPublicToken(Some(public_token));
 
