@@ -6,7 +6,6 @@
   "scripts": {
     "build": "remix build",
     "dev": "remix dev",
-    "env": "./app/env.sh",
     "sass": "sass --watch app/:app/"
   },
   "dependencies": {

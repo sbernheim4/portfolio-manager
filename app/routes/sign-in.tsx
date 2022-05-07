@@ -35,7 +35,7 @@ const validateCredentials = async (
 			console.log('Incorrect password');
 			return null;
 		} else {
-			console.log('logged in successfully. User is ', userInfo);
+			console.log('logged in successfully');
 			return userInfo.user;
 		}
 
@@ -97,8 +97,6 @@ export const action: ActionFunction = async ({ request }) => {
 		username,
 		password
 	);
-
-	console.log({ userId });
 
 	if (userId === null) {
 		session.flash("error", "Invalid username/password");
