@@ -62,12 +62,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 		country_codes: [CountryCode.Us],
 	};
 
-	const createTokenResponse = await createPlaidLinkToken(plaidRequest);
+	const createLinkTokenResponse = await createPlaidLinkToken(plaidRequest);
 
-	return json(
+	return json<ManageAccountsLoader>(
 		{
 			linkedInstitutions,
-			linkToken: createTokenResponse
+			linkToken: createLinkTokenResponse
 		},
 		{ headers: { "Cache-Control": "max-age=43200" } }
 	);
@@ -137,7 +137,7 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 	const config: Parameters<typeof usePlaidLink>[0] = {
 		token: props.linkToken,
 		onSuccess,
-		env: 'development'
+		env: 'sandbox'
 	};
 
 	const { open, ready } = usePlaidLink(config);
