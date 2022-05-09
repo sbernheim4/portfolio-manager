@@ -1,6 +1,6 @@
 import { AccountBase } from "plaid";
 import { Link } from "@remix-run/react";
-import { dollarFormatter } from "~/helpers/formatters";
+import { dollarFormatter, lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 import { positiveAccountTypes } from "./NetworthComponent";
 
 export const AccountsList = (
@@ -27,7 +27,7 @@ export const AccountsList = (
 			{
 				balances.map((account) => {
 					return (
-						<Link key={account.account_id} to={`/accounts/${account.account_id}`}>
+						<Link key={account.account_id} to={`/accounts/${replaceSpacesWithDashes(lowerCase(account.name))}`}>
 							<p>{account.name}</p>
 						</Link>
 					);

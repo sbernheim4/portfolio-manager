@@ -10,3 +10,11 @@ export const decimalFormatter = Intl.NumberFormat('en-US', {
 export const percentageFormatter = Intl.NumberFormat('en-US', {
 	style: "percent"
 });
+
+export const replaceSpacesWithDashes = (str: string) => {
+	return str.replace(/\s/g, '-');
+};
+
+export const lowerCase = (str: string) => {
+	return str.toLowerCase();
+};
