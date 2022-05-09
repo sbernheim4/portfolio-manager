@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { AccountsList } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
@@ -7,6 +7,7 @@ import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAc
 import { getUserNameFromSession } from "~/helpers/session";
 import { positiveAccountTypes } from "~/components/NetworthComponent";
 import { validateIsLoggedIn } from "~/remix-helpers";
+import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -16,7 +17,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => {
-	return [ ];
+	return [];
 };
 
 export const loader: LoaderFunction = async (args) => {
@@ -39,6 +40,18 @@ export const loader: LoaderFunction = async (args) => {
 		{ headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" } }
 	);
 
+};
+
+export const action: ActionFunction = async ({ request }) => {
+	const formData = await request.formData();
+	const action = formData.get("action");
+
+	switch (action) {
+		case 'isLoggedIn':
+			await validateIsLoggedIn(request);
+		default:
+			return null;
+	}
 };
 
 /**
@@ -65,6 +78,9 @@ const sumAccountBalances = (accounts: AccountBase[]) => {
  * The route component
  */
 const Accounts = () => {
+
+	useLoggedIn();
+
 	const data = useLoaderData<{
 		investmentAccounts: AccountBase[],
 		nonInvestmentAccounts: AccountBase[],

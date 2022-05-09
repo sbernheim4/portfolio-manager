@@ -158,7 +158,6 @@ const LinkAccount = () => {
 	const loaderData = useLoaderData<ManageAccountsLoader>();
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
-
 	const { linkToken, linkedInstitutions } = loaderData;
 
 	useEffect(() => {

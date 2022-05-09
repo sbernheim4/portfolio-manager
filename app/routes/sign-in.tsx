@@ -23,7 +23,6 @@ const validateCredentials = async (
 		const noUserFound = userInfo === null;
 
 		if (noUserFound) {
-			console.log('No user found');
 			return null
 		}
 
@@ -32,10 +31,8 @@ const validateCredentials = async (
 		const isIncorrectPassword = password !== hashedPassword
 
 		if (isIncorrectPassword) {
-			console.log('Incorrect password');
 			return null;
 		} else {
-			console.log('logged in successfully');
 			return userInfo.user;
 		}
 
