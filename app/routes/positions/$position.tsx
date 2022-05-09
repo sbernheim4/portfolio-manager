@@ -2,7 +2,6 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useOutletContext, useParams } from "@remix-run/react";
-import { constructSecurityIdToTickerSymbol } from "~/components/Positions/Positions";
 import { decimalFormatter } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
@@ -60,22 +59,25 @@ const IndividualInvestmentInformation = () => {
 
 	const response = tickerSymbolOpt.map(tickerSymbol => {
 
-		const securityId = Option.of(securities.find(sec => sec.ticker_symbol === tickerSymbol)?.security_id);
-		const holdingsOfCurrentSecurityOpt = securityId.map(secId => holdings.filter(holding => holding.security_id === secId));
+		const securityIdOpt = Option.of(securities.find(sec => sec.ticker_symbol === tickerSymbol)).map(x => x.security_id);
+
+		const holdingsOfCurrentSecurity = securityIdOpt
+			.map(securityId => holdings.filter(holding => holding.security_id === securityId))
+			.getOrElse<Holding[]>([]);
 
 		/*
 		 * The total number of shares of a single stock held across all accounts
 		 */
-		const totalNumberShares = holdingsOfCurrentSecurityOpt.map(h => {
-			return h.reduce((acc, curr) => acc + curr.quantity, 0)
-		}).map(x => {
-			return decimalFormatter.format(x);
-		});
+		const shareQuantity = holdingsOfCurrentSecurity.reduce((acc, curr) => acc + curr.quantity, 0);
+		const shareQuantityFormatted = decimalFormatter.format(shareQuantity);
 
-		const accountIdToNumberOfShares = securityId.map(secId => {
+		/*
+		 * The number of shares held in each account
+		 */
+		const accountIdToNumberOfShares = securityIdOpt.map(securityId => {
 
 			return holdings
-				.filter(holding => holding.security_id === secId)
+				.filter(holding => holding.security_id === securityId)
 				.reduce((acc, curr) => {
 
 					const newQuantity = acc[curr.account_id] ?
@@ -90,36 +92,31 @@ const IndividualInvestmentInformation = () => {
 				}, {} as Record<string, number>);
 		})
 
-		const x = holdingsOfCurrentSecurityOpt.map(holdingsOfCurrentSecurity => {
+		const AccountsHoldingSecurity = holdingsOfCurrentSecurity.map(holding => {
+			const accountName = getAccountNameById(holding.account_id);
+			const numberOfShares = accountIdToNumberOfShares.map(x => x[holding.account_id]);
+			const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares));
 
-			return holdingsOfCurrentSecurity.map(holding => {
-				const accountName = getAccountNameById(holding.account_id);
-				const numberOfShares = accountIdToNumberOfShares.map(x => x[holding.account_id]);
-				const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares));
+			return (
+				<Link key={holding.account_id} to={`/accounts/${holding.account_id}`}>
+					<p>{accountName}: {formattedNumberOfShares.getOrElse("Could not determine the number of total owned shares")} shares</p>
+				</Link>
+			);
 
-				return (
-					<Link key={holding.account_id} to={`/accounts/${holding.account_id}`}>
-						<p>{accountName}: {formattedNumberOfShares.getOrElse("Could not determine the number of total owned shares")} shares</p>
-					</Link>
-				);
-
-			});
-		}).getOrElse(<p>No accounts holding {tickerSymbol}</p>)
+		});
 
 		return (
 			<div className="investment">
 				<h1>Accounts Holding {tickerSymbol}</h1>
 
-				<h3>Total number of shares: {totalNumberShares.getOrElse("Could not determine the number of total owned shares")}</h3>
+				<h3>Total number of shares: {shareQuantityFormatted}</h3>
 
-				{x}
+				{AccountsHoldingSecurity}
 			</div>
-		)
+		);
 	});
 
 	return response.getOrElse("Error");
-
-	// const holdings = holdings.filter(holding => holding.security_id === securityId);
 
 };
 
