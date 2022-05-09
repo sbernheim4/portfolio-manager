@@ -9,7 +9,7 @@ import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import networthStyles from "~/styles/networth/networth.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
-import { InvestmentAccounts } from "~/components/InvestmentAccounts";
+import { AccountsList } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db.server";
@@ -260,7 +260,7 @@ const Networth = () => {
 	return (
 		<div className="networth">
 			<h1>Your Portfolio Balance</h1>
-			<InvestmentAccounts balances={balances} />
+			<AccountsList balances={balances} />
 
 			{
 				// If JS is disabled, allow the user to store today's balances

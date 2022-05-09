@@ -3,7 +3,7 @@ import { Link } from "@remix-run/react";
 import { dollarFormatter } from "~/helpers/formatters";
 import { positiveAccountTypes } from "./NetworthComponent";
 
-export const InvestmentAccounts = (
+export const AccountsList = (
 	props: { children?: React.ReactNode, balances: AccountBase[] }
 ) => {
 

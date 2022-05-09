@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../styles/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
-import { InvestmentAccounts } from '~/components/InvestmentAccounts';
+import { AccountsList } from '~/components/InvestmentAccounts';
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
@@ -47,7 +47,7 @@ const Dashboard = () => {
 			<Positions securities={securities} holdings={holdings} />
 
 			<h1>Your Portfolio Balance</h1>
-			<InvestmentAccounts balances={balances} />
+			<AccountsList balances={balances} />
 		</div>
 	);
 

@@ -1,7 +1,7 @@
 import { AccountBase } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { InvestmentAccounts } from "~/components/InvestmentAccounts";
+import { AccountsList } from "~/components/InvestmentAccounts";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
@@ -83,13 +83,13 @@ const Accounts = () => {
 
 			<h1>Account Balances: {dollarFormatter.format(totalBalance)}</h1>
 
-			<InvestmentAccounts balances={investmentAccounts}>
+			<AccountsList balances={investmentAccounts}>
 				<h2>Investment and Brokerage Accounts</h2>
-			</InvestmentAccounts>
+			</AccountsList>
 
-			<InvestmentAccounts balances={nonInvestmentAccounts}>
+			<AccountsList balances={nonInvestmentAccounts}>
 				<h2>Cash and Loan Accounts</h2>
-			</InvestmentAccounts>
+			</AccountsList>
 
 		</div>
 	);
