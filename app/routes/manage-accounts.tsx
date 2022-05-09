@@ -1,7 +1,7 @@
 import { Option, Some } from "excoptional";
 import { CountryCode, Institution, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
-import { usePlaidLink } from "react-plaid-link";
+import { PlaidLinkOptionsWithLinkToken, usePlaidLink } from "react-plaid-link";
 
 import {
 	ActionFunction,
@@ -56,6 +56,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 			client_user_id: clientUserId,
 		},
 		client_name: 'Portfolio Manager',
+		// TODO: Need to register for production access with plaid to get access
+		// to investments data.
 		products: [Products.Auth, Products.Investments, Products.Transactions],
 		language: 'en',
 		webhook: 'https://webhook.example.com',
@@ -83,7 +85,11 @@ export const action: ActionFunction = async ({ request }) => {
 	switch (action) {
 		case "linkAccount":
 			const publicToken = formData.get("public_token") as string;
-			const { error } = await exchangePublicTokenForAccessToken(publicToken);
+			const {
+				access_token,
+				error,
+				item_id
+			} = await exchangePublicTokenForAccessToken(publicToken);
 
 			if (error) {
 
@@ -94,8 +100,6 @@ export const action: ActionFunction = async ({ request }) => {
 				});
 
 			}
-
-			const { access_token, item_id } = await exchangePublicTokenForAccessToken(publicToken);
 
 			await saveNewAccessToken(username, access_token, item_id);
 
@@ -134,10 +138,10 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 
 	}, []);
 
-	const config: Parameters<typeof usePlaidLink>[0] = {
+
+	const config: PlaidLinkOptionsWithLinkToken = {
 		token: props.linkToken,
 		onSuccess,
-		env: 'sandbox'
 	};
 
 	const { open, ready } = usePlaidLink(config);
