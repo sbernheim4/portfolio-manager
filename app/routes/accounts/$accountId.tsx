@@ -4,6 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
+import { lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -20,14 +21,24 @@ export const links: LinksFunction = () => {
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 
-	const accountId = params.accountId;
+	const accountName = params.accountId ?? "";
 
 	const username = await getUserNameFromSession(request);
 	const accountData = await getPlaidAccountBalances(username);
 	const { holdings, securities } = await getInvestmentHoldings(username);
 
-	const holdingsInCurrentAccount = holdings.filter(holding => holding.account_id === accountId)
-	const account = accountData.find(acc => acc.account_id === accountId)
+	const accountNamesToAccountId = accountData.reduce((acc, curr) => {
+		const accountNameNormalized = replaceSpacesWithDashes(lowerCase(curr.name));
+
+		return {
+			...acc,
+			[accountNameNormalized]: curr.account_id
+		}
+	});
+
+	const accountId = accountNamesToAccountId[accountName];
+	const holdingsInCurrentAccount = holdings.filter(holding => holding.account_id === accountId);
+	const account = accountData.find(acc => acc.account_id === accountId);
 
 	return json({
 		account,
