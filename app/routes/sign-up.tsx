@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import signUpStyles from './../../styles/signUp.css'
+import signUpStyles from './../styles/signUp.css'
 import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { UserInfo } from "~/types/UserInfo.types";

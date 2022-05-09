@@ -1,13 +1,13 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
-import dashboardStyles from './../../styles/dashboard.css';
+import dashboardStyles from './../styles/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
 import { InvestmentAccounts } from '~/components/InvestmentAccounts';
-import { getInvestmentsAndAccountBalances } from "../positions";
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
+import { getInvestmentsAndAccountBalances } from "./positions";
 
 export const meta: MetaFunction = () => {
 	return {
