@@ -15,14 +15,17 @@ export const links: LinksFunction = () => {
 export const StockInvestmentSummary = (props: {
 	totalInvested: number,
 	holding: Holding,
-	tickerOpt: Option<string>
+	tickerOpt: Option<string>,
+	securityId: string
 }) => {
 
 	const { totalInvested, holding, tickerOpt } = props;
 
 	const percentageOfAllFunds = (holding.institution_value / totalInvested);
 	const threshold = .1;
-	const ticker = tickerOpt.getOrElse("N/A")
+
+	// Fallback to displaying the security id if no ticker is available
+	const ticker = tickerOpt.getOrElse(props.securityId)
 	const quantity = decimalFormatter.format(holding.quantity);
 	const percentage = percentageFormatter.format(percentageOfAllFunds);
 	const aboveThreshold = percentageOfAllFunds >= threshold;

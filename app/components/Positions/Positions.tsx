@@ -39,12 +39,14 @@ export const constructSecurityIdToTickerSymbol = (securities: Array<Security>) =
 
 	const securityIdToTickerSymbol = securities.reduce((acc, curr) => {
 
+		const tickerSymbol = curr.ticker_symbol ?? undefined;
+
 		return {
 			...acc,
-			[curr.security_id]: curr.ticker_symbol
+			[curr.security_id]: tickerSymbol
 		};
 
-	}, {} as Record<string, string | null>);
+	}, {} as Record<string, string | undefined>);
 
 	return securityIdToTickerSymbol;
 
@@ -174,14 +176,14 @@ export const Positions = (
 							.sort((a, b) => b.institution_value - a.institution_value)
 							.map((holding, i) => {
 
-								const ticker = Option.of(securityIdToTickerSymbol[holding.security_id] as string | undefined);
+								const ticker = Option.of(securityIdToTickerSymbol[holding.security_id]);
 
 								return (
 									<StockInvestmentSummary
 										tickerOpt={ticker}
 										totalInvested={totalInvested}
 										holding={holding}
-										key={securities[i].security_id}
+										securityId={securities[i].security_id}
 									/>
 								);
 							})
