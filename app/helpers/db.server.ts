@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { Option } from "excoptional";
+import { None, Option, Some } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
 
@@ -217,42 +217,37 @@ export const saveAccountBalancesToDB = async (
 
 		const accountBalances = await getAccountBalancesFromDB(username);
 
-		console.log({ accountBalances });
+		const mostRecentAccountBalanceEntry = accountBalances
+			.map(x => x.date)
+			.map(dateString => new Date(dateString))
+			.sort((a, b) => {
+				if (isSameDay(a, b)) {
+					return 0;
+				} else if (isBefore(a, b)) {
+					return 1
+				} else {
+					return -1;
+				}
+			}).at(0);
 
-		Option.of(
-			(accountBalances
-				.map(x => x.date)
-				.map(dateString => new Date(dateString))
-				.sort((a, b) => {
-					if (isSameDay(a, b)) {
-						return 0;
-					} else if (isBefore(a, b)) {
-						return 1
-					} else {
-						return -1;
-					}
-				})[0]) ?? undefined
-		).map(mostRecentEntryDate => {
+		const updatedAccountBalances = Option.of(mostRecentAccountBalanceEntry)
+			.map(mostRecentEntryDate => {
 
-			if (!isToday(mostRecentEntryDate)) {
+				return !isToday(mostRecentEntryDate) ?
+					[...newEntry, ...accountBalances] :
+					accountBalances;
 
-				const updateAccountBalances = () => {
-					return accountBalances.length > 0 ?
-						[...newEntry, ...accountBalances] :
-						newEntry;
-				};
+			}).getOrElse(newEntry);
 
-				// Fire and forget
-				updateDB(
-					username,
-					'accountBalances',
-					newEntry,
-					updateAccountBalances
-				);
 
-			}
+		// Fire and forget
+		updateDB(
+			username,
+			'accountBalances',
+			updatedAccountBalances,
+			() => updatedAccountBalances
+		);
 
-		});
 
 	} catch (err) {
 
