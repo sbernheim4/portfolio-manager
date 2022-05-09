@@ -47,45 +47,56 @@ const mergeHistoricalAndTodaysBalanceData = (
 	todaysBalanceData: Record<string, number>
 ) => {
 
-	const lastEntry = historicalBalanceData[historicalBalanceData.length - 1];
-	const noEntriesExist = lastEntry === undefined;
+	const noEntriesExist = historicalBalanceData.length === 0;
 
+	// If there are no entries in the historical balance data, then we can just
+	// return an array containing one entry.
+	//
+	// This happens the first time the user visits the page.
 	if (noEntriesExist) {
-
-		return [{
-			date: new Date().toISOString(),
-			totalBalance: todaysBalance,
-			...todaysBalanceData
-		}].sort((a, b) => {
-			const dateA = new Date(a.date);
-			const dateB = new Date(b.date);
-
-			return isAfter(dateA, dateB) ? 1 : -1;
-		});
-	}
-
-	const lastEntryDate = new Date(lastEntry.date);
-
-	return isToday(lastEntryDate) ?
-		(historicalBalanceData.sort((a, b) => {
-			const dateA = new Date(a.date);
-			const dateB = new Date(b.date);
-
-			return isAfter(dateA, dateB) ? 1 : -1;
-		})) :
-		([
-			...historicalBalanceData,
+		return [
 			{
-				date: new Date().toISOString(),
+				date: new Date().toLocaleDateString(),
 				totalBalance: todaysBalance,
 				...todaysBalanceData
 			}
-		].sort((a, b) => {
-			const dateA = new Date(a.date);
-			const dateB = new Date(b.date);
+		];
+	}
 
-			return isAfter(dateA, dateB) ? 1 : -1;
-		}));
+	// Find the most recent entry in the historical data
+	let mostRecentEntryDate = new Date(historicalBalanceData[0].date);
+	for (let i = 1; i < historicalBalanceData.length; i++) {
+		const entry = historicalBalanceData[i];
+		const entryDate = new Date(entry.date);
+
+		if (isAfter(entryDate, mostRecentEntryDate)) {
+			mostRecentEntryDate = entryDate;
+		}
+	}
+
+	// Create a new entry for the today (it may not be needed).
+	const todaysEntry = {
+		date: new Date().toISOString(),
+		totalBalance: todaysBalance,
+		...todaysBalanceData
+	};
+
+	// If the most recent entry is not from today, add today's entry to the end
+	// of the array.
+	const updatedHistoricalBalanceData = isToday(mostRecentEntryDate) ?
+		historicalBalanceData :
+		[
+			...historicalBalanceData,
+			todaysEntry
+		];
+
+	// Return the array sorted by date
+	return updatedHistoricalBalanceData.sort((a, b) => {
+		const dateA = new Date(a.date);
+		const dateB = new Date(b.date);
+
+		return isAfter(dateA, dateB) ? 1 : -1;
+	});
 
 };
 
