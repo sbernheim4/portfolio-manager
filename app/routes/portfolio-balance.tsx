@@ -255,82 +255,7 @@ const Networth = () => {
 
 	};
 
-	const PositionsBalanceChartWithSize = () => {
-		return (
-			<AreaChart width={800} height={250} margin={{ left: 50, top: 30 }} data={accountBalancesChartData}>
-
-				<CartesianAxis />
-
-				<XAxis interval={1} minTickGap={10} dataKey="date" />
-
-				<YAxis domain={[0, 'dataMax']} />
-
-				<Tooltip formatter={tooltipFormatter} />
-
-				<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
-
-				{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
-					return <Area
-						type="monotone"
-						fillOpacity={.5}
-						fill={COLORS[index % COLORS.length]}
-						stroke={COLORS[index % COLORS.length]}
-						name={account.name}
-						key={account.accountId}
-						dataKey={account.accountId}
-					/>
-				})}
-
-			</AreaChart>
-		);
-	};
-
-	const chart = isClientSideJSEnabled() ?
-		<ResponsiveContainer width="100%" height={250}>
-			<AreaChart data={accountBalancesChartData}>
-
-				<CartesianAxis />
-
-				<XAxis interval={6} dataKey="date" />
-
-				<YAxis domain={[0, 'dataMax']} />
-
-				<Tooltip formatter={tooltipFormatter} />
-
-				<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
-
-				{
-					/* Successively test all 3 versions of the account data to
-					 * render into the chart. The order is intended.
-					 *
-					 * If JS is *disabled* and form is submitted defer to form
-					 * result (selectedAccountsFromFormSubmission) above all
-					 * else.
-					 *
-					 * If JS is *enabled*, defer to state variable
-					 * (accountsToShow) as this value is connected to the
-					 * checkbox click handler.
-					 *
-					 * If JS is *disabled* AND the form has not yet been
-					 * submitted (inital render), defer to loader value
-					 * (accountIdsAndNames).
-					*/
-				}
-				{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
-					return <Area
-						type="monotone"
-						fillOpacity={.5}
-						fill={COLORS[index % COLORS.length]}
-						stroke={COLORS[index % COLORS.length]}
-						name={account.name}
-						key={account.accountId}
-						dataKey={account.accountId}
-					/>
-				})}
-
-			</AreaChart>
-		</ResponsiveContainer> :
-		<PositionsBalanceChartWithSize />;
+	console.log('isClientSideJSEnabled', isClientSideJSEnabled());
 
 	return (
 		<div className="networth">
@@ -381,8 +306,53 @@ const Networth = () => {
 				</Form>
 
 				<br />
+				{console.log(accountBalancesChartData)}
 
-				{chart}
+				<ResponsiveContainer width="100%" height={250}>
+					<AreaChart data={accountBalancesChartData}>
+
+						<CartesianAxis />
+
+						<XAxis interval={6} dataKey="date" />
+
+						<YAxis width={85} tickFormatter={(value) => dollarFormatter.format(value)} domain={[0, 'dataMax']} />
+
+						<Tooltip formatter={tooltipFormatter} />
+
+						<Area type="monotone" fillOpacity={.5} name={"Total Balance"} dataKey="totalBalance" />
+
+						{
+							/* Successively test all 3 versions of the account data to
+							 * render into the chart. The order is intended.
+							 *
+							 * If JS is *disabled* and form is submitted defer to form
+							 * result (selectedAccountsFromFormSubmission) above all
+							 * else.
+							 *
+							 * If JS is *enabled*, defer to state variable
+							 * (accountsToShow) as this value is connected to the
+							 * checkbox click handler.
+							 *
+							 * If JS is *disabled* AND the form has not yet been
+							 * submitted (inital render), defer to loader value
+							 * (accountIdsAndNames).
+							*/
+						}
+						{(selectedAccountsFromFormSubmission ?? accountsToShow ?? accountIdsAndNames).map((account, index) => {
+							return <Area
+								type="monotone"
+								fillOpacity={.5}
+								fill={COLORS[index % COLORS.length]}
+								stroke={COLORS[index % COLORS.length]}
+								name={account.name}
+								key={account.accountId}
+								dataKey={account.accountId}
+							/>
+						})}
+
+					</AreaChart>
+				</ResponsiveContainer>;
+
 			</div>
 
 		</div>
