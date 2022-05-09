@@ -28,7 +28,7 @@ export const StockInvestmentSummary = (props: {
 
 	return (
 		<tr className="investment-line-item">
-			<Link className="investment-line-item-link" to={`/positions/${holding.security_id}`}>
+			<Link className="investment-line-item-link" to={`/positions/${ticker}`}>
 
 				<td className="investment-line-item__ticker">{ticker ?? "N/A"}</td>
 				<td className="investment-line-item__share">{quantity}</td>
