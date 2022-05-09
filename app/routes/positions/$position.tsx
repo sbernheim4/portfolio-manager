@@ -44,30 +44,7 @@ const IndividualInvestmentInformation = () => {
 	} = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
 
 	const params = useParams();
-	const tickerSymbol = params.position ?? "";
-	const securityId = Option.of(securities.find(sec => sec.ticker_symbol === tickerSymbol)?.security_id);
-	const holdingsOfCurrentSecurity = securityId.map(secId => holdings.filter(holding => holding.security_id === secId));
-
-	// const holdings = holdings.filter(holding => holding.security_id === securityId);
-
-	const accountIdToNumberOfShares = securityId.map(secId => {
-
-		return holdings
-			.filter(holding => holding.security_id === secId)
-			.reduce((acc, curr) => {
-
-				const newQuantity = acc[curr.account_id] ?
-					acc[curr.account_id] + curr.quantity :
-					curr.quantity
-
-				return {
-					...acc,
-					[curr.account_id]: newQuantity
-				};
-
-			}, {} as Record<string, number>);
-	})
-
+	const tickerSymbolOpt = Option.of(params.position);
 
 	/*
 	 * Helper function to retrieve an account's name given its ID
@@ -81,41 +58,68 @@ const IndividualInvestmentInformation = () => {
 			"Account Name not found";
 	};
 
-	/*
-	 * The total number of shares of a single stock held across all accounts
-	 */
-	const totalNumberShares = holdingsOfCurrentSecurity.map(h => {
-		return h.reduce((acc, curr) => acc + curr.quantity, 0)
-	}).map(x => {
-		return decimalFormatter.format(x);
-	})
+	const response = tickerSymbolOpt.map(tickerSymbol => {
 
+		const securityId = Option.of(securities.find(sec => sec.ticker_symbol === tickerSymbol)?.security_id);
+		const holdingsOfCurrentSecurityOpt = securityId.map(secId => holdings.filter(holding => holding.security_id === secId));
 
-	return (
-		<div className="investment">
-			<h1>Accounts Holding {tickerSymbol}</h1>
+		/*
+		 * The total number of shares of a single stock held across all accounts
+		 */
+		const totalNumberShares = holdingsOfCurrentSecurityOpt.map(h => {
+			return h.reduce((acc, curr) => acc + curr.quantity, 0)
+		}).map(x => {
+			return decimalFormatter.format(x);
+		});
 
-			<h3>Total number of shares: {totalNumberShares.getOrElse("Could not determine the number of total owned shares")}</h3>
+		const accountIdToNumberOfShares = securityId.map(secId => {
 
-			{
-				holdingsOfCurrentSecurity.map(holding => {
+			return holdings
+				.filter(holding => holding.security_id === secId)
+				.reduce((acc, curr) => {
 
-					return holding.map(h => {
-						const accountName = getAccountNameById(h.account_id);
-						const numberOfShares = accountIdToNumberOfShares.map(x => x[h.account_id]);
-						const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares));
+					const newQuantity = acc[curr.account_id] ?
+						acc[curr.account_id] + curr.quantity :
+						curr.quantity
 
-						return (
-							<Link key={h.account_id} to={`/accounts/${h.account_id}`}>
-								<p>{accountName}: {formattedNumberOfShares.getOrElse("Could not determine the number of total owned shares")} shares</p>
-							</Link>
-						);
+					return {
+						...acc,
+						[curr.account_id]: newQuantity
+					};
 
-					});
-				}).getOrElse(<p>No accounts holding {tickerSymbol}</p>)
-			}
-		</div>
-	);
+				}, {} as Record<string, number>);
+		})
+
+		const x = holdingsOfCurrentSecurityOpt.map(holdingsOfCurrentSecurity => {
+
+			return holdingsOfCurrentSecurity.map(holding => {
+				const accountName = getAccountNameById(holding.account_id);
+				const numberOfShares = accountIdToNumberOfShares.map(x => x[holding.account_id]);
+				const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares));
+
+				return (
+					<Link key={holding.account_id} to={`/accounts/${holding.account_id}`}>
+						<p>{accountName}: {formattedNumberOfShares.getOrElse("Could not determine the number of total owned shares")} shares</p>
+					</Link>
+				);
+
+			});
+		}).getOrElse(<p>No accounts holding {tickerSymbol}</p>)
+
+		return (
+			<div className="investment">
+				<h1>Accounts Holding {tickerSymbol}</h1>
+
+				<h3>Total number of shares: {totalNumberShares.getOrElse("Could not determine the number of total owned shares")}</h3>
+
+				{x}
+			</div>
+		)
+	});
+
+	return response.getOrElse("Error");
+
+	// const holdings = holdings.filter(holding => holding.security_id === securityId);
 
 };
 
