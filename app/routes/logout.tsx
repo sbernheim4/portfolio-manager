@@ -1,6 +1,7 @@
-import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
+import { ActionFunction, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { getSession, destroySession } from "~/helpers/session";
+import { validateIsLoggedIn } from "~/remix-helpers";
 import logoutStyles from './../styles/logout.css';
 
 export const links: LinksFunction = () => {
@@ -9,6 +10,11 @@ export const links: LinksFunction = () => {
 		{ rel: 'stylesheet', href: logoutStyles }
 	];
 
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+	await validateIsLoggedIn(request);
+	return null;
 };
 
 export const action: ActionFunction = async ({ request }) => {
