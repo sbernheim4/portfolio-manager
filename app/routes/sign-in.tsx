@@ -99,7 +99,7 @@ export const action: ActionFunction = async ({ request }) => {
 	);
 
 	if (userId === null) {
-		session.flash("error", "Invalid username/password");
+		session.flash("error", "Invalid username and password combination");
 
 		// Redirect back to the login page with errors.
 		return redirect("sign-in", {
