@@ -16,6 +16,7 @@ import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "
 import { getUserNameFromSession } from "~/helpers/session";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import { validateIsLoggedIn } from "~/remix-helpers";
+import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -148,6 +149,9 @@ export const action: ActionFunction = async ({ request }) => {
 
 
 	switch (action) {
+		case 'isLoggedIn':
+			await validateIsLoggedIn(request);
+
 		// User clicks to save today's balance information to their historical
 		// record.
 		case "saveBalance":
@@ -223,6 +227,8 @@ const Networth = () => {
 
 	const submit = useSubmit();
 
+	useLoggedIn();
+
 	// Auto Submit today's balance when JS is enabled via useEffect
 	useEffect(() => {
 		if (isToday(new Date(mostRecentAccountBalancesEntryDate))) {
@@ -254,8 +260,6 @@ const Networth = () => {
 		setAccountsToShow(updatedAccountIdsToShow);
 
 	};
-
-	console.log('isClientSideJSEnabled', isClientSideJSEnabled());
 
 	return (
 		<div className="networth">
@@ -306,7 +310,6 @@ const Networth = () => {
 				</Form>
 
 				<br />
-				{console.log(accountBalancesChartData)}
 
 				<ResponsiveContainer width="100%" height={250}>
 					<AreaChart data={accountBalancesChartData}>

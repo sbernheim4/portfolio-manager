@@ -4,8 +4,7 @@ import {
     json,
     LinksFunction,
     LoaderFunction,
-    MetaFunction,
-    redirect,
+    MetaFunction
 } from "@remix-run/node";
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
@@ -20,7 +19,8 @@ import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
 import { calculateNewXirr, searchActionHandler } from "~/helpers/positionRouteHelpers";
 import { Option } from "excoptional";
-import { isLoggedOut } from "~/helpers/isLoggedOut";
+import { validateIsLoggedIn } from "~/remix-helpers";
+import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -78,9 +78,7 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
 
-	if (await isLoggedOut(request)) {
-		return redirect("/sign-in");
-	}
+	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);
 
@@ -130,8 +128,10 @@ export const action: ActionFunction = async ({ request }) => {
 	const username = await getUserNameFromSession(request);
 
 	switch (action) {
-		case "search":
+		case 'isLoggedIn':
+			await validateIsLoggedIn(request);
 
+		case "search":
 			const searchTerm = formData.get("search") as string | null
 
 			return searchActionHandler(username, searchTerm);
@@ -161,6 +161,8 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const Holdings = () => {
+
+	useLoggedIn();
 
 	const {
 		xirr,

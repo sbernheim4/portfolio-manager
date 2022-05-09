@@ -23,8 +23,10 @@ export const action: ActionFunction = async ({ request }) => {
 		request.headers.get("Cookie")
 	);
 
+	const cookie = await destroySession(session)
+
 	return redirect("/sign-in", {
-		headers: { "Set-Cookie": await destroySession(session) }
+		headers: { "Set-Cookie": cookie }
 	});
 };
 
