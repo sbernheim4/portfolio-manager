@@ -4,6 +4,7 @@ import { Link } from "@remix-run/react";
 import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 import { WarningSign } from "./../WarningSign";
 import stockInvestmentSummaryStyles from "./styles/stockInvestmentSummary.css";
+import { Option } from "excoptional";
 
 export const links: LinksFunction = () => {
 	return [
@@ -14,28 +15,32 @@ export const links: LinksFunction = () => {
 export const StockInvestmentSummary = (props: {
 	totalInvested: number,
 	holding: Holding,
-	ticker: string | null
+	tickerOpt: Option<string>
 }) => {
 
-	const { totalInvested, holding, ticker } = props;
+	const { totalInvested, holding, tickerOpt } = props;
 
 	const percentageOfAllFunds = (holding.institution_value / totalInvested);
 	const threshold = .1;
-	const aboveThreshold = percentageOfAllFunds >= threshold;
-
+	const ticker = tickerOpt.getOrElse("N/A")
 	const quantity = decimalFormatter.format(holding.quantity);
 	const percentage = percentageFormatter.format(percentageOfAllFunds);
+	const aboveThreshold = percentageOfAllFunds >= threshold;
 
-	return (
-		<tr className="investment-line-item">
-			<Link className="investment-line-item-link" to={`/positions/${ticker}`}>
-
-				<td className="investment-line-item__ticker">{ticker ?? "N/A"}</td>
-				<td className="investment-line-item__share">{quantity}</td>
-				<td className="investment-line-item__percentage">{percentage}</td>
-				<td className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</td>
-				<td><WarningSign aboveThreshold={aboveThreshold} /></td>
-			</Link>
-		</tr>
+	const row = (
+		<>
+			<td className="investment-line-item__ticker">{ticker}</td>
+			<td className="investment-line-item__share">{quantity}</td>
+			<td className="investment-line-item__percentage">{percentage}</td>
+			<td className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</td>
+			<td><WarningSign aboveThreshold={aboveThreshold} /></td>
+		</>
 	);
+
+	const linkRow = (ticker: string) => {
+		return <Link className="investment-line-item-link" to={`/positions/${ticker}`}>{row}</Link>;
+	};
+
+	return <tr className="investment-line-item">{tickerOpt.map(ticker => linkRow(ticker)).getOrElse(row)}</tr>
+
 };
