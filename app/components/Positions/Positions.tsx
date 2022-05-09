@@ -8,6 +8,7 @@ import {
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 import { dollarFormatter } from '~/helpers/formatters';
 import { useSearchableList } from '~/hooks/useSearchHoldings';
+import { Option } from 'excoptional';
 
 export const links: LinksFunction = () => {
 	return [
@@ -172,9 +173,12 @@ export const Positions = (
 						holdingsToDisplay
 							.sort((a, b) => b.institution_value - a.institution_value)
 							.map((holding, i) => {
+
+								const ticker = Option.of(securityIdToTickerSymbol[holding.security_id] as string | undefined);
+
 								return (
 									<StockInvestmentSummary
-										ticker={securityIdToTickerSymbol[holding.security_id]}
+										tickerOpt={ticker}
 										totalInvested={totalInvested}
 										holding={holding}
 										key={securities[i].security_id}
