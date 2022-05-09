@@ -24,7 +24,7 @@ export const links: LinksFunction = () => {
 };
 
 export const StockPieChart = (props: {
-	securityIdToTickerSymbol: Record<string, string | null>;
+	securityIdToTickerSymbol: Record<string, string | undefined>;
 	holdings: Holding[];
 }) => {
 
