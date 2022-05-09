@@ -2,7 +2,7 @@
 import { AccountBase, Holding, Security } from "plaid";
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useOutletContext, useParams } from "@remix-run/react";
-import { decimalFormatter } from "~/helpers/formatters";
+import { decimalFormatter, lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
 import investmentStyles from '~/styles/investment.css';
@@ -49,12 +49,9 @@ const IndividualInvestmentInformation = () => {
 	 * Helper function to retrieve an account's name given its ID
 	 */
 	const getAccountNameById = (accountId: string) => {
-		const account = balances.find(account => account.account_id === accountId);
+		const account = Option.of(balances.find(account => account.account_id === accountId)).map(account => account.name);
 
-		return account?.name ??
-			account?.official_name ??
-			account?.account_id ??
-			"Account Name not found";
+		return account;
 	};
 
 	const response = tickerSymbolOpt.map(tickerSymbol => {
@@ -93,15 +90,26 @@ const IndividualInvestmentInformation = () => {
 		})
 
 		const AccountsHoldingSecurity = holdingsOfCurrentSecurity.map(holding => {
-			const accountName = getAccountNameById(holding.account_id);
+			const accountNameOpt = getAccountNameById(holding.account_id)
+			const normalizeStringUrl = (str: string) => replaceSpacesWithDashes(lowerCase(str));
 			const numberOfShares = accountIdToNumberOfShares.map(x => x[holding.account_id]);
-			const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares));
+			const formattedNumberOfShares = numberOfShares.map(numShares => decimalFormatter.format(numShares)).getOrElse("Could not determine the number of total owned shares")
 
-			return (
-				<Link key={holding.account_id} to={`/accounts/${holding.account_id}`}>
-					<p>{accountName}: {formattedNumberOfShares.getOrElse("Could not determine the number of total owned shares")} shares</p>
-				</Link>
+			const accountHoldingPosition = accountNameOpt.map(accountName => {
+
+				const row = (
+					<Link key={holding.account_id} to={`/accounts/${normalizeStringUrl(accountName)}`}>
+						<p>{accountName}: {formattedNumberOfShares} shares</p>
+					</Link>
+				);
+
+				return row;
+
+			}).getOrElse(
+				<p>{holding.account_id}: {formattedNumberOfShares} shares</p>
 			);
+
+			return accountHoldingPosition;
 
 		});
 
