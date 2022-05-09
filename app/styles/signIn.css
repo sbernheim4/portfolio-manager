@@ -2,6 +2,7 @@
 	margin: 0 auto;
 	min-width: 250px;
 	width: fit-content;
+	max-width: 250px;
 }
 
 .login--header {
@@ -13,7 +14,9 @@
 }
 
 .login--header--error {
-	color: red;
+	color: #b30000;
+	text-align: center;
+	margin-bottom: 15px;
 }
 
 .login > form > label > input {

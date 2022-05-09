@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import signUpStyles from './../../styles/signUp.css'
 import { ActionFunction, LinksFunction, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, Link, useActionData } from "@remix-run/react";
 import { UserInfo } from "~/types/UserInfo.types";
 import { commitSession, getSession } from "~/helpers/session";
 import { getNewUserInfo, getUserInfoCollection } from "~/helpers/db.server";
@@ -84,8 +84,8 @@ export const action: ActionFunction = async ({ request }) => {
 	if (await usernameAlreadyExists(username)) {
 		return {
 			isError: true,
-			error: "Username already exists - Please try again with a new username",
-			errorMessage: "Username already exists - Please try again with a new username"
+			error: "That username is already taken. Please choose another one.",
+			errorMessage: "That username is already taken. Please choose another one."
 		}
 	}
 
@@ -134,7 +134,7 @@ const CreateAccount = () => {
 
 			{
 				actionData?.isError === true ?
-					<h1>{actionData?.errorMessage}</h1> :
+					<p className="signup--error">{actionData?.errorMessage}</p> :
 					null
 			}
 
@@ -153,6 +153,8 @@ const CreateAccount = () => {
 
 				<input className="signup--submit" value="Create Account" type="submit" name="Submit" />
 			</Form>
+
+			<Link to="/sign-in"><p>Sign in to your account</p></Link>
 
 		</div>
 	);
