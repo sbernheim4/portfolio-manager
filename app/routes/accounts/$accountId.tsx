@@ -65,7 +65,7 @@ const Accounts = () => {
 
 	return (
 		<div className="accounts">
-			<h1>{account.name}</h1>
+			<h1 className="accounts__name">{account.name}</h1>
 
 			<Positions securities={securities} holdings={holdingsInCurrentAccount} />
 		</div>
