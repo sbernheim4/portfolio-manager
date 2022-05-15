@@ -5,29 +5,20 @@
 }
 
 .positions {
-  background: var(--positions-bg-color);
   color: var(--positions-font-color);
   padding: 30px;
 }
 .positions h1 {
   text-align: center;
 }
-.positions__table {
-  margin-top: 30px;
-  padding: 30px;
-  width: 100%;
-  background: var(--positions-contrast-color);
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
-  border-radius: 5px;
-}
-.positions__table__search {
+.positions__search {
   max-width: 500px;
   height: 40px;
   margin: 40px auto;
   margin-top: 15px;
   color: var(--positions-font-color);
 }
-.positions__table ::placeholder {
+.positions ::placeholder {
   color: var(--positions-font-color);
   opacity: 1;
 }

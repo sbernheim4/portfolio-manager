@@ -1,0 +1,22 @@
+.investments {
+  margin-top: 30px;
+  background-color: var(--positions-bg-color);
+}
+.investments__positions {
+  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
+  padding: 30px;
+  background: var(--positions-contrast-color);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 5px;
+}
+.investments__sector-weight {
+  padding: 30px;
+  width: 100%;
+  background: var(--positions-contrast-color);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 5px;
+}
+
+/*# sourceMappingURL=investments.css.map */

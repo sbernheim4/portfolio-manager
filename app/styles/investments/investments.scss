@@ -1,0 +1,22 @@
+.investments {
+	margin-top: 30px;
+	background-color: var(--positions-bg-color);
+
+	&__positions {
+		margin: 0 auto;
+		max-width: 900px;
+		width: 100%;
+		padding: 30px;
+		background: var(--positions-contrast-color);
+		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
+		border-radius: 5px;
+	}
+
+	&__sector-weight {
+		padding: 30px;
+		width: 100%;
+		background: var(--positions-contrast-color);
+		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
+		border-radius: 5px;
+	}
+}
