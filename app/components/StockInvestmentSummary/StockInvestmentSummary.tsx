@@ -41,7 +41,7 @@ export const StockInvestmentSummary = (props: {
 	);
 
 	const linkRow = (ticker: string) => {
-		return <Link className="investment-line-item-link" to={`/positions/${ticker}`}>{row}</Link>;
+		return <Link className="investment-line-item-link" to={`/investments/${ticker}`}>{row}</Link>;
 	};
 
 	return <tr className="investment-line-item">{tickerOpt.map(ticker => linkRow(ticker)).getOrElse(row)}</tr>
