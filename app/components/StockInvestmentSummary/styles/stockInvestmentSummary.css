@@ -1,43 +1,61 @@
 /******************************************************************************/
 .investment-line-item-link {
-  color: black;
+  color: var(--positions-font-color);
 }
 
 .investment-line-items {
+  max-width: 700px;
+  width: 100%;
+  min-width: 380px;
   margin: 0 auto;
-  table-layout: fixed;
-  width: 700px;
+  table-layout: auto;
+  color: var(--positions-font-color);
 }
-.investment-line-items tr th {
+.investment-line-items thead tr th:first-child {
   text-align: left;
 }
-.investment-line-items a {
-  text-decoration: none;
-  display: contents;
+.investment-line-items thead tr th {
+  padding-bottom: 10px;
+  text-align: right;
+  font-size: 14px;
 }
-
-/******************************************************************************/
-.investment-line-item {
+.investment-line-items thead tr th:last-child {
+  text-align: center;
+}
+.investment-line-items .investment-line-item {
   margin: 10px;
   padding: 15px;
-  border: 1px solid #aaaaaa;
+  text-align: right;
+  border: 1px solid rgb(170, 170, 170);
   border-radius: 5px;
   position: relative;
-  cursor: pointer;
 }
-.investment-line-item:hover {
-  background: #fafafa;
+.investment-line-items .investment-line-item:hover {
+  background: #1a2d4b;
 }
-.investment-line-item__ticker {
+.investment-line-items .investment-line-item__ticker {
   margin: 10px;
   font-weight: 400;
   text-overflow: ellipsis;
   overflow: clip;
   padding-right: 10px;
 }
-.investment-line-item__share {
+.investment-line-items .investment-line-item__share {
   font-weight: 600;
 }
+.investment-line-items .investment-line-item__ticker {
+  max-width: 70px;
+  text-align: left;
+}
+.investment-line-items .investment-line-item__warning-symbol {
+  text-align: center;
+}
+.investment-line-items a {
+  text-decoration: none;
+  display: contents;
+  cursor: pointer;
+}
+
 /******************************************************************************/
 
 /*# sourceMappingURL=stockInvestmentSummary.css.map */

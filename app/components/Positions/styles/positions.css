@@ -1,30 +1,35 @@
+:root {
+  --positions-contrast-color: rgb(29 49 83);
+  --positions-bg-color: rgb(10, 34, 57);
+  --positions-font-color: #D1D1D1;
+}
+
 .positions {
+  background: var(--positions-bg-color);
+  color: var(--positions-font-color);
   padding: 30px;
 }
-.positions__search {
+.positions h1 {
+  text-align: center;
+}
+.positions__table {
+  margin-top: 30px;
+  padding: 30px;
+  width: 100%;
+  background: var(--positions-contrast-color);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 5px;
+}
+.positions__table__search {
+  max-width: 500px;
   height: 40px;
   margin: 40px auto;
   margin-top: 15px;
+  color: var(--positions-font-color);
 }
-.positions .investment-line-items {
-  margin: 0 auto;
-}
-.positions .investment-line-items thead tr th:first-child {
-  text-align: left;
-}
-.positions .investment-line-items thead tr th {
-  padding-bottom: 10px;
-  text-align: right;
-  font-size: 14px;
-}
-.positions .investment-line-items .investment-line-item {
-  text-align: right;
-}
-.positions .investment-line-items .investment-line-item__ticker {
-  text-align: left;
-}
-.positions .investment-line-items .investment-line-item__warning-symbol {
-  text-align: center;
+.positions__table ::placeholder {
+  color: var(--positions-font-color);
+  opacity: 1;
 }
 .positions .noJS {
   font-style: italic;

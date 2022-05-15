@@ -1,67 +1,79 @@
 /******************************************************************************/
 .investment-line-item-link {
-	color: black;
+	color: var(--positions-font-color);
 }
 
 .investment-line-items {
+	max-width: 700px;
+	width: 100%;
+	min-width: 380px;
 	margin: 0 auto;
-	table-layout: fixed;
-    width: 700px;
+	table-layout: auto;
+	color: var(--positions-font-color);
 
-	tr {
+	thead {
 
-		th {
-			text-align: left;
+		tr {
+
+			th:first-child {
+				text-align: left;
+			}
+
+			th {
+				padding-bottom: 10px;
+				text-align: right;
+				font-size: 14px;
+
+			}
+
+			th:last-child {
+				text-align: center;
+			}
+		}
+	}
+
+	.investment-line-item {
+		margin: 10px;
+		padding: 15px;
+		text-align: right;
+		border: 1px solid rgb(170, 170, 170);
+		border-radius: 5px;
+		position: relative;
+
+		&:hover {
+			background: darken(rgb(29 49 83), 2)
 		}
 
+		&__ticker {
+			margin: 10px;
+			font-weight: 400;
+			text-overflow: ellipsis;
+			overflow: clip;
+			padding-right: 10px;
+		}
+
+		&__share {
+			font-weight: 600;
+		}
+
+
+	}
+
+	.investment-line-item__ticker {
+		max-width: 70px;
+		text-align: left;
+	}
+
+	.investment-line-item__warning-symbol {
+		text-align: center;
 	}
 
 	a {
 		text-decoration: none;
 		display: contents;
+		cursor: pointer;
 	}
 
-}
-
-/******************************************************************************/
-
-.investment-line-item {
-	margin: 10px;
-	// min-width: 200px;
-	// width: 200px;
-	// max-width: 200px;
-	padding: 15px;
-	border: 1px solid rgb(170, 170, 170);
-	border-radius: 5px;
-	position: relative;
-	cursor: pointer;
-
-	&:hover {
-		background: rgb(250, 250, 250);
-	}
-
-	&__ticker {
-		margin: 10px;
-		font-weight: 400;
-		text-overflow: ellipsis;
-		overflow: clip;
-		padding-right: 10px;
-	}
-
-	&__share {
-		font-weight: 600;
-	}
-
-	&__percentage {
-	}
-
-	&__warning-symbol {
-		// display: inline;
-		// position: absolute;
-		// border-radius: 100%;
-		// top: 0px;
-		// right: 3px;
-	}
 }
 
 /******************************************************************************/

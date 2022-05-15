@@ -6,7 +6,6 @@ import {
 	links as stockInvestmentSummaryStyles
 } from '~/components/StockInvestmentSummary/StockInvestmentSummary';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
-import { dollarFormatter } from '~/helpers/formatters';
 import { useSearchableList } from '~/hooks/useSearchHoldings';
 import { Option } from 'excoptional';
 
@@ -149,47 +148,48 @@ export const Positions = (
 		<div className="positions">
 			<h1>Your Positions</h1>
 
-			<h3>Balance: {dollarFormatter.format(totalInvested)}</h3>
+			<div className="positions__table">
 
-			<input
-				className="positions__search"
-				value={searchTerm}
-				onChange={(e) => handleSearch(e)}
-				name="search"
-				type="search"
-				placeholder="Search by ticker"
-			/>
+				<input
+					className="positions__table__search"
+					value={searchTerm}
+					onChange={(e) => handleSearch(e)}
+					name="search"
+					type="search"
+					placeholder="Search by ticker"
+				/>
 
-			<table className="investment-line-items">
-				<thead>
-					<tr>
-						<th>Ticker</th>
-						<th>Quantity</th>
-						<th>Percentage</th>
-						<th>Dollar Value</th>
-						<th>Above Threshold</th>
-					</tr>
-				</thead>
-				<tbody>
-					{
-						holdingsToDisplay
-							.sort((a, b) => b.institution_value - a.institution_value)
-							.map((holding, i) => {
+				<table className="investment-line-items">
+					<thead>
+						<tr>
+							<th>Ticker</th>
+							<th>Quantity</th>
+							<th>Percentage</th>
+							<th>Dollar Value</th>
+							<th>Above Threshold</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							holdingsToDisplay
+								.sort((a, b) => b.institution_value - a.institution_value)
+								.map((holding, i) => {
 
-								const ticker = Option.of(securityIdToTickerSymbol[holding.security_id]);
+									const ticker = Option.of(securityIdToTickerSymbol[holding.security_id]);
 
-								return (
-									<StockInvestmentSummary
-										tickerOpt={ticker}
-										totalInvested={totalInvested}
-										holding={holding}
-										securityId={securities[i].security_id}
-									/>
-								);
-							})
-					}
-				</tbody>
-			</table>
+									return (
+										<StockInvestmentSummary
+											tickerOpt={ticker}
+											totalInvested={totalInvested}
+											holding={holding}
+											securityId={securities[i].security_id}
+										/>
+									);
+								})
+						}
+					</tbody>
+				</table>
+			</div>
 
 			<StockPieChart
 				securityIdToTickerSymbol={securityIdToTickerSymbol}
