@@ -1,10 +1,10 @@
 import { AccountBase, Holding } from "plaid";
 import {
-    ActionFunction,
-    json,
-    LinksFunction,
-    LoaderFunction,
-    MetaFunction
+	ActionFunction,
+	json,
+	LinksFunction,
+	LoaderFunction,
+	MetaFunction
 } from "@remix-run/node";
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
@@ -22,6 +22,7 @@ import { calculateNewXirr, searchActionHandler } from "~/helpers/investmentRoute
 import { Option } from "excoptional";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
+import { PositionsTable } from "~/components/Positions/PositionsTable";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -188,7 +189,10 @@ const Holdings = () => {
 			<RateOfReturn xirr={Option.of(xirr.value)} />
 
 			<div className="investments__positions">
-				<Positions securities={securities} holdings={holdingsToDisplay} />
+
+				<Positions>
+					<PositionsTable securities={securities} holdings={holdingsToDisplay} />
+				</Positions>
 			</div>
 
 			<div className="investments__sector-weight">
