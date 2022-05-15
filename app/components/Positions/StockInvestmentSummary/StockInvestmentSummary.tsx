@@ -1,10 +1,10 @@
-import { Holding } from "plaid";
-import { LinksFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
-import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
-import { WarningSign } from "./../WarningSign";
 import stockInvestmentSummaryStyles from "./styles/stockInvestmentSummary.css";
+import { Holding } from "plaid";
+import { Link } from "@remix-run/react";
+import { LinksFunction } from "@remix-run/node";
 import { Option } from "excoptional";
+import { WarningSign } from "~/components/WarningSign";
+import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
 
 export const links: LinksFunction = () => {
 	return [

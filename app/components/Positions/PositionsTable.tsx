@@ -1,7 +1,7 @@
 import { Option } from "excoptional";
 import { Holding, Security } from "plaid";
 import { useSearchableList } from "~/hooks/useSearchHoldings";
-import { StockInvestmentSummary } from "../StockInvestmentSummary/StockInvestmentSummary";
+import { StockInvestmentSummary } from "./StockInvestmentSummary/StockInvestmentSummary";
 import { aggregateHoldings, constructSecurityIdToTickerSymbol, constructTickerSymbolToSecurityId } from "./Positions";
 
 export const PositionsTable = (

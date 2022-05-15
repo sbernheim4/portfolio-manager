@@ -3,7 +3,7 @@ import { LinksFunction } from "@remix-run/node";
 import positionsStyles from './styles/positions.css';
 import {
 	links as stockInvestmentSummaryStyles
-} from '~/components/StockInvestmentSummary/StockInvestmentSummary';
+} from '~/components/Positions/StockInvestmentSummary/StockInvestmentSummary';
 import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 import { PositionsTable } from './PositionsTable';
 
