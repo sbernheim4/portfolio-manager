@@ -7,7 +7,7 @@ import { AccountsList } from '~/components/InvestmentAccounts';
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
-import { getInvestmentsAndAccountBalances } from "./positions";
+import { getInvestmentsAndAccountBalances } from "./investments";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {

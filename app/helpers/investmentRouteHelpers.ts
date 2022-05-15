@@ -2,7 +2,7 @@ import { differenceInMonths, subDays } from "date-fns";
 import { xirr as calculateXirr } from "@webcarrot/xirr";
 import { InvestmentTransaction } from "plaid";
 import { json } from "@remix-run/node";
-import { getInvestmentsAndAccountBalances } from "~/routes/positions";
+import { getInvestmentsAndAccountBalances } from "~/routes/investments";
 import { aggregateHoldings, constructTickerSymbolToSecurityId } from "~/components/Positions/Positions";
 
 /**

@@ -43,7 +43,7 @@ const IndividualInvestmentInformation = () => {
 	} = useOutletContext<{ securities: Security[], holdings: Holding[] }>();
 
 	const params = useParams();
-	const tickerSymbolOpt = Option.of(params.position);
+	const tickerSymbolOpt = Option.of(params.investment);
 
 	/*
 	 * Helper function to retrieve an account's name given its ID

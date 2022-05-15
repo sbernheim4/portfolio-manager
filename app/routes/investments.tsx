@@ -17,7 +17,7 @@ import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
-import { calculateNewXirr, searchActionHandler } from "~/helpers/positionRouteHelpers";
+import { calculateNewXirr, searchActionHandler } from "~/helpers/investmentRouteHelpers";
 import { Option } from "excoptional";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
