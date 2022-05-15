@@ -9,6 +9,7 @@ import {
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
+import investmentStyles from "~/styles/investments/investments.css";
 import { PositionsLoaderData } from "~/types/positions.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight } from "~/components/SectorWeight";
@@ -31,6 +32,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: 'stylesheet', href: investmentStyles },
 		...positionStyles(),
 	];
 };
@@ -180,13 +182,19 @@ const Holdings = () => {
 	useCheckInForXIRR(xirrDataLastUpdatedOn, todaysInvestmentBalances, xirr);
 
 	return (
-		<>
+		<div className="investments">
 			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
 			<RateOfReturn xirr={Option.of(xirr.value)} />
-			<Positions securities={securities} holdings={holdingsToDisplay} />
-			<SectorWeight securities={securities} holdings={holdings} />
-		</>
+
+			<div className="investments__positions">
+				<Positions securities={securities} holdings={holdingsToDisplay} />
+			</div>
+
+			<div className="investments__sector-weight">
+				<SectorWeight securities={securities} holdings={holdings} />
+			</div>
+		</div>
 	);
 
 };
