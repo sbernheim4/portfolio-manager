@@ -1,8 +1,9 @@
-import { Holding } from "plaid";
+import { Holding, Security } from "plaid";
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
 import { LinksFunction } from "@remix-run/node";
 import { dollarFormatter } from "~/helpers/formatters";
 import stockPieChartStyles from "./stockPieChart.css";
+import { aggregateHoldings, constructSecurityIdToTickerSymbol } from "../Positions";
 
 export const COLORS = [
 	'#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
@@ -24,13 +25,23 @@ export const links: LinksFunction = () => {
 };
 
 export const StockPieChart = (props: {
-	securityIdToTickerSymbol: Record<string, string | undefined>;
 	holdings: Holding[];
+	securities: Security[];
 }) => {
 
-	const { securityIdToTickerSymbol, holdings } = props;
+	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(
+		props.securities
+	);
 
-	const data = holdings.map(holding => {
+	// Note: A single stock can be held in multiple accounts. Plaid
+	// (correctly) returns the stock per each account that holds it. This
+	// means that if the same stock is held in two accounts, it will appear
+	// twice in the holdings list. We don't care about that however as we're
+	// focused on the total investment risk NOT the risk of each account.
+	// To dedupe these, we use this helper aggregateHoldings function
+	const aggregatedHoldings = aggregateHoldings(props.holdings);
+
+	const data = aggregatedHoldings.map(holding => {
 		const name = securityIdToTickerSymbol && securityIdToTickerSymbol[holding.security_id] ?
 			securityIdToTickerSymbol[holding.security_id] :
 			holding.security_id;
@@ -59,7 +70,7 @@ export const StockPieChart = (props: {
 						fill="#8884d8"
 						label={PieLabel}
 					>
-						{data.map((_, i) => <Cell key={_.securityId} fill={COLORS[i % COLORS.length]}/>)}
+						{data.map((_, i) => <Cell key={_.securityId} fill={COLORS[i % COLORS.length]} />)}
 					</Pie>
 
 					<Tooltip formatter={foo} />

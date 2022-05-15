@@ -4,8 +4,7 @@ import positionsStyles from './styles/positions.css';
 import {
 	links as stockInvestmentSummaryStyles
 } from '~/components/Positions/StockInvestmentSummary/StockInvestmentSummary';
-import { StockPieChart, links as StockPieChartStyles } from './StockPieChart/StockPieChart';
-import { PositionsTable } from './PositionsTable';
+import { links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 
 export const links: LinksFunction = () => {
 	return [
@@ -102,33 +101,14 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 };
 
 export const Positions = (
-	props: { securities: Security[]; holdings: Holding[] }
+	props: { children: JSX.Element }
 ) => {
-
-	const { securities, holdings } = props;
-
-	// Note: A single stock can be held in multiple accounts. Plaid
-	// (correctly) returns the stock per each account that holds it. This
-	// means that if the same stock is held in two accounts, it will appear
-	// twice in the holdings list. We don't care about that however as we're
-	// focused on the total investment risk NOT the risk of each account.
-	// To dedupe these, we use this helper aggregateHoldings function
-	const aggregatedHoldings = aggregateHoldings(holdings);
-
-	const securityIdToTickerSymbol = constructSecurityIdToTickerSymbol(
-		securities
-	);
 
 	return (
 		<div className="positions">
 			<h1>Your Positions</h1>
 
-			<PositionsTable securities={securities} holdings={holdings}/>
-
-			<StockPieChart
-				securityIdToTickerSymbol={securityIdToTickerSymbol}
-				holdings={aggregatedHoldings}
-			/>
+			{props.children}
 		</div>
 	);
 };
