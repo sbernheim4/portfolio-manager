@@ -10,13 +10,14 @@ import networthStyles from "~/styles/networth/networth.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
 import { AccountsList } from "~/components/InvestmentAccounts";
-import { decimalFormatter, dollarFormatter } from "~/helpers/formatters";
+import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isClientSideJSEnabled } from "~/helpers/isClientSideJSEnabled";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
+import { collapseDollarAmountText } from "~/helpers/collapseDollarAmountText";
 
 export type AccountBalanceChartData = Array<{
 	[key: string]: number;
@@ -324,7 +325,7 @@ const Networth = () => {
 
 						<XAxis style={axisStyles} interval={getXAxisInterval(accountBalancesChartData.length)} dataKey="date" />
 
-						<YAxis style={axisStyles} tickFormatter={tickFormatter} domain={[0, getMaxDomain(accountBalancesChartData)]} />
+						<YAxis style={axisStyles} tickFormatter={collapseDollarAmountText} domain={[0, getMaxDomain(accountBalancesChartData)]} />
 
 						<Tooltip formatter={tooltipFormatter} />
 
@@ -379,18 +380,6 @@ const getMaxDomain = (data: AccountBalanceChartData) => {
 	const maxDomain = Math.round(largestAccountBalance / 1000) * 1000
 
 	return maxDomain;
-};
-
-export const tickFormatter = (dollarAmount: number) => {
-	if (dollarAmount >= 100000) {
-		return '$' + decimalFormatter.format(dollarAmount / 10000) + 'K'
-	} else if (dollarAmount >= 10000) {
-		return '$' + decimalFormatter.format(dollarAmount / 1000) + 'K'
-	} else if (dollarAmount >= 1000) {
-		return '$' + decimalFormatter.format(dollarAmount / 1000) + 'K'
-	} else {
-		return '$' + decimalFormatter.format(dollarAmount);
-	};
 };
 
 const getXAxisInterval = (numberOfInputs: number) => {
