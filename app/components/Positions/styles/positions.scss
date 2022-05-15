@@ -1,11 +1,13 @@
 .positions {
+	padding: 30px;
 
 	h1 {
+
 	}
 
 	h2 {
-	}
 
+	}
 	&__search {
 		height: 40px;
 		margin: 40px auto;
@@ -14,11 +16,34 @@
 
 	.investment-line-items {
 		margin: 0 auto;
-        // width: 80%;
-		// display: flex;
-		// flex-direction: row;
-		// justify-content: center;
-		// flex-wrap: wrap;
+
+		thead {
+
+			tr {
+
+				th:first-child {
+					text-align: left;
+				}
+
+				th {
+					padding-bottom: 10px;
+					text-align: right;
+					font-size: 14px;
+				}
+			}
+		}
+
+		.investment-line-item {
+			text-align: right;
+		}
+
+		.investment-line-item__ticker {
+			text-align: left;
+		}
+
+		.investment-line-item__warning-symbol {
+			text-align: center;
+		}
 	}
 
 	.noJS {

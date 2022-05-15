@@ -1,8 +1,33 @@
-.networth__chart {
+.networth {
+  min-height: 100vh;
+  margin: 0;
+  padding: 30px;
+  background-color: rgb(10, 28, 59);
+  color: #D1D1D1;
+}
+.networth h1 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+.networth__accounts-list {
+  padding: 30px;
   width: 100%;
+  background: rgb(13, 42, 89);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 5px;
+}
+.networth__chart {
+  padding: 30px;
+  width: 100%;
+  background: rgb(13, 42, 89);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 5px;
 }
 .networth__chart__checkbox-container input {
   margin-right: 5px;
+}
+.recharts-responsive-container {
+  margin-left: -15px;
 }
 
 /*# sourceMappingURL=networth.css.map */

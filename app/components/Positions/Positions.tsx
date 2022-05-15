@@ -164,7 +164,7 @@ export const Positions = (
 				<thead>
 					<tr>
 						<th>Ticker</th>
-						<th>Quantity (shares)</th>
+						<th>Quantity</th>
 						<th>Percentage</th>
 						<th>Dollar Value</th>
 						<th>Above Threshold</th>

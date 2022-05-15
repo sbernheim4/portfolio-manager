@@ -1,7 +1,7 @@
 import { AccountBase } from "plaid";
 import { ActionFunction, json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
-import { Area, AreaChart, CartesianAxis, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { isAfter, isToday } from "date-fns";
 import { useEffect, useState } from "react";
 
@@ -10,7 +10,7 @@ import networthStyles from "~/styles/networth/networth.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
 import { AccountsList } from "~/components/InvestmentAccounts";
-import { dollarFormatter } from "~/helpers/formatters";
+import { decimalFormatter, dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
@@ -215,6 +215,12 @@ export const action: ActionFunction = async ({ request }) => {
 
 };
 
+const axisStyles = {
+	fontSize: '11px',
+	fontWeight: 'regular',
+	fill: '#D1D1D1'
+};
+
 const Networth = () => {
 	const {
 		accountBalancesChartData,
@@ -263,8 +269,10 @@ const Networth = () => {
 
 	return (
 		<div className="networth">
-			<h1>Your Portfolio Balance</h1>
-			<AccountsList balances={balances} />
+			<h1>Portfolio Balance</h1>
+			<div className="networth__accounts-list">
+				<AccountsList balances={balances} />
+			</div>
 
 			{
 				// If JS is disabled, allow the user to store today's balances
@@ -314,11 +322,9 @@ const Networth = () => {
 				<ResponsiveContainer width="100%" height={250}>
 					<AreaChart data={accountBalancesChartData}>
 
-						<CartesianAxis />
+						<XAxis style={axisStyles} interval={getXAxisInterval(accountBalancesChartData.length)} dataKey="date" />
 
-						<XAxis interval={6} dataKey="date" />
-
-						<YAxis width={85} tickFormatter={(value) => dollarFormatter.format(value)} domain={[0, 'dataMax']} />
+						<YAxis style={axisStyles} tickFormatter={tickFormatter} domain={[0, getMaxDomain(accountBalancesChartData)]} />
 
 						<Tooltip formatter={tooltipFormatter} />
 
@@ -354,7 +360,7 @@ const Networth = () => {
 						})}
 
 					</AreaChart>
-				</ResponsiveContainer>;
+				</ResponsiveContainer>
 
 			</div>
 
@@ -367,4 +373,36 @@ const tooltipFormatter = (dollarAmount: number) => {
 	return dollarFormatter.format(dollarAmount);
 };
 
+const getMaxDomain = (data: AccountBalanceChartData) => {
+	const totalBalances = data.map(x => x.totalBalance)
+	const largestAccountBalance = Math.max(...totalBalances);
+	const maxDomain = Math.round(largestAccountBalance / 1000) * 1000
+
+	return maxDomain;
+};
+
+export const tickFormatter = (dollarAmount: number) => {
+	if (dollarAmount >= 100000) {
+		return '$' + decimalFormatter.format(dollarAmount / 10000) + 'K'
+	} else if (dollarAmount >= 10000) {
+		return '$' + decimalFormatter.format(dollarAmount / 1000) + 'K'
+	} else if (dollarAmount >= 1000) {
+		return '$' + decimalFormatter.format(dollarAmount / 1000) + 'K'
+	} else {
+		return '$' + decimalFormatter.format(dollarAmount);
+	};
+};
+
+const getXAxisInterval = (numberOfInputs: number) => {
+	if (numberOfInputs <= 3) {
+		return 1
+	} else if (numberOfInputs <= 7) {
+		return 2
+	} else if (numberOfInputs <= 20) {
+		return 4
+	} else {
+		return Math.floor(Math.log(numberOfInputs));
+	}
+
+};
 export default Networth;
