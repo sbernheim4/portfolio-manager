@@ -67,7 +67,7 @@ const Accounts = () => {
 		<div className="accounts">
 			<h1 className="accounts__name">{account.name}</h1>
 
-			<Positions securities={securities} holdings={holdingsInCurrentAccount} />
+			{/* <Positions securities={securities} holdings={holdingsInCurrentAccount} /> */}
 		</div>
 	);
 };

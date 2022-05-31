@@ -1,8 +1,19 @@
+:root {
+  --accounts-bg-color: rgb(10, 34, 57);
+  --accounts-contrast-color: rgb(29 49 83);
+  --accounts-font-color: #D1D1D1;
+}
+
 .accounts {
-  margin: 30px;
+  background: var(--accounts-bg-color);
+  color: var(--accounts-font-color);
+  min-height: 100vh;
 }
 .accounts__balances {
-  margin-bottom: 30px;
+  padding: 30px;
+}
+.accounts__list {
+  padding: 30px;
 }
 
 /*# sourceMappingURL=accounts.css.map */
