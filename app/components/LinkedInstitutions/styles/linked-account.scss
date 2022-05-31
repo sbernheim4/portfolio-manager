@@ -1,0 +1,36 @@
+:root {
+	--linked-institutions-ontrast-color: rgb(29 49 83);
+	--linked-institutions-investments-bg-color: rgb(10, 34, 57);
+	--linked-institutions-investments-font-color: #D1D1D1;
+}
+
+.linked-institutions {
+	background: var(--linked-institutions-investments-bg-color);
+	color: var(--linked-institutions-investments-font-color);
+
+	&__container {
+		display: flex;
+		align-items: flex-start;
+		flex-direction: column;
+
+		&__modify {
+			margin: 5px 5px 5px 0;
+			display: flex;
+			justify-content: space-evenly;
+			align-items: center;
+
+			p {
+				width: 250px;
+
+			}
+
+			button {
+				width: 150px;
+				height: auto;
+				padding: 10px;
+			}
+		}
+	}
+
+}
+

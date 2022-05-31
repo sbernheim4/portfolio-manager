@@ -104,13 +104,17 @@ const Accounts = () => {
 
 			<div className="accounts__list">
 
-				<AccountsList balances={investmentAccounts}>
-					<h2>Investment and Brokerage Accounts</h2>
-				</AccountsList>
+				<div className="accounts__list__investment">
+					<AccountsList balances={investmentAccounts}>
+						<h2>Investment and Brokerage Accounts</h2>
+					</AccountsList>
+				</div>
 
-				<AccountsList balances={nonInvestmentAccounts}>
-					<h2>Cash and Loan Accounts</h2>
-				</AccountsList>
+				<div className="accounts__list__cash">
+					<AccountsList balances={nonInvestmentAccounts}>
+						<h2>Cash and Loan Accounts</h2>
+					</AccountsList>
+				</div>
 
 			</div>
 

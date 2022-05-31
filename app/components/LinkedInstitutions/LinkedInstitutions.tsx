@@ -39,7 +39,7 @@ const LinkedInstitution = (
 	const { linkedInstitution, itemId } = props;
 
 	return (
-		<div className="manage-accounts__container__modify">
+		<div className="linked-institutions__container__modify">
 
 			<p>{linkedInstitution.name}</p>
 
