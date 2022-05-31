@@ -8,6 +8,7 @@ import { getUserNameFromSession } from "~/helpers/session";
 import { positiveAccountTypes } from "~/components/NetworthComponent";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
+import accountStyles from './../../styles/accounts/accounts.css';
 
 export const meta: MetaFunction = () => {
 	return {
@@ -17,7 +18,9 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => {
-	return [];
+	return [
+		{ rel: 'stylesheet', href: accountStyles },
+	];
 };
 
 export const loader: LoaderFunction = async (args) => {
@@ -97,7 +100,7 @@ const Accounts = () => {
 	return (
 		<div className="accounts">
 
-			<h1>Account Balances: {dollarFormatter.format(totalBalance)}</h1>
+			<h1 className="accounts__balances">Account Balances: {dollarFormatter.format(totalBalance)}</h1>
 
 			<AccountsList balances={investmentAccounts}>
 				<h2>Investment and Brokerage Accounts</h2>
