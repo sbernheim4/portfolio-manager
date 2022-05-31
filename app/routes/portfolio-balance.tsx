@@ -6,7 +6,7 @@ import { isAfter, isToday } from "date-fns";
 import { useEffect, useState } from "react";
 
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
-import networthStyles from "~/styles/networth/networth.css";
+import networthStyles from "~/styles/portfolio-balance/portfolio-balance.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
 import { AccountsList } from "~/components/InvestmentAccounts";

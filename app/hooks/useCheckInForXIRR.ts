@@ -1,7 +1,7 @@
 import { isToday } from "date-fns";
 import { useEffect } from "react";
 import { useSubmit } from "@remix-run/react";
-import { NewXirrCalculation } from "~/types/positions.types";
+import { NewXirrCalculation } from "~/types/investments.types";
 
 export const useCheckInForXIRR = (
 	xirrDataLastUpdatedOn: string | undefined,

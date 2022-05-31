@@ -60,7 +60,7 @@ const Dashboard = () => {
 	const { holdings, securities, balances } = investmentData;
 	return (
 		<div className="dashboard">
-			<Positions securities={securities} holdings={holdings} />
+			{/* <Positions securities={securities} holdings={holdings} /> */}
 
 			<h1>Your Portfolio Balance</h1>
 			<AccountsList balances={balances} />

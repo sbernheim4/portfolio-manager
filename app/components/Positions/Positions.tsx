@@ -63,9 +63,12 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 			...holding,
 			quantity: existingHoldingEntry.quantity + holding.quantity,
 			institution_value: existingHoldingEntry.institution_value + holding.institution_value,
+
 			// TODO: Need to figure out how to calculate the cost basis across all accounts that
 			// hold this security
+			//
 			// cost_basis:
+			//
 		};
 
 		// Remove the existing holding entry from the list - it will be replaced
@@ -100,6 +103,11 @@ export const aggregateHoldings = (holdings: Holding[]) => {
 
 };
 
+/**
+ * Positions Container Component
+ *
+ * Can display Positions Table, Stock Pie Chart, Stock Investment Summary
+ */
 export const Positions = (
 	props: { children: JSX.Element }
 ) => {
