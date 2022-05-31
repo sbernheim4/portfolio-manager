@@ -9,6 +9,7 @@ import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
 import { getInvestmentsAndAccountBalances } from "./investments";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
+import { PositionsTable } from "~/components/Positions/PositionsTable";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -60,7 +61,9 @@ const Dashboard = () => {
 	const { holdings, securities, balances } = investmentData;
 	return (
 		<div className="dashboard">
-			{/* <Positions securities={securities} holdings={holdings} /> */}
+			<Positions>
+				<PositionsTable securities={securities} holdings={holdings} />
+			</Positions>
 
 			<h1>Your Portfolio Balance</h1>
 			<AccountsList balances={balances} />

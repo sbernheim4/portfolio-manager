@@ -1,13 +1,30 @@
+:root {
+  --investments-contrast-color: rgb(29 49 83);
+  --investments-bg-color: rgb(10, 34, 57);
+  --investments-font-color: #D1D1D1;
+}
+
 .investments {
-	margin-top: 30px;
+	color: var(--investments-font-color);
 	background-color: var(--positions-bg-color);
+
 
 	&__positions {
 		margin: 0 auto;
 		max-width: 900px;
 		width: 100%;
 		padding: 30px;
-		background: var(--positions-contrast-color);
+		background: var(--investments-contrast-color);
+		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
+		border-radius: 5px;
+	}
+
+	&__irr {
+		margin: 10px auto;
+		max-width: 900px;
+		width: 100%;
+		padding: 30px;
+		background: var(--investments-contrast-color);
 		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
 		border-radius: 5px;
 	}
@@ -15,8 +32,19 @@
 	&__sector-weight {
 		padding: 30px;
 		width: 100%;
-		background: var(--positions-contrast-color);
+		background: var(--investments-contrast-color);
 		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
 		border-radius: 5px;
 	}
+
+	&__position {
+		margin: 10px auto;
+		max-width: 900px;
+		width: 100%;
+		padding: 30px;
+		background: var(--investments-contrast-color);
+		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
+		border-radius: 5px;
+	}
+
 }

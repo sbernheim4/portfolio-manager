@@ -114,7 +114,7 @@ const IndividualInvestmentInformation = () => {
 		});
 
 		return (
-			<div className="investment">
+			<div className="investments__position">
 				<h1>Accounts Holding {tickerSymbol}</h1>
 
 				<h3>Total number of shares: {shareQuantityFormatted}</h3>

@@ -8,3 +8,4 @@ node_modules
 api/
 app/env.sh
 .vercel/
+**/*.css

@@ -10,7 +10,7 @@ export const RateOfReturn = (props: {
 
 	return (
 		<>
-			<h2>{text}</h2>
+			<h2 className="investments__irr">{text}</h2>
 		</>
 	);
 

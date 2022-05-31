@@ -184,16 +184,16 @@ const Holdings = () => {
 
 	return (
 		<div className="investments">
-			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
-
-			<RateOfReturn xirr={Option.of(xirr.value)} />
-
 			<div className="investments__positions">
 
 				<Positions>
 					<PositionsTable securities={securities} holdings={holdingsToDisplay} />
 				</Positions>
 			</div>
+
+			<RateOfReturn xirr={Option.of(xirr.value)} />
+
+			<Outlet context={{ securities, holdings, holdingsToDisplay }} />
 
 			<div className="investments__sector-weight">
 				<SectorWeight securities={securities} holdings={holdings} />
