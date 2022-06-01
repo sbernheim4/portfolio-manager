@@ -27,7 +27,7 @@ export const useCheckInForXIRR = (
 
 		data.set("_action", "saveNewXirrData");
 
-		submit(data, { method: "post", action: "/positions" });
+		submit(data, { method: "post", action: "/investments" });
 
 	}, []);
 
