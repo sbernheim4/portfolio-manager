@@ -1,21 +1,25 @@
-import { LoaderFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { validateIsLoggedIn } from "~/remix-helpers";
+import { LinksFunction } from "@remix-run/react/routeModules";
+import homeStyles from "~/styles/home/home.css";
 
-export const loader: LoaderFunction = async ({ request }) => {
-	await validateIsLoggedIn(request);
+export const links: LinksFunction = () => {
 
-	return null;
-};
-
+	return [
+		{ rel: 'stylesheet', href: homeStyles },
+	]
+}
 export default () => {
 
 	return (
-		<div>
-			<h1>Welcome to the homepage</h1>
-			<Link to={'/manage-accounts'}>Link an account</Link>
-			<br />
-			<Link to={'/dashboard'}>Go to the dashboard</Link>
+		<div className="home">
+			<h1>Your Portfolio Management Tool</h1>
+
+			<h4>YNAB for Investing</h4>
+
+			<div className="home__links">
+				<Link to={'/sign-in'}>Sign In</Link>
+				<Link to={'/sign-up'}>Sign Up</Link>
+			</div>
 		</div>
 	);
 

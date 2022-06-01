@@ -1,0 +1,26 @@
+.home {
+	margin: 30px;
+
+
+	h1 {
+
+
+	}
+
+	h5 {
+
+	}
+
+	&__links {
+		margin: 10px 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+
+		a {
+			margin: 5px 0;
+		}
+	}
+
+}
