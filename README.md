@@ -2,6 +2,26 @@
 
 - [Remix Docs](https://remix.run/docs)
 
+## Environment Variables
+Some environment variables will be needed before this project can be run locally
+or in the cloud. This file will need to be `source`d  before starting the server
+locally.
+
+1. Create an environment variable file: `touch app/env.sh`, or set them via your
+   server's UI.
+2. Set the following environment variables:
+
+```sh
+export PLAID_ENV=
+export PLAID_CLIENT_ID=
+export PLAID_SECRET=
+export MONGODB_PWD=
+```
+
+## Database
+This project is set up to use MongoDB though you can swap out the underlying
+storage mechanism by updating the functions in `db.server.ts`.
+
 ## Deployment
 
 After having run the `create-remix` command and selected "Vercel" as a deployment target, you only need to [import your Git repository](https://vercel.com/new) into Vercel, and it will be deployed.
