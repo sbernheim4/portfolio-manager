@@ -4,9 +4,10 @@
   "description": "",
   "license": "",
   "scripts": {
-    "build": "remix build",
+    "build": "npm run sass:build && remix build",
     "dev": "remix dev",
-    "sass": "sass --watch app/:app/"
+    "sass": "sass --watch app/:app/",
+	"sass:build": "sass app/:app/"
   },
   "dependencies": {
     "@remix-run/express": "^1.4.1",
