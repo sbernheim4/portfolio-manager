@@ -99,8 +99,9 @@ const Accounts = () => {
 
 	return (
 		<div className="accounts">
+			<h1>Accounts</h1>
 
-			<h1 className="accounts__balances">Account Balances: {dollarFormatter.format(totalBalance)}</h1>
+			<h2 className="accounts__balances">Account Balances: {dollarFormatter.format(totalBalance)}</h2>
 
 			<div className="accounts__list">
 

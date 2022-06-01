@@ -9,3 +9,4 @@ api/
 app/env.sh
 .vercel/
 **/*.css
+**/*.css.map
