@@ -18,6 +18,7 @@ import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/L
 import { getUserNameFromSession } from "~/helpers/session";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import manageAccountStyles from '~/styles/manage-accounts/manage-accounts.css';
+import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -162,6 +163,8 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 
 const LinkAccount = () => {
 
+	useLoggedIn();
+
 	const loaderData = useLoaderData<ManageAccountsLoader>();
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
@@ -188,8 +191,10 @@ const LinkAccount = () => {
 
 		<div className="manage-accounts">
 
+			<h1>Manage Accounts</h1>
+
 			<div className="manage-accounts__link">
-				<h1>Link A New Account</h1>
+				<h2>Link A New Account</h2>
 
 				{
 					linkToken.length ?
@@ -199,7 +204,7 @@ const LinkAccount = () => {
 			</div>
 
 			<div className="manage-accounts__linked">
-				<h1>Linked Accounts</h1>
+				<h2>Linked Institutions</h2>
 
 				{/* <p>Not all linked accounts will be used, only investment and brokerage accounts</p> */}
 

@@ -186,6 +186,8 @@ const Holdings = () => {
 	return (
 		<div className="investments">
 
+			<br />
+
 			<div className="investments__positions">
 				<Positions>
 					<PositionsTable securities={securities} holdings={holdingsToDisplay} />
@@ -199,6 +201,9 @@ const Holdings = () => {
 			<div className="investments__sector-weight">
 				<SectorWeight securities={securities} holdings={holdings} />
 			</div>
+
+			<br />
+
 		</div>
 	);
 

@@ -1,7 +1,7 @@
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
-import dashboardStyles from './../styles/dashboard.css';
+import dashboardStyles from './../styles/dashboard/dashboard.css';
 import { BalancesHoldingsSecurities } from '~/types/index';
 import { AccountsList } from '~/components/InvestmentAccounts';
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
@@ -20,8 +20,8 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: "stylesheet", href: dashboardStyles },
 		...positionsStyles(),
-		{ rel: "stylesheet", href: dashboardStyles }
 	];
 };
 
@@ -61,12 +61,21 @@ const Dashboard = () => {
 	const { holdings, securities, balances } = investmentData;
 	return (
 		<div className="dashboard">
-			<Positions>
-				<PositionsTable securities={securities} holdings={holdings} />
-			</Positions>
 
-			<h1>Your Portfolio Balance</h1>
-			<AccountsList balances={balances} />
+			<h1>Dashboard</h1>
+
+			<div className="dashboard__positions">
+				<Positions>
+					<PositionsTable securities={securities} holdings={holdings} />
+				</Positions>
+			</div>
+
+			<br />
+
+			<div className="dashboard__account-list">
+				<h1>Your Portfolio Balance</h1>
+				<AccountsList balances={balances} />
+			</div>
 		</div>
 	);
 

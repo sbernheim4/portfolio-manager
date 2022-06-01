@@ -3,6 +3,11 @@
 	background: var(--bg-color);
 	color: var(--font-color);
 
+	h1 {
+		text-align: center;
+		margin-bottom: 15px;
+	}
+
 	&__link {
 		margin-bottom: 120px;
 
