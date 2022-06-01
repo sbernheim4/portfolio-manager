@@ -2,7 +2,6 @@ import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } fro
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../styles/dashboard/dashboard.css';
-import { BalancesHoldingsSecurities } from '~/types/index';
 import { AccountsList } from '~/components/InvestmentAccounts';
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { validateIsLoggedIn } from "~/remix-helpers";
@@ -10,6 +9,7 @@ import { getUserNameFromSession } from "~/helpers/session";
 import { getInvestmentsAndAccountBalances } from "./investments";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { PositionsTable } from "~/components/Positions/PositionsTable";
+import { AccountBase, Holding, Security } from "plaid";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -52,6 +52,12 @@ export const action: ActionFunction = async ({ request }) => {
 		default:
 			return null;
 	}
+};
+
+type BalancesHoldingsSecurities = {
+	balances: AccountBase[];
+	holdings: Holding[];
+	securities: Security[];
 };
 
 const Dashboard = () => {

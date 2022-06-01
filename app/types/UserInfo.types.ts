@@ -1,4 +1,4 @@
-import { ValueOf } from ".";
+export type ValueOf<T> = T[keyof T];
 
 export type AccountBalances = Array<AccountIdToValue & {
 	"date": string,

@@ -1,4 +1,4 @@
-import { AccountBase, Holding } from "plaid";
+import { AccountBase, Holding, Security } from "plaid";
 import {
 	ActionFunction,
 	json,
@@ -7,7 +7,6 @@ import {
 	MetaFunction
 } from "@remix-run/node";
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
-import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
 import investmentStyles from "~/styles/investments/investments.css";
 import { PositionsLoaderData } from "~/types/investments.types";
@@ -37,6 +36,11 @@ export const links: LinksFunction = () => {
 		...sectorWeightLinks(),
 		{ rel: 'stylesheet', href: investmentStyles },
 	];
+};
+
+type HoldingsSecurities = {
+	holdings: Holding[];
+	securities: Security[];
 };
 
 /**

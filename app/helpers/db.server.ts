@@ -72,8 +72,6 @@ export const getValuesFromDB = async (
 	const userInfoCollection = await getUserInfoCollection();
 	const userInfo = await userInfoCollection.findOne({ user: username }) as unknown as UserInfo;
 
-
-
 	const data = properties.reduce((acc, prop) => {
 
 		const value = userInfo[prop];
