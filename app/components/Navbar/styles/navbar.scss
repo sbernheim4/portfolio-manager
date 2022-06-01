@@ -2,7 +2,7 @@ nav {
 	margin: 20px auto 0 auto;
 	padding: 10px 0;
 	max-width: 1200px;
-	min-height: 45px;
+	min-height: var(--navbar-height);
 	border-bottom: 1px solid black;
 	display: flex;
 	justify-content: space-evenly;

@@ -1,11 +1,5 @@
-:root {
-  --positions-contrast-color: rgb(29 49 83);
-  --positions-bg-color: rgb(10, 34, 57);
-  --positions-font-color: #D1D1D1;
-}
-
 .positions {
-	color: var(--positions-font-color);
+	color: var(--font-color);
 	padding: 30px;
 
 	h1 {
@@ -17,11 +11,11 @@
 		height: 40px;
 		margin: 40px auto;
 		margin-top: 15px;
-		color: var(--positions-font-color);
+		color: var(--font-color);
 	}
 
 	::placeholder {
-		color: var(--positions-font-color);
+		color: var(--font-color);
 		opacity: 1;
 	}
 

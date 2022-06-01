@@ -1,14 +1,7 @@
-:root {
-  --accounts-bg-color: rgb(10, 34, 57);
-  --accounts-contrast-color: rgb(29 49 83);
-  --accounts-font-color: #D1D1D1;
-}
-
 .accounts {
 
-	background: var(--accounts-bg-color);
-	color: var(--accounts-font-color);
-	min-height: 100vh;
+	background: var(--bg-color);
+	color: var(--font-color);
 
 	&__balances {
 		padding: 30px 30px 0px 30px;

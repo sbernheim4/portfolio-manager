@@ -1,15 +1,9 @@
-:root {
-  --networth-bg-color: rgb(10, 34, 57);
-  --networth-contrast-color: rgb(29 49 83);
-  --networth-font-color: #D1D1D1;
-}
-
 .networth {
 	min-height: 100vh;
 	margin: 0;
 	padding: 30px;
-	background-color: var(--networth-bg-color);
-	color: var(--networth-font-color);
+	background-color: var(--bg-color);
+	color: var(--font-color);
 
 	h1 {
 		margin-bottom: 15px;
@@ -19,7 +13,7 @@
 	&__accounts-list {
 		padding: 30px;
 		width: 100%;
-		background: var(--networth-contrast-color);
+		background: var(--contrast-color);
 		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
 		border-radius: 5px;
 	}
@@ -27,7 +21,7 @@
 	&__chart {
 		padding: 30px;
 		width: 100%;
-		background: var(--networth-contrast-color);
+		background: var(--contrast-color);
 		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
 		border-radius: 5px;
 

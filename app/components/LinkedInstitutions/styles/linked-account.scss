@@ -1,12 +1,6 @@
-:root {
-	--linked-institutions-ontrast-color: rgb(29 49 83);
-	--linked-institutions-investments-bg-color: rgb(10, 34, 57);
-	--linked-institutions-investments-font-color: #D1D1D1;
-}
-
 .linked-institutions {
-	background: var(--linked-institutions-investments-bg-color);
-	color: var(--linked-institutions-investments-font-color);
+	background: var(--bg-color);
+	color: var(--font-color);
 
 	&__container {
 		display: flex;
