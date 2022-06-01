@@ -10,9 +10,9 @@ import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { HoldingsSecurities } from '~/types/index';
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
 import investmentStyles from "~/styles/investments/investments.css";
-import { PositionsLoaderData } from "~/types/positions.types";
+import { PositionsLoaderData } from "~/types/investments.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
-import { SectorWeight } from "~/components/SectorWeight";
+import { SectorWeight, links as sectorWeightLinks } from "~/components/SectorWeight/SectorWeight";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
@@ -33,8 +33,9 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: 'stylesheet', href: investmentStyles },
 		...positionStyles(),
+		...sectorWeightLinks(),
+		{ rel: 'stylesheet', href: investmentStyles },
 	];
 };
 
@@ -184,8 +185,8 @@ const Holdings = () => {
 
 	return (
 		<div className="investments">
-			<div className="investments__positions">
 
+			<div className="investments__positions">
 				<Positions>
 					<PositionsTable securities={securities} holdings={holdingsToDisplay} />
 				</Positions>

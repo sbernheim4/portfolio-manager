@@ -1,5 +1,13 @@
+import { LinksFunction } from "@remix-run/node";
 import { Holding, Security } from "plaid";
 import { dollarFormatter, percentageFormatter } from "~/helpers/formatters";
+import sectorWeightStyles from './styles/sector-weight.css';
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: 'stylesheet', href: sectorWeightStyles },
+	];
+};
 
 export const SectorWeight = (
 	props: { securities: Security[], holdings: Holding[] }
@@ -43,29 +51,42 @@ export const SectorWeight = (
 	);
 
 	return (
-		<>
-			<h1>Portfolio by Weights</h1>
+		<div className="sector-weights">
+			<h1>Portfolio Weights</h1>
 
 			<h3>Accounts by Type</h3>
 
-			{
-				Object.keys(investmentTypeToValue).map(type => {
+			<table className="sector-weights__type">
 
-					const dollarAmount = dollarFormatter.format(investmentTypeToValue[type]);
-					const percentage = investmentTypeToValue[type] / totalInvested;
-					const formattedPercentage = percentageFormatter.format(percentage);
-					const formattedType = type[0].toUpperCase() + type.slice(1);
+				<tbody>
+					{
+						Object.keys(investmentTypeToValue).map(type => {
 
-					return <p key={type}>{formattedType}: {dollarAmount} - {formattedPercentage}</p>
-				})
-			}
+							const dollarAmount = dollarFormatter.format(investmentTypeToValue[type]);
+							const percentage = investmentTypeToValue[type] / totalInvested;
+							const formattedPercentage = percentageFormatter.format(percentage);
+							const formattedType = type[0].toUpperCase() + type.slice(1);
+
+							return (
+								<tr>
+									<td>{formattedType}</td>
+									<td>{dollarAmount}</td>
+									<td>{formattedPercentage}</td>
+								</tr>
+							);
+						})
+					}
+				</tbody>
+
+			</table>
+
 
 			{/* <h3>Weights by Sector</h3> */}
 
 			{/* TODO: Find an API or download data of security --> Sector */}
 			{/* Might need to use polygon.io --> Free api keys */}
 
-		</>
+		</div>
 	);
 
 };
