@@ -17,7 +17,7 @@ export const LinkedInstitutions = (
 	const { linkedInstitutions } = props;
 
 	return (
-		<>
+		<div className="linked-institutions">
 			{
 				linkedInstitutions.map((institution) => {
 					return <LinkedInstitution
@@ -27,7 +27,7 @@ export const LinkedInstitutions = (
 					/>
 				})
 			}
-		</>
+		</div>
 	);
 
 };
@@ -39,13 +39,13 @@ const LinkedInstitution = (
 	const { linkedInstitution, itemId } = props;
 
 	return (
-		<div className="linked-institutions__container__modify">
+		<div className="linked-institutions__modify">
 
 			<p>{linkedInstitution.name}</p>
 
 			<Form action="/manage-accounts" method="post">
-				<input type="submit" value="Unlink Instituion" />
-				<input type="hidden" name="_action" value="unlinkAccount" readOnly />
+				<input type="submit" value="Unlink Instituion" className="linked-institutions__modify__unlink" />
+				<input type="hidden" name="_action" value="unlinkAccount" readOnly  />
 				<input type="hidden" value={itemId} name="itemId" readOnly />
 			</Form>
 

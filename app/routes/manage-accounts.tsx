@@ -17,6 +17,7 @@ import { saveNewAccessToken } from "~/helpers/db.server";
 import { LinkedInstitutions, links as linkedAccountStyles } from "~/components/LinkedInstitutions/LinkedInstitutions";
 import { getUserNameFromSession } from "~/helpers/session";
 import { validateIsLoggedIn } from "~/remix-helpers";
+import manageAccountStyles from '~/styles/manage-accounts/manage-accounts.css';
 
 export const meta: MetaFunction = () => {
 	return {
@@ -27,6 +28,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: 'stylesheet', href: manageAccountStyles },
 		...linkedAccountStyles(),
 	];
 };
@@ -186,20 +188,28 @@ const LinkAccount = () => {
 
 		<div className="manage-accounts">
 
-			<h1>Link A New Account</h1>
+			<div className="manage-accounts__link">
+				<h1>Link A New Account</h1>
 
-			{
-				linkToken.length ?
-					<Link linkToken={linkToken} setPublicToken={setPublicToken} /> :
-					null
-			}
-
-			<h1>Linked Accounts</h1>
-			<p>Not all linked accounts will be used, only investment and brokerage accounts</p>
-			<br />
-			<div className="manage-accounts__container">
-				<LinkedInstitutions linkedInstitutions={linkedInstitutions} />
+				{
+					linkToken.length ?
+						<Link linkToken={linkToken} setPublicToken={setPublicToken} /> :
+						null
+				}
 			</div>
+
+			<div className="manage-accounts__linked">
+				<h1>Linked Accounts</h1>
+
+				{/* <p>Not all linked accounts will be used, only investment and brokerage accounts</p> */}
+
+				<br />
+
+				<div className="manage-accounts__container">
+					<LinkedInstitutions linkedInstitutions={linkedInstitutions} />
+				</div>
+			</div>
+
 
 		</div>
 

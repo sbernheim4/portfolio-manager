@@ -1,0 +1,26 @@
+.manage-accounts {
+	padding: 30px;
+	background: var(--bg-color);
+	color: var(--font-color);
+
+	&__link {
+		margin-bottom: 120px;
+
+		h1 {
+			margin-bottom: 10px;
+
+		}
+
+		button {
+			padding: 10px 25px;
+			cursor: pointer;
+		}
+
+	}
+
+	&__linked {
+
+	}
+
+
+}
