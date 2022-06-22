@@ -6,6 +6,8 @@ import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidU
 import { getUserNameFromSession } from "~/helpers/session";
 import { lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 import { StockPieChart } from "~/components/Positions/StockPieChart/StockPieChart";
+import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
+import accountIdStyles from './../../styles/accounts/accountId.css';
 
 export const meta: MetaFunction = () => {
 	return {
@@ -16,7 +18,8 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => {
 	return [
-		...positionsStyles()
+		{ rel: "stylesheet", href: accountIdStyles },
+		...positionsStyles(),
 	];
 };
 
@@ -65,12 +68,12 @@ const Accounts = () => {
 	}
 
 	return (
-		<div className="accounts">
-			<h1 className="accounts__name">{account.name}</h1>
+		<div className="account-id">
+			<h1 className="account-id__name">{account.name}</h1>
 
 			<Positions>
+				<PositionsTable holdings={holdingsInCurrentAccount} securities={securities} />
 				<StockPieChart holdings={holdingsInCurrentAccount} securities={securities} />
-
 			</Positions>
 		</div>
 	);

@@ -4,11 +4,11 @@ import positionsStyles from './styles/positions.css';
 import {
 	links as positionsTableStyles
 } from './PositionsTable/PositionsTable';
-import { links as StockPieChartStyles } from './StockPieChart/StockPieChart';
+import { links as stockPieChartStyles } from './StockPieChart/StockPieChart';
 
 export const links: LinksFunction = () => {
 	return [
-		...StockPieChartStyles(),
+		...stockPieChartStyles(),
 		...positionsTableStyles(),
 		{ rel: "stylesheet", href: positionsStyles }
 	];
@@ -109,13 +109,11 @@ export const aggregateHoldings = (holdings: Holding[]) => {
  * Can display Positions Table, Stock Pie Chart, Stock Investment Summary
  */
 export const Positions = (
-	props: { children: JSX.Element }
+	props: { children: JSX.Element | JSX.Element[] }
 ) => {
 
 	return (
 		<div className="positions">
-			<h1>Your Positions</h1>
-
 			{props.children}
 		</div>
 	);

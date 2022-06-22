@@ -1,14 +1,15 @@
-import { Option } from "excoptional";
-import { Holding, Security } from "plaid";
-import { useSearchableList } from "~/hooks/useSearchHoldings";
-import { StockInvestmentSummary } from "./StockInvestmentSummary/StockInvestmentSummary";
-import { aggregateHoldings, constructSecurityIdToTickerSymbol, constructTickerSymbolToSecurityId } from "./../Positions";
-import { useWindowSize } from "~/hooks/useWindowSize";
 import { LinksFunction } from "@remix-run/node";
-import { links as stockInvestmentSummaryStyles } from './StockInvestmentSummary/StockInvestmentSummary';
+import { Holding, Security } from "plaid";
+import { Option } from "excoptional";
+import { useSearchableList } from "~/hooks/useSearchHoldings";
+import { useWindowSize } from "~/hooks/useWindowSize";
+import { aggregateHoldings, constructSecurityIdToTickerSymbol, constructTickerSymbolToSecurityId } from "./../Positions";
+import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from "./StockInvestmentSummary/StockInvestmentSummary";
+import positionsTableStyles from './styles/positionsTable.css';
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: "stylesheet", href: positionsTableStyles },
 		...stockInvestmentSummaryStyles()
 	]
 };
@@ -57,10 +58,10 @@ export const PositionsTable = (
 	};
 
 	return (
-		<div>
+		<div className="positions-table">
 
 			<input
-				className="positions__search"
+				className="positions-table__search"
 				value={searchTerm}
 				onChange={(e) => handleSearch(e)}
 				name="search"

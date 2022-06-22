@@ -2,21 +2,6 @@
 	color: var(--font-color);
 	background-color: var(--bg-color);
 
-	&__positions {
-		margin: 0 auto;
-		max-width: 900px;
-		width: 90%;
-		padding: 30px;
-		background: var(--contrast-color);
-		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
-		border-radius: 5px;
-
-		@media all and (max-width: var(--media-break-point)) {
-			width: 100%;
-			background: var(--bg-color);
-		}
-	}
-
 	&__irr {
 		margin: 10px auto;
 		max-width: 900px;
