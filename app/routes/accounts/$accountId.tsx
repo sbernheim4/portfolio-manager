@@ -73,6 +73,7 @@ const Accounts = () => {
 
 			<Positions>
 				<PositionsTable holdings={holdingsInCurrentAccount} securities={securities} />
+				<br />
 				<StockPieChart holdings={holdingsInCurrentAccount} securities={securities} />
 			</Positions>
 		</div>
