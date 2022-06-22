@@ -61,7 +61,7 @@ export const PositionsTable = (
 
 	return (
 		<div className="positions-table">
-			<h1>Your Investments</h1>
+			<h1>Your Positions</h1>
 
 			<input
 				className="positions-table__search"
