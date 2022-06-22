@@ -9,16 +9,17 @@
 	}
 
 	&__link {
-		margin-bottom: 120px;
+		margin-bottom: 30px;
 
 		h1 {
 			margin-bottom: 10px;
-
 		}
 
 		button {
+			margin-top: 10px;
 			padding: 10px 25px;
 			cursor: pointer;
+			border-radius: 5px;
 		}
 
 	}
@@ -26,6 +27,5 @@
 	&__linked {
 
 	}
-
 
 }

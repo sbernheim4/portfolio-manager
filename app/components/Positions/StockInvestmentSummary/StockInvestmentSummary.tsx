@@ -5,6 +5,7 @@ import { LinksFunction } from "@remix-run/node";
 import { Option } from "excoptional";
 import { WarningSign } from "~/components/WarningSign";
 import { decimalFormatter, dollarFormatter, percentageFormatter } from "~/helpers/formatters";
+import { useWindowSize } from "~/hooks/useWindowSize";
 
 export const links: LinksFunction = () => {
 	return [
@@ -20,6 +21,7 @@ export const StockInvestmentSummary = (props: {
 }) => {
 
 	const { totalInvested, holding, tickerOpt } = props;
+	const { width } = useWindowSize();
 
 	const percentageOfAllFunds = (holding.institution_value / totalInvested);
 	const threshold = .1;
@@ -36,7 +38,7 @@ export const StockInvestmentSummary = (props: {
 			<td className="investment-line-item__share">{quantity}</td>
 			<td className="investment-line-item__percentage">{percentage}</td>
 			<td className="investment-line-item__dollars">{dollarFormatter.format(holding.institution_value)}</td>
-			<td><WarningSign aboveThreshold={aboveThreshold} /></td>
+			{!!width && width > 480 ? <td><WarningSign aboveThreshold={aboveThreshold} /></td> : <></> }
 		</>
 	);
 

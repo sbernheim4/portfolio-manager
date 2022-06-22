@@ -153,7 +153,7 @@ const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.S
 	return (
 		<>
 			<button onClick={() => open()} disabled={!ready}>
-				Link Account
+				Link an Account
 			</button>
 		</>
 	);
@@ -194,8 +194,6 @@ const LinkAccount = () => {
 			<h1>Manage Accounts</h1>
 
 			<div className="manage-accounts__link">
-				<h2>Link A New Account</h2>
-
 				{
 					linkToken.length ?
 						<Link linkToken={linkToken} setPublicToken={setPublicToken} /> :

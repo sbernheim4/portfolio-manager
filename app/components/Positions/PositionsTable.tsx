@@ -3,10 +3,14 @@ import { Holding, Security } from "plaid";
 import { useSearchableList } from "~/hooks/useSearchHoldings";
 import { StockInvestmentSummary } from "./StockInvestmentSummary/StockInvestmentSummary";
 import { aggregateHoldings, constructSecurityIdToTickerSymbol, constructTickerSymbolToSecurityId } from "./Positions";
+import { useWindowSize } from "~/hooks/useWindowSize";
 
 export const PositionsTable = (
 	props: { securities: Security[]; holdings: Holding[] }
 ) => {
+
+	const { width } = useWindowSize();
+
 	const { securities, holdings } = props;
 
 	const tickerSymbolToSecurityId = constructTickerSymbolToSecurityId(
@@ -62,8 +66,8 @@ export const PositionsTable = (
 						<th>Ticker</th>
 						<th>Quantity</th>
 						<th>Percentage</th>
-						<th>Dollar Value</th>
-						<th>Above Threshold</th>
+						<th>Market Value</th>
+						{!!width && width > 480 ? <th>Above Threshold</th> : <></>}
 					</tr>
 				</thead>
 				<tbody>

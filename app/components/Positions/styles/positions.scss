@@ -1,6 +1,6 @@
 .positions {
 	color: var(--font-color);
-	padding: 0px 30px 30px 30px;
+	padding: 0px min(1vw, 30px), min(1vw, 30px), min(1vw, 30px);
 
 	h1 {
 		text-align: center;

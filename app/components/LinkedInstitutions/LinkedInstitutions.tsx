@@ -45,7 +45,7 @@ const LinkedInstitution = (
 
 			<Form action="/manage-accounts" method="post">
 				<input type="submit" value="Unlink Instituion" className="linked-institutions__modify__unlink" />
-				<input type="hidden" name="_action" value="unlinkAccount" readOnly  />
+				<input type="hidden" name="_action" value="unlinkAccount" readOnly />
 				<input type="hidden" value={itemId} name="itemId" readOnly />
 			</Form>
 
