@@ -2,14 +2,14 @@ import { Holding, Security } from 'plaid';
 import { LinksFunction } from "@remix-run/node";
 import positionsStyles from './styles/positions.css';
 import {
-	links as stockInvestmentSummaryStyles
-} from '~/components/Positions/StockInvestmentSummary/StockInvestmentSummary';
+	links as positionsTableStyles
+} from './PositionsTable/PositionsTable';
 import { links as StockPieChartStyles } from './StockPieChart/StockPieChart';
 
 export const links: LinksFunction = () => {
 	return [
 		...StockPieChartStyles(),
-		...stockInvestmentSummaryStyles(),
+		...positionsTableStyles(),
 		{ rel: "stylesheet", href: positionsStyles }
 	];
 };

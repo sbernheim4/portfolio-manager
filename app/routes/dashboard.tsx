@@ -8,7 +8,7 @@ import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";
 import { getInvestmentsAndAccountBalances } from "./investments";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
-import { PositionsTable } from "~/components/Positions/PositionsTable";
+import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
 import { AccountBase, Holding, Security } from "plaid";
 
 export const meta: MetaFunction = () => {

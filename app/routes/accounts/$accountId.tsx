@@ -5,6 +5,7 @@ import { Positions, links as positionsStyles } from "~/components/Positions/Posi
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
 import { lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
+import { StockPieChart } from "~/components/Positions/StockPieChart/StockPieChart";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -67,7 +68,10 @@ const Accounts = () => {
 		<div className="accounts">
 			<h1 className="accounts__name">{account.name}</h1>
 
-			{/* <Positions securities={securities} holdings={holdingsInCurrentAccount} /> */}
+			<Positions>
+				<StockPieChart holdings={holdingsInCurrentAccount} securities={securities} />
+
+			</Positions>
 		</div>
 	);
 };

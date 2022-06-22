@@ -21,7 +21,7 @@ import { calculateNewXirr, searchActionHandler } from "~/helpers/investmentRoute
 import { Option } from "excoptional";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
-import { PositionsTable } from "~/components/Positions/PositionsTable";
+import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
 
 export const meta: MetaFunction = () => {
 	return {
