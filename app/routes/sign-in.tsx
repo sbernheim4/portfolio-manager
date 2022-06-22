@@ -110,7 +110,7 @@ export const action: ActionFunction = async ({ request }) => {
 	const cookie = await commitSession(session);
 
 	return redirect(
-		"/",
+		"/dashboard",
 		{ headers: { "Set-Cookie": cookie } }
 	);
 
