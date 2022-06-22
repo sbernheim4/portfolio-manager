@@ -60,21 +60,22 @@ export const SectorWeight = (
 
 				<tbody>
 					{
-						Object.keys(investmentTypeToValue).map(type => {
+						Object.keys(investmentTypeToValue)
+							.map(type => {
 
-							const dollarAmount = dollarFormatter.format(investmentTypeToValue[type]);
-							const percentage = investmentTypeToValue[type] / totalInvested;
-							const formattedPercentage = percentageFormatter.format(percentage);
-							const formattedType = type[0].toUpperCase() + type.slice(1);
+								const dollarAmount = dollarFormatter.format(investmentTypeToValue[type]);
+								const percentage = investmentTypeToValue[type] / totalInvested;
+								const formattedPercentage = percentageFormatter.format(percentage);
+								const formattedType = type[0].toUpperCase() + type.slice(1);
 
-							return (
-								<tr>
-									<td>{formattedType}</td>
-									<td>{dollarAmount}</td>
-									<td>{formattedPercentage}</td>
-								</tr>
-							);
-						})
+								return (
+									<tr key={type}>
+										<td>{formattedType}</td>
+										<td>{dollarAmount}</td>
+										<td>{formattedPercentage}</td>
+									</tr>
+								);
+							})
 					}
 				</tbody>
 

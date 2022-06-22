@@ -14,10 +14,10 @@ export const links: LinksFunction = () => {
 };
 
 export const StockInvestmentSummary = (props: {
-	totalInvested: number,
 	holding: Holding,
-	tickerOpt: Option<string>,
 	securityId: string
+	tickerOpt: Option<string>,
+	totalInvested: number,
 }) => {
 
 	const { totalInvested, holding, tickerOpt } = props;

@@ -80,10 +80,11 @@ export const PositionsTable = (
 
 								return (
 									<StockInvestmentSummary
+										holding={holding}
+										key={holding.security_id}
+										securityId={securities[i].security_id}
 										tickerOpt={ticker}
 										totalInvested={totalInvested}
-										holding={holding}
-										securityId={securities[i].security_id}
 									/>
 								);
 							})
