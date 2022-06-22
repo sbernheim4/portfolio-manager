@@ -1,9 +1,10 @@
 import { MongoClient } from 'mongodb';
-import { None, Option, Some } from "excoptional";
+import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
 import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
+import { getEnvVar } from './getEnvVar';
 
-const uri = `mongodb+srv://portfolio-manager:${process.env.MONGODB_PWD}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://portfolio-manager:${getEnvVar('MONGODB_PWD')}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 const connection = client.connect();
 
