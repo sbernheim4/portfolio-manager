@@ -11,7 +11,7 @@
 		box-shadow: rgb(0 0 0 / 20%) 0px 4px 8px;
 		border-radius: 5px;
 
-		@media all and (max-width: 400px) {
+		@media all and (max-width: var(--media-break-point)) {
 			width: 100%;
 			background: var(--bg-color);
 		}
