@@ -13,7 +13,7 @@ import { PositionsLoaderData } from "~/types/investments.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight, links as sectorWeightLinks } from "~/components/SectorWeight/SectorWeight";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { getXirrData, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
+import { getXirrDataFromDB, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
@@ -91,7 +91,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const username = await getUserNameFromSession(request);
 
 	const { balances, holdings, securities } = await getInvestmentsAndAccountBalances(username);
-	const { xirr: xirrFromDB, balance, xirrDataLastUpdatedOn } = await getXirrData(username)
+	const { xirr: xirrFromDB, balance, xirrDataLastUpdatedOn } = await getXirrDataFromDB(username)
 
 	const today = new Date();
 	const fetchTransactionsFrom = new Date(xirrDataLastUpdatedOn || today);

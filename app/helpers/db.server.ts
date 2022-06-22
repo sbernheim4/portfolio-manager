@@ -310,7 +310,7 @@ export const getAccountBalancesFromDB = async (
 
 };
 
-export const getXirrData = async (username: string) => {
+export const getXirrDataFromDB = async (username: string) => {
 
 	return await getValueFromDB<XirrData>(
 		username,
