@@ -3,7 +3,8 @@ import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
 import { LinksFunction } from "@remix-run/node";
 import { dollarFormatter } from "~/helpers/formatters";
 import stockPieChartStyles from "./stockPieChart.css";
-import { aggregateHoldings, constructSecurityIdToTickerSymbol } from "../Positions";
+import { constructSecurityIdToTickerSymbol } from "~/helpers/constructSecurityIdToTickerSymbol";
+import { aggregateHoldings } from "~/helpers/aggregateHoldings";
 
 export const COLORS = [
 	'#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',

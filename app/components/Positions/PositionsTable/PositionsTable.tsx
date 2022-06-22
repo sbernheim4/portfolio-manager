@@ -3,9 +3,11 @@ import { Holding, Security } from "plaid";
 import { Option } from "excoptional";
 import { useSearchableList } from "~/hooks/useSearchHoldings";
 import { useWindowSize } from "~/hooks/useWindowSize";
-import { aggregateHoldings, constructSecurityIdToTickerSymbol, constructTickerSymbolToSecurityId } from "./../Positions";
 import { StockInvestmentSummary, links as stockInvestmentSummaryStyles } from "./StockInvestmentSummary/StockInvestmentSummary";
 import positionsTableStyles from './styles/positionsTable.css';
+import { constructTickerSymbolToSecurityId } from "~/helpers/constructTickerSymbolToSecurityId";
+import { constructSecurityIdToTickerSymbol } from "~/helpers/constructSecurityIdToTickerSymbol";
+import { aggregateHoldings } from "~/helpers/aggregateHoldings";
 
 export const links: LinksFunction = () => {
 	return [

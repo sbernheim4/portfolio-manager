@@ -4,7 +4,6 @@ import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react"
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { isAfter, isToday } from "date-fns";
 import { useEffect, useState } from "react";
-
 import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import networthStyles from "~/styles/portfolio-balance/portfolio-balance.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
