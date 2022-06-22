@@ -22,8 +22,8 @@ import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {
 	return {
-		title: "View and gain insights into your investments",
-		description: "Track your investments, distributions, and more"
+		title: "Manage your connected accounts",
+		description: "Manage and link your bank accounts"
 	};
 };
 
