@@ -57,10 +57,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	// Logged in user can proceed to the hompage
 	if (session.has("userId")) {
-		return redirect("/");
+		return redirect("/dashboard");
 	}
 
 	// User is logged out
+
 	const error = session.get("error");
 
 	const data = {
