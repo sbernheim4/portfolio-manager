@@ -60,8 +60,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 			client_user_id: clientUserId,
 		},
 		client_name: 'Portfolio Manager',
-		// TODO: Need to register for production access with plaid to get access
-		// to investments data.
 		products: [Products.Auth, Products.Investments, Products.Transactions],
 		language: 'en',
 		webhook: 'https://webhook.example.com',
