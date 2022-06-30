@@ -1,7 +1,10 @@
-import { LinksFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { ActionFunction, json, LinksFunction, LoaderFunction } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { isLoggedOut } from "~/helpers/isLoggedOut";
+import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { useWindowSize } from "~/hooks/useWindowSize";
+import { validateIsLoggedIn } from "~/remix-helpers";
 import navbarStlyes from "./styles/navbar.css";
 
 export const links: LinksFunction = () => {
@@ -10,10 +13,33 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const Navbar = () => {
+export const loader: LoaderFunction = async ({ request }) => {
+
+	const isLoggedOutV = await isLoggedOut(request);
+
+	const response = json({ isLoggedOut: isLoggedOutV })
+
+	return response;
+
+};
+
+export const action: ActionFunction = async ({ request }) => {
+
+	const formData = await request.formData();
+	const action = formData.get("_action");
+
+	switch (action) {
+		case 'isLoggedIn':
+			await validateIsLoggedIn(request);
+	}
+}
+
+export const Navbar = (props: { isLoggedOut: boolean }) => {
+
+	const { isLoggedOut } = props;
 
 	const { width } = useWindowSize();
-	const [Navbar, setNavbar] = useState(DesktopNavbar);
+	const [Navbar, setNavbar] = useState(DesktopNavbar(isLoggedOut));
 
 	useEffect(() => {
 
@@ -22,9 +48,9 @@ export const Navbar = () => {
 		};
 
 		if (width > 600) {
-			setNavbar(DesktopNavbar);
+			setNavbar(DesktopNavbar(isLoggedOut));
 		} else {
-			setNavbar(MobileNavbar);
+			setNavbar(MobileNavbar(isLoggedOut));
 		}
 
 	}, [width])
@@ -32,20 +58,26 @@ export const Navbar = () => {
 	return Navbar
 };
 
-const MobileNavbar = () => {
+const MobileNavbar = (isLoggedOut: boolean) => {
+
+	const linkUrl = isLoggedOut ? '/sign-in' : '/logout';
+	const linkText = isLoggedOut ? 'Log In' : 'Log Out';
 
 	return (
 		<nav>
 			<Link to={"/dashboard"}>Dashboard</Link>
 			<Link to={"/investments"}>Investments</Link>
-			<Link to={"/logout"}>Log Out</Link>
+			<Link to={linkUrl}>{linkText}</Link>
 		</nav>
 	)
 
 };
 
 
-const DesktopNavbar = () => {
+const DesktopNavbar = (isLoggedOut: boolean) => {
+
+	const linkUrl = isLoggedOut ? '/sign-in' : '/logout';
+	const linkText = isLoggedOut ? 'Log In' : 'Log Out';
 
 	return (
 		<nav>
@@ -54,7 +86,7 @@ const DesktopNavbar = () => {
 			<Link to={"/investments"}>Investments</Link>
 			<Link to={"/portfolio-balance"}>Portfolio Balance</Link>
 			<Link to={"/manage-accounts"}>Manage Accounts</Link>
-			<Link to={"/logout"}>Log Out</Link>
+			<Link to={linkUrl}>{linkText}</Link>
 		</nav>
 	)
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { LinksFunction } from "@remix-run/node";
+import type { ActionFunction, LinksFunction, LoaderFunction } from "@remix-run/node";
 
 import {
 	Links,
@@ -9,11 +9,17 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useCatch,
+	useLoaderData,
 	useLocation,
 } from "@remix-run/react";
 
 import globalStylesUrl from "~/styles/global.css";
-import { Navbar, links as navbarStyles } from "./components/Navbar/Navbar";
+import {
+	Navbar,
+	action as navbarAction,
+	loader as navbarLoader,
+	links as navbarStyles
+} from "./components/Navbar/Navbar";
 
 /**
  * The `links` export is a function that returns an array of objects that map to
@@ -30,15 +36,27 @@ export const links: LinksFunction = () => {
 	];
 };
 
+export const loader: LoaderFunction = (args) => {
+	return navbarLoader(args);
+}
+
+export const action: ActionFunction = async (args) => {
+
+	return navbarAction(args)
+}
+
 /**
  * The root module's default export is a component that renders the current
  * route via the `<Outlet />` component. Think of this as the global layout
  * component for your app.
  */
 export default function App() {
+
+	const data = useLoaderData();
+
 	return (
 		<Document>
-			<Navbar />
+			<Navbar isLoggedOut={data.isLoggedOut} />
 			<Outlet />
 		</Document>
 	);
