@@ -8,7 +8,7 @@ import * as NetworthHelpers from "~/helpers/networthRouteHelpers";
 import networthStyles from "~/styles/portfolio-balance/portfolio-balance.css";
 import { AccountIdToValue } from "~/types/UserInfo.types";
 import { COLORS } from "~/components/Positions/StockPieChart/StockPieChart";
-import { AccountsList } from "~/components/InvestmentAccounts";
+import { AccountsList } from "~/components/AccountsList";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, getPlaidAccountBalances, getPlaidAccounts } from "~/helpers/plaidUtils";
 import { getMostRecentAccountBalancesEntryDate, saveAccountBalancesToDB } from "~/helpers/db.server";

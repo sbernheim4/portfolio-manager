@@ -2,7 +2,7 @@ import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } fro
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../styles/dashboard/dashboard.css';
-import { AccountsList } from '~/components/InvestmentAccounts';
+import { AccountsList } from '~/components/AccountsList';
 import { filterForInvestmentAccounts } from "~/helpers/plaidUtils";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import { getUserNameFromSession } from "~/helpers/session";

@@ -1,7 +1,7 @@
 import { Option, Some } from "excoptional";
 import { CountryCode, Institution, Products } from "plaid";
 import { useState, useCallback, useEffect } from "react";
-import { PlaidLinkOptionsWithLinkToken, usePlaidLink } from "react-plaid-link";
+import { PlaidLinkOnSuccess, PlaidLinkOptionsWithLinkToken, usePlaidLink } from "react-plaid-link";
 
 import {
 	ActionFunction,
@@ -132,14 +132,15 @@ export const action: ActionFunction = async ({ request }) => {
 
 const Link = (props: { linkToken: string, setPublicToken: React.Dispatch<React.SetStateAction<Option<string>>> }) => {
 
-	const onSuccess = useCallback((public_token, _metadata) => {
+	const callback: PlaidLinkOnSuccess = (public_token, _metadata) => {
 
 		console.log('onSuccessCallback called');
 
 		props.setPublicToken(Some(public_token));
 
-	}, []);
+	};
 
+	const onSuccess = useCallback(callback, []);
 
 	const config: PlaidLinkOptionsWithLinkToken = {
 		token: props.linkToken,

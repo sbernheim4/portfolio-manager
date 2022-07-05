@@ -1,7 +1,7 @@
 import { AccountBase } from "plaid";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { AccountsList } from "~/components/InvestmentAccounts";
+import { AccountsList } from "~/components/AccountsList";
 import { dollarFormatter } from "~/helpers/formatters";
 import { filterForInvestmentAccounts, filterForNonInvestmentAccounts, getPlaidAccountBalances } from "~/helpers/plaidUtils";
 import { getUserNameFromSession } from "~/helpers/session";
