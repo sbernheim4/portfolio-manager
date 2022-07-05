@@ -200,6 +200,7 @@ export const getMostRecentAccountBalancesEntryDate = async (
 
 };
 
+// TODO: Hash the balance data string value (totalBalance and the keys of todaysBalanceData).
 export const saveAccountBalancesToDB = async (
 	username: string,
 	todaysBalanceData: AccountIdToValue,
@@ -303,10 +304,16 @@ export const getAccountBalancesFromDB = async (
 	username: string
 ) => {
 
-	return getValueFromDB<AccountBalances>(
+	const accountBalances = await getValueFromDB<AccountBalances>(
 		username,
 		'accountBalances'
 	);
+
+	// TODO: Unhash the blance data response. The property totalBalance in
+	// accountBalances, along with all the values of the remaining keys that are
+	// neither totalBalance and date.
+
+	return accountBalances;
 
 };
 
