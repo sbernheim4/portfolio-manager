@@ -155,7 +155,21 @@ export const getPlaidAccountBalances = async (username: string) => {
 		});
 
 		const balances = await Promise.allSettled(balancesPromises);
+
+
 		const resolvedBalancesData = balances.filter(isFilled).flatMap(x => x.value.data.accounts)
+
+		/*
+		TODO: Need to figure out how ot handle any promises that have errors
+		in them
+
+		const rejectedBalancesData = balances.filter((x) => !isFilled(x)).flatMap(x => x.reason.response)
+		return {
+			balanceData: resolvedBalancesData,
+			rejectedBalancesData,
+		};
+
+		*/
 
 		return resolvedBalancesData;
 
