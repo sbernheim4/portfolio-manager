@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	const account = accountData.find(acc => acc.account_id.toLowerCase() === accountId);
 
 	return json({
-		account,
+		account: account ?? { error: "Could not find this accounts information" },
 		holdingsInCurrentAccount,
 		securities
 	});
@@ -48,7 +48,7 @@ const Accounts = () => {
 		holdingsInCurrentAccount,
 		account
 	} = useLoaderData<{
-		account: AccountBase | undefined,
+		account: AccountBase | { error: "Could not find this accounts information" },
 		holdingsInCurrentAccount: Holding[],
 		securities: Security[]
 	}>();
@@ -57,17 +57,19 @@ const Accounts = () => {
 		return (<div className="account-id"><h1>Could not pull your account information :(. Please try again in a litle bit</h1></div>)
 	}
 
-	return (
-		<div className="account-id">
-			<h1 className="account-id__name">{account.name}</h1>
+	return account.error ?
+		(<h1>Could not pull your account information :(</h1>) :
+		(
+			<div className="account-id">
+				<h1 className="account-id__name">{account.name}</h1>
 
-			<Positions>
-				<PositionsTable holdings={holdingsInCurrentAccount} securities={securities} />
-				<br />
-				<StockPieChart holdings={holdingsInCurrentAccount} securities={securities} />
-			</Positions>
-		</div>
-	);
+				<Positions>
+					<PositionsTable holdings={holdingsInCurrentAccount} securities={securities} />
+					<br />
+					<StockPieChart holdings={holdingsInCurrentAccount} securities={securities} />
+				</Positions>
+			</div>
+		);
 };
 
 export default Accounts;
