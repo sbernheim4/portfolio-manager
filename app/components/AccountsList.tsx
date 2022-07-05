@@ -32,7 +32,7 @@ export const AccountsList = (
 					const value = optionDollarFormatter(currentBalance).getOrElse("");
 
 					return (
-						<Link key={account.account_id} to={`/accounts/${replaceSpacesWithDashes(lowerCase(account.name))}`}>
+						<Link key={account.account_id} to={`/accounts/${replaceSpacesWithDashes(lowerCase(account.account_id))}`}>
 							<p>{account.name} - {value}</p>
 						</Link>
 					);
