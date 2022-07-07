@@ -2,7 +2,7 @@ import { useSubmit } from "@remix-run/react";
 import { useEffect } from "react";
 
 /**
- * Custom Hook to validate on the client if a user is logged isLoggedIn.
+ * Custom Hook to validate on the client if a user is logged in.
  *
  * Necessary since sometimes the session doesn't get correctly destroyed and
  * personal data is cached in the browser which shouldn't be visible if the user

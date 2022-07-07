@@ -17,7 +17,7 @@ export const useSearchableList = <T>(
 			}
 
 			const filterFunction = toFilterFn(searchTerm);
-			const filteredValues = initialList.filter(item => filterFunction(item));
+			const filteredValues = initialList.filter(filterFunction);
 
 			return filteredValues;
 		}
@@ -30,4 +30,3 @@ export const useSearchableList = <T>(
 	return [searchTerm, setSearchTerm, displayItems];
 
 };
-
