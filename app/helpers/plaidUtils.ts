@@ -1,9 +1,9 @@
 import { AccountBase, CountryCode, Holding, InstitutionsGetByIdResponse, LinkTokenCreateRequest, Security } from "plaid";
 import type { AxiosResponse } from 'axios';
 import { isFilled } from "~/helpers/isFilled";
-import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB, removeItemId } from "./db.server";
+import { getItemIdToAccessTokenFromDB, getAccessTokensFromDB, removeItemId, getMostRecentAccountBalancesEntryDate, getCachedAccountBalancesFromDB, cacheAccountBalanceData } from "./db.server";
 import { client } from "./plaidClient.server";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 
 /**
  *
@@ -148,6 +148,15 @@ export const getPlaidAccountBalances = async (username: string) => {
 
 	try {
 
+		// Check cache for the data
+		// const { lastUpdated, accountBalanceData } = await getCachedAccountBalancesFromDB(username);
+
+		// if (isToday(new Date(lastUpdated))) {
+		// 	console.log("using cached data");
+		// 	return accountBalanceData;
+		// }
+
+		// If cache is out of date (older than one day), hit up plaid
 		const accessTokens = await getAccessTokensFromDB(username);
 
 		const balancesPromises = accessTokens.map(token => {
@@ -156,11 +165,10 @@ export const getPlaidAccountBalances = async (username: string) => {
 
 		const balances = await Promise.allSettled(balancesPromises);
 
-
 		const resolvedBalancesData = balances.filter(isFilled).flatMap(x => x.value.data.accounts)
 
 		/*
-		TODO: Need to figure out how ot handle any promises that have errors
+		TODO: Need to figure out how to handle any promises that have errors
 		in them
 
 		const rejectedBalancesData = balances.filter((x) => !isFilled(x)).flatMap(x => x.reason.response)
@@ -268,7 +276,7 @@ export const unlinkPlaidItem = async (username: string, itemId: string, numTries
 		console.log("removing account with access token", accessTokens);
 
 		// TODO: Uncomment to go live
-		const promises = accessTokens.map(token => client.itemRemove({ access_token: token }));
+		// const promises = accessTokens.map(token => client.itemRemove({ access_token: token }));
 
 		await Promise.all(promises);
 

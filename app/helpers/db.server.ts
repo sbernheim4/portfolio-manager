@@ -1,12 +1,14 @@
 import { MongoClient } from 'mongodb';
 import { Option } from "excoptional";
 import { isBefore, isSameDay, isToday, subDays } from 'date-fns';
-import { AccountBalances, AccountIdToValue, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
+import { AccountBalances, AccountIdToValue, CachedPlaidAccountBalances, ItemIdToAccessToken, UserInfo, UserInfoKeys, UserInfoValues, XirrData } from '~/types/UserInfo.types';
 import { getEnvVar } from './getEnvVar';
+import { AccountBase } from 'plaid';
 
-const uri = `mongodb+srv://portfolio-manager:${getEnvVar('MONGODB_PWD')}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
-const client = new MongoClient(uri);
+const URI = `mongodb+srv://portfolio-manager:${getEnvVar('MONGODB_PWD')}@cluster0.bvttm.mongodb.net/plaid?retryWrites=true&w=majority`;
+const client = new MongoClient(URI);
 const connection = client.connect();
+const COLLECTION_NAME = "userInfo";
 
 /**
  * Used when a new user is singing up for an account
@@ -17,6 +19,10 @@ export const getNewUserInfo = (
 	salt: string
 ): UserInfo => {
 	return {
+		cachedPlaidAccountBalances: {
+			lastUpdated: '',
+			accountBalanceData: []
+		},
 		accountBalances: [],
 		itemIdToAccessToken: {},
 		password,
@@ -30,9 +36,11 @@ export const getNewUserInfo = (
 	};
 };
 
+/**
+ * Retrieves a connection to the database that can then be used for queries and
+ * updates.
+ */
 export const getUserInfoCollection = async () => {
-	const collectionName = "userInfo";
-
 	const connect = connection;
 
 	if (connect === undefined) {
@@ -40,7 +48,7 @@ export const getUserInfoCollection = async () => {
 	}
 
 	return connect.then(mongoClient => {
-		return mongoClient.db().collection(collectionName);
+		return mongoClient.db().collection(COLLECTION_NAME);
 	});
 };
 
@@ -124,6 +132,10 @@ const updateDB = async <T extends UserInfoValues>(
 
 };
 
+/**
+ * Removes a Plaid Item ID from a user's account.
+ * Used for unlinking an account (or maybe an institution?).
+ */
 export const removeItemId = async (username: string, itemId: string) => {
 
 	const itemIdToAccessTokens = await getItemIdToAccessTokenFromDB(username);
@@ -200,6 +212,9 @@ export const getMostRecentAccountBalancesEntryDate = async (
 
 };
 
+/**
+ * Updates the user's account balance stored data.
+ */
 // TODO: Hash the balance data string value (totalBalance and the keys of todaysBalanceData).
 export const saveAccountBalancesToDB = async (
 	username: string,
@@ -259,12 +274,24 @@ export const saveAccountBalancesToDB = async (
 
 };
 
+/**
+ * Retrieves the Item ID to access token object from the database.
+ */
 export const getItemIdToAccessTokenFromDB = async (username: string) => {
 
 	return getValueFromDB<ItemIdToAccessToken>(username, 'itemIdToAccessToken')
 
 };
 
+/**
+ * Returns all the access tokens the user has stored.
+ *
+ * Each access token represents a linked account.
+ *
+ * A single institution (represented by an Item ID) can have multiple linked
+ * accounts (checking, savings, brokerage accounts at the same institution for
+ * example).
+ */
 export const getAccessTokensFromDB = async (
 	username: string
 ): Promise<Array<string>> => {
@@ -278,7 +305,10 @@ export const getAccessTokensFromDB = async (
 
 };
 
-export const updatePositionsLastUpdatedAt = (
+/**
+ * Saves new XIRR data to the DB.
+ */
+export const updateXirrData = (
 	username: string,
 	date: string,
 	balance: number,
@@ -300,6 +330,9 @@ export const updatePositionsLastUpdatedAt = (
 
 };
 
+/**
+ * Retrieves account balance data stored in the DB.
+ */
 export const getAccountBalancesFromDB = async (
 	username: string
 ) => {
@@ -317,11 +350,87 @@ export const getAccountBalancesFromDB = async (
 
 };
 
+/**
+ * Retrieves XIRR data stored in the DB.
+ */
 export const getXirrDataFromDB = async (username: string) => {
 
-	return await getValueFromDB<XirrData>(
+	const xirrData = await getValueFromDB<XirrData>(
 		username,
 		'xirrData'
 	);
+
+	return xirrData;
+
+};
+
+export const getCachedAccountBalancesFromDB = async (username: string) => {
+
+	const cachedAccountBalanceData = await getValueFromDB<CachedPlaidAccountBalances>(
+		username,
+		'cachedPlaidAccountBalances'
+	);
+
+	return cachedAccountBalanceData;
+
+};
+
+export const cacheAccountBalanceData = async (
+	username: string,
+	accountBalanceData: AccountBase[]
+) => {
+
+	const accountBalanceDataWithDate = {
+		lastUpdated: new Date().toISOString(),
+		accountBalanceData
+	};
+
+	const result = await updateDB(
+		username,
+		'cachedPlaidAccountBalances',
+		accountBalanceDataWithDate,
+		() => accountBalanceDataWithDate
+	);
+
+	return result;
+};
+
+export const toCachedPlaidUtil = async <T>(
+	username: string,
+	key: UserInfoKeys,
+	plaidUtilFn: (username: string) => Promise<T>,
+	dBCacheCheckFn: () => Promise<T & { lastUpdated: string}>
+) => {
+
+	const hof = async <PlaidUtilReturnType>() => {
+
+
+		const cachedData = await dBCacheCheckFn();
+		const cachedDataDate = new Date(cachedData.lastUpdated);
+		if (isToday(cachedDataDate)) {
+			const res = cachedData[key];
+			return res;
+		}
+
+		const result = await plaidUtilFn<PlaidUtilReturnType>(username);
+
+		const resultWithDate = {
+			lastUpdated: new Date().toISOString(),
+			[key]: result
+		};
+
+		await updateDB(
+			username,
+			key,
+			// @ts-ignore
+			resultWithDate,
+			() => resultWithDate
+		);
+
+		return result;
+
+	};
+
+	return hof;
 
 };

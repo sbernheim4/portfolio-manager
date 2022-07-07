@@ -13,7 +13,7 @@ import { PositionsLoaderData } from "~/types/investments.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight, links as sectorWeightLinks } from "~/components/SectorWeight/SectorWeight";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
-import { getXirrDataFromDB, updatePositionsLastUpdatedAt } from "~/helpers/db.server";
+import { getXirrDataFromDB, updateXirrData } from "~/helpers/db.server";
 import { getUserNameFromSession } from "~/helpers/session";
 import { isFilled } from "~/helpers/isFilled";
 import { useCheckInForXIRR } from "~/hooks/useCheckInForXIRR";
@@ -156,7 +156,7 @@ export const action: ActionFunction = async ({ request }) => {
 			// @ts-ignore
 			const xirrValue = parseFloat(formData.get("todaysXirr").toString());
 
-			updatePositionsLastUpdatedAt(
+			updateXirrData(
 				username,
 				xirrDataLastUpdatedOn,
 				todaysInvestmentAccountBalances,

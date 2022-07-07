@@ -1,3 +1,5 @@
+import { AccountBase } from "plaid";
+
 export type ValueOf<T> = T[keyof T];
 
 export type AccountBalances = Array<AccountIdToValue & {
@@ -15,9 +17,15 @@ export type XirrData = {
 	xirr: number | null;
 };
 
+export type CachedPlaidAccountBalances = {
+	lastUpdated: string,
+	accountBalanceData: AccountBase[]
+};
+
 export type UserInfo = {
+	cachedPlaidAccountBalances: CachedPlaidAccountBalances;
 	accountBalances: AccountBalances;
-	itemIdToAccessToken: ItemIdToAccessToken,
+	itemIdToAccessToken: ItemIdToAccessToken;
 	password: string;
 	salt: string;
 	user: string;

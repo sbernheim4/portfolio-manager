@@ -27,12 +27,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	const accountId = params.accountId ?? "";
 
 	const username = await getUserNameFromSession(request);
-	const accountData = await getPlaidAccountBalances(username);
+	const balances = await getPlaidAccountBalances(username);
 	const { holdings, securities } = await getInvestmentHoldings(username);
 
 	const holdingsInCurrentAccount = holdings.filter(holding => holding.account_id.toLowerCase() === accountId);
 
-	const account = accountData.find(acc => acc.account_id.toLowerCase() === accountId);
+	const account = balances.find(acc => acc.account_id.toLowerCase() === accountId);
 
 	return json({
 		account,
