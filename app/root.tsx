@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { ActionFunction, LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunction, LinksFunction, LoaderArgs } from "@remix-run/node";
 
 import {
 	Links,
@@ -36,7 +36,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = (args) => {
+export const loader = (args: LoaderArgs) => {
 	return navbarLoader(args);
 }
 
@@ -52,7 +52,7 @@ export const action: ActionFunction = async (args) => {
  */
 export default function App() {
 
-	const data = useLoaderData();
+	const data = useLoaderData<typeof loader>();
 
 	return (
 		<Document>

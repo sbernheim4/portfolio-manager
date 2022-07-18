@@ -7,7 +7,7 @@ import {
 	ActionFunction,
 	json,
 	LinksFunction,
-	LoaderFunction,
+	LoaderArgs,
 	MetaFunction
 } from "@remix-run/node";
 
@@ -44,7 +44,7 @@ type ManageAccountsLoader = {
 	linkToken: string;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
 	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);
@@ -164,7 +164,7 @@ const LinkAccount = () => {
 
 	useLoggedIn();
 
-	const loaderData = useLoaderData<ManageAccountsLoader>();
+	const loaderData = useLoaderData<typeof loader>();
 	const submit = useSubmit();
 	const [publicTokenOpt, setPublicToken] = useState(Option.of<string>());
 	const { linkToken, linkedInstitutions } = loaderData;

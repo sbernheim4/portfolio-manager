@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { AccountsList } from "~/components/AccountsList";
 import { dollarFormatter } from "~/helpers/formatters";
@@ -23,7 +23,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async (args) => {
+export const loader = async (args: LoaderArgs) => {
 
 	await validateIsLoggedIn(args.request);
 
@@ -84,11 +84,7 @@ const Accounts = () => {
 
 	useLoggedIn();
 
-	const data = useLoaderData<{
-		investmentAccounts: AccountBase[],
-		nonInvestmentAccounts: AccountBase[],
-		totalBalance: number
-	}>();
+	const data = useLoaderData<typeof loader>();
 
 	const {
 		investmentAccounts,

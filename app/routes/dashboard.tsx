@@ -1,4 +1,4 @@
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../styles/dashboard/dashboard.css';
@@ -9,7 +9,6 @@ import { getUserNameFromSession } from "~/helpers/session";
 import { getInvestmentsAndAccountBalances } from "./investments";
 import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
-import { AccountBase, Holding, Security } from "plaid";
 
 export const meta: MetaFunction = () => {
 	return {
@@ -25,7 +24,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async (args) => {
+export const loader = async (args: LoaderArgs) => {
 
 	await validateIsLoggedIn(args.request);
 
@@ -54,16 +53,10 @@ export const action: ActionFunction = async ({ request }) => {
 	}
 };
 
-type BalancesHoldingsSecurities = {
-	balances: AccountBase[];
-	holdings: Holding[];
-	securities: Security[];
-};
-
 const Dashboard = () => {
 	useLoggedIn();
 
-	const investmentData = useLoaderData<BalancesHoldingsSecurities>();
+	const investmentData = useLoaderData<typeof loader>();
 	const { holdings, securities, balances } = investmentData;
 	return (
 		<div className="dashboard">

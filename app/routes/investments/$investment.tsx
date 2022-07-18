@@ -1,6 +1,6 @@
 
-import { AccountBase, Holding, Security } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { Holding, Security } from "plaid";
+import { json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useOutletContext, useParams } from "@remix-run/react";
 import { decimalFormatter, lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -22,7 +22,7 @@ export const links: LinksFunction = () => {
 	];
 
 };
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
 
 	const username = await getUserNameFromSession(request);
 	const balances = await getPlaidAccountBalances(username);
@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 const IndividualInvestmentInformation = () => {
-	const { balances } = useLoaderData<{ balances: AccountBase[] }>();
+	const { balances } = useLoaderData<typeof loader>();
 
 	const {
 		securities,

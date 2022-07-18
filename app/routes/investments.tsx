@@ -3,13 +3,12 @@ import {
 	ActionFunction,
 	json,
 	LinksFunction,
-	LoaderFunction,
+	LoaderArgs,
 	MetaFunction
 } from "@remix-run/node";
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { Positions, links as positionStyles } from "~/components/Positions/Positions";
 import investmentStyles from "~/styles/investments/investments.css";
-import { PositionsLoaderData } from "~/types/investments.types";
 import { RateOfReturn } from "~/components/RateOfReturn";
 import { SectorWeight, links as sectorWeightLinks } from "~/components/SectorWeight/SectorWeight";
 import { getInvestmentHoldings, getInvestmentTransactions, getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -84,7 +83,7 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
 
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
 
 	await validateIsLoggedIn(request);
 
@@ -178,7 +177,7 @@ const Holdings = () => {
 		holdings,
 		securities,
 		xirrDataLastUpdatedOn
-	} = useLoaderData<PositionsLoaderData>();
+	} = useLoaderData<typeof loader>();
 
 	const actionData = useActionData<{ filteredHoldings: Holding[] }>();
 	const holdingsToDisplay = actionData?.filteredHoldings ?? holdings;

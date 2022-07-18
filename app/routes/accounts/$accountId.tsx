@@ -1,5 +1,4 @@
-import { AccountBase, Holding, Security } from "plaid";
-import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -22,7 +21,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
 
 	const accountId = params.accountId ?? "";
 
@@ -47,11 +46,7 @@ const Accounts = () => {
 		securities,
 		holdingsInCurrentAccount,
 		account
-	} = useLoaderData<{
-		account: AccountBase | undefined,
-		holdingsInCurrentAccount: Holding[],
-		securities: Security[]
-	}>();
+	} = useLoaderData<typeof loader>();
 
 	if (account === undefined) {
 		return (<div className="account-id"><h1>Could not pull your account information :(. Please try again in a litle bit</h1></div>)

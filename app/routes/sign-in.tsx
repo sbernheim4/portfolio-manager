@@ -1,4 +1,4 @@
-import { ActionFunction, json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderArgs, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import { getUserInfoCollection } from "~/helpers/db.server";
 import { getSession, commitSession } from "~/helpers/session";
@@ -52,7 +52,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
 	const session = await getSession(request.headers.get("Cookie"));
 
 	// Logged in user can proceed to the hompage
@@ -119,7 +119,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 const SignIn = () => {
 
-	const { error } = useLoaderData();
+	const { error } = useLoaderData<typeof loader>();
 
 	return (
 		<div className="login">

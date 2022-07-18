@@ -1,8 +1,7 @@
-import { ActionFunction, json, LinksFunction, LoaderFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { ActionFunction, json, LinksFunction, LoaderArgs } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { isLoggedOut } from "~/helpers/isLoggedOut";
-import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { useWindowSize } from "~/hooks/useWindowSize";
 import { validateIsLoggedIn } from "~/remix-helpers";
 import navbarStlyes from "./styles/navbar.css";
@@ -13,7 +12,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
 
 	const isLoggedOutV = await isLoggedOut(request);
 
