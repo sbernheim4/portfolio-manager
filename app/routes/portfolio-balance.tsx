@@ -48,20 +48,21 @@ const mergeHistoricalAndTodaysBalanceData = (
 	todaysBalanceData: Record<string, number>
 ) => {
 
+	// Create a new entry for the today (it may not be needed).
+	const todaysEntry = {
+		date: new Date().toISOString(),
+		totalBalance: todaysBalance,
+		...todaysBalanceData
+	};
+
 	const noEntriesExist = historicalBalanceData.length === 0;
 
 	// If there are no entries in the historical balance data, then we can just
-	// return an array containing one entry.
+	// return an array containing today's entry.
 	//
 	// This happens the first time the user visits the page.
 	if (noEntriesExist) {
-		return [
-			{
-				date: new Date().toLocaleDateString(),
-				totalBalance: todaysBalance,
-				...todaysBalanceData
-			}
-		];
+		return [todaysEntry];
 	}
 
 	// Find the most recent entry in the historical data
@@ -75,20 +76,13 @@ const mergeHistoricalAndTodaysBalanceData = (
 		}
 	}
 
-	// Create a new entry for the today (it may not be needed).
-	const todaysEntry = {
-		date: new Date().toISOString(),
-		totalBalance: todaysBalance,
-		...todaysBalanceData
-	};
-
 	// If the most recent entry is not from today, add today's entry to the end
 	// of the array.
 	const updatedHistoricalBalanceData = isToday(mostRecentEntryDate) ?
 		historicalBalanceData :
 		[
+			todaysEntry,
 			...historicalBalanceData,
-			todaysEntry
 		];
 
 	// Return the array sorted by date
@@ -136,7 +130,9 @@ export const loader = async ({ request }: LoaderArgs) => {
 			// Data should only be cached by browsers (not shared caches)
 			// Valid for 4 hours
 			// Stale while revalidate for an additional 8 hours
-			headers: { "Cache-Control": "private, max-age=14400, stale-while-revalidate=28800" }
+			headers: {
+				"Cache-Control": "private, max-age=14400, stale-while-revalidate=28800"
+			}
 		}
 	);
 };
