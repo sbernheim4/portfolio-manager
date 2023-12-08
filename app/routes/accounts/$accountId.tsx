@@ -1,4 +1,4 @@
-import { json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from "~/components/Positions/Positions";
 import { getInvestmentHoldings, getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -8,10 +8,12 @@ import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsT
 import accountIdStyles from './../../styles/accounts/accountId.css';
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Account Overview",
-		description: "View all your investment accounts"
-	};
+	return [
+		{
+			title: "Account Overview",
+			description: "View all your investment accounts"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -21,7 +23,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 	const accountId = params.accountId ?? "";
 

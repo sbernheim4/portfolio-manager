@@ -1,4 +1,4 @@
-import { ActionFunction, LinksFunction, LoaderArgs, redirect } from "@remix-run/node";
+import { ActionFunction, LinksFunction, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { getSession, destroySession } from "~/helpers/session";
 import { validateIsLoggedIn } from "~/remix-helpers";
@@ -12,7 +12,7 @@ export const links: LinksFunction = () => {
 
 };
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await validateIsLoggedIn(request);
 	return null;
 };

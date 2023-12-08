@@ -1,4 +1,4 @@
-import { ActionFunction, json, LinksFunction, LoaderArgs } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { isLoggedOut } from "~/helpers/isLoggedOut";
@@ -12,7 +12,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 	const isLoggedOutV = await isLoggedOut(request);
 

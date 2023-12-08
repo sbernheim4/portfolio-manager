@@ -3,7 +3,7 @@ import {
 	ActionFunction,
 	json,
 	LinksFunction,
-	LoaderArgs,
+	LoaderFunctionArgs,
 	MetaFunction
 } from "@remix-run/node";
 import { Outlet, useActionData, useLoaderData } from "@remix-run/react";
@@ -23,10 +23,12 @@ import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Your Investments",
-		description: "View your investments across your entire portfolio"
-	};
+	return [
+		{
+			title: "Your Investments",
+			description: "View your investments across your entire portfolio"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -83,7 +85,7 @@ export const getInvestmentsAndAccountBalances = async (username: string) => {
 
 };
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 	await validateIsLoggedIn(request);
 

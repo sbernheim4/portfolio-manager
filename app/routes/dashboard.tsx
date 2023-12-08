@@ -1,4 +1,4 @@
-import { ActionFunction, json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Positions, links as positionsStyles } from '~/components/Positions/Positions';
 import dashboardStyles from './../styles/dashboard/dashboard.css';
@@ -11,10 +11,12 @@ import { useLoggedIn } from "~/hooks/useLoggedIn";
 import { PositionsTable } from "~/components/Positions/PositionsTable/PositionsTable";
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Analyze your Investment Portfolio",
-		description: "Portfolio analysis by position weight, sector weight, and more"
-	};
+	return [
+		{
+			title: "Analyze your Investment Portfolio",
+			description: "Portfolio analysis by position weight, sector weight, and more"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -24,7 +26,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader = async (args: LoaderArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
 
 	await validateIsLoggedIn(args.request);
 

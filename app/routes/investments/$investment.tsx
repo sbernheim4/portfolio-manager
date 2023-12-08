@@ -1,6 +1,6 @@
 
 import { Holding, Security } from "plaid";
-import { json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useOutletContext, useParams } from "@remix-run/react";
 import { decimalFormatter, lowerCase, replaceSpacesWithDashes } from "~/helpers/formatters";
 import { getPlaidAccountBalances } from "~/helpers/plaidUtils";
@@ -9,10 +9,12 @@ import investmentStyles from '~/styles/investment.css';
 import { Option } from "excoptional";
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Position Information",
-		description: "See specifics on individual positions"
-	};
+	return [
+		{
+			title: "Position Information",
+			description: "See specifics on individual positions"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -22,7 +24,7 @@ export const links: LinksFunction = () => {
 	];
 
 };
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 	const username = await getUserNameFromSession(request);
 	const balances = await getPlaidAccountBalances(username);

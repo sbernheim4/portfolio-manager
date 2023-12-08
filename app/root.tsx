@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { ActionFunction, LinksFunction, LoaderArgs } from "@remix-run/node";
+import type { ActionFunction, LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 
 import {
 	Links,
@@ -8,9 +8,10 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useCatch,
+	isRouteErrorResponse,
 	useLoaderData,
 	useLocation,
+	useRouteError,
 } from "@remix-run/react";
 
 import globalStylesUrl from "~/styles/global.css";
@@ -36,7 +37,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader = (args: LoaderArgs) => {
+export const loader = (args: LoaderFunctionArgs) => {
 	return navbarLoader(args);
 }
 
@@ -89,54 +90,33 @@ function Document({
 	);
 }
 
-export function CatchBoundary() {
-	const caught = useCatch();
+export function ErrorBoundary() {
+	const error = useRouteError();
 
-	let message;
-	switch (caught.status) {
-		case 401:
-			message = (
-				<p>
-					Oops! Looks like you tried to visit a page that you do not have access
-					to.
-				</p>
-			);
-			break;
-		case 404:
-			message = (
-				<p>Oops! Looks like you tried to visit a page that does not exist.</p>
-			);
-			break;
-
-		default:
-			throw new Error(caught.data || caught.statusText);
+	// when true, this is what used to go to `CatchBoundary`
+	if (isRouteErrorResponse(error)) {
+		return (
+			<div>
+				<h1>Oops</h1>
+				<p>Status: {error.status}</p>
+				<p>{error.data.message}</p>
+			</div>
+		);
 	}
 
-	return (
-		<Document title={`${caught.status} ${caught.statusText}`}>
-			<h1>
-				{caught.status}: {caught.statusText}
-			</h1>
-			{message}
-		</Document>
-	);
-}
+	// Don't forget to typecheck with your own logic.
+	// Any value can be thrown, not just errors!
+	let errorMessage = "Unknown error";
+	// if (isDefinitelyAnError(error)) {
+	// 	errorMessage = error.message;
+	// }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-	console.error(error);
 	return (
-		<Document title="Error!">
-			<div>
-				<h1>There was an error</h1>
-				<p>{error.message}</p>
-				<hr />
-				<p>
-					Hey, developer, you should replace this with what you want your
-					users to see.
-				</p>
-				<p>Thrown from app/root.tsx</p>
-			</div>
-		</Document>
+		<div>
+			<h1>Uh oh ...</h1>
+			<p>Something went wrong.</p>
+			<pre>{errorMessage}</pre>
+		</div>
 	);
 }
 

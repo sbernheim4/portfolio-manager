@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderArgs } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { isAfter, isToday } from "date-fns";
@@ -95,7 +95,7 @@ const mergeHistoricalAndTodaysBalanceData = (
 
 };
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);

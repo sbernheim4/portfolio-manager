@@ -7,7 +7,7 @@ import {
 	ActionFunction,
 	json,
 	LinksFunction,
-	LoaderArgs,
+	LoaderFunctionArgs,
 	MetaFunction
 } from "@remix-run/node";
 
@@ -21,10 +21,12 @@ import manageAccountStyles from '~/styles/manage-accounts/manage-accounts.css';
 import { useLoggedIn } from "~/hooks/useLoggedIn";
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Manage your connected accounts",
-		description: "Manage and link your bank accounts"
-	};
+	return [
+		{
+			title: "Manage your connected accounts",
+			description: "Manage and link your bank accounts"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -44,7 +46,7 @@ type ManageAccountsLoader = {
 	linkToken: string;
 };
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await validateIsLoggedIn(request);
 
 	const username = await getUserNameFromSession(request);

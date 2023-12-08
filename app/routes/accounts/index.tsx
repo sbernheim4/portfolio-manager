@@ -1,5 +1,5 @@
 import { AccountBase } from "plaid";
-import { ActionFunction, json, LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import { ActionFunction, json, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { AccountsList } from "~/components/AccountsList";
 import { dollarFormatter } from "~/helpers/formatters";
@@ -11,10 +11,12 @@ import { useLoggedIn } from "~/hooks/useLoggedIn";
 import accountStyles from './../../styles/accounts/accounts.css';
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Account Specific Information",
-		description: "View your investments for a given account"
-	};
+	return [
+		{
+			title: "Account Specific Information",
+			description: "View your investments for a given account"
+		},
+	];
 };
 
 export const links: LinksFunction = () => {
@@ -23,7 +25,7 @@ export const links: LinksFunction = () => {
 	];
 };
 
-export const loader = async (args: LoaderArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
 
 	await validateIsLoggedIn(args.request);
 

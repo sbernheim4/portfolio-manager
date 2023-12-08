@@ -10,3 +10,4 @@ app/env.sh
 .vercel/
 **/*.css
 **/*.css.map
+build/
