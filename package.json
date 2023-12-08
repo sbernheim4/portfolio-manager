@@ -4,8 +4,9 @@
 	"description": "",
 	"license": "",
 	"scripts": {
+		"start": "concurrently \"npm run sass\" \"npm run dev\"",
 		"build": "npm run sass:build && remix build",
-		"dev": "remix dev",
+		"dev": "source app/env.sh && remix dev",
 		"sass": "sass --watch app/:app/",
 		"sass:build": "sass app/:app/"
 	},
@@ -36,6 +37,7 @@
 		"@types/react": "^18.0.17",
 		"@types/react-dom": "^18.0.6",
 		"axios": "^0.27.2",
+		"concurrently": "^8.2.2",
 		"sass": "^1.54.5",
 		"typescript": "^4.8.2"
 	},

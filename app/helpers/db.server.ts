@@ -44,11 +44,16 @@ export const getUserInfoCollection = async () => {
 	const connect = connection;
 
 	if (connect === undefined) {
+		console.log('could not connect to DB.');
 		throw new Error("Could not connect to DB");
 	}
 
 	return connect.then(mongoClient => {
-		return mongoClient.db().collection(COLLECTION_NAME);
+
+		const collection = mongoClient.db().collection(COLLECTION_NAME);
+
+		return collection;
+
 	});
 };
 

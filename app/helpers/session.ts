@@ -8,14 +8,15 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
 	// a Cookie from `createCookie` or the CookieOptions to create one
 	cookie: {
 		name: "__session",
-		// all of these are optional
-		expires: new Date(Date.now() + 10000),
 		httpOnly: true,
 		maxAge,
 		path: "/",
 		sameSite: "lax",
 		secrets: ["s3cret1"],
-		secure: true
+		// *Note* be careful when setting this to `true`, as compliant clients will
+		// not send the cookie back to the server in the future if the browser does
+		// not have an HTTPS connection.
+		// secure: true
 	}
 });
 

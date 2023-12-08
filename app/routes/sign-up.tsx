@@ -110,7 +110,13 @@ export const action: ActionFunction = async ({ request }) => {
 
 	// Save the new user in the session
 	const session = await getSession(request.headers.get("Cookie"));
-	const cookie = await commitSession(session);
+	const cookie = await commitSession(
+		session,
+		{
+			expires: new Date(Date.now() + 10000)
+		}
+	);
+
 	session.set("userId", username);
 
 	// Redirect the now logged in user to the home page with the session cookie

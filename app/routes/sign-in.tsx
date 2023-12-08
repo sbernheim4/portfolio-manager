@@ -68,7 +68,12 @@ export const loader = async ({ request }: LoaderArgs) => {
 		error
 	};
 
-	const committedSession = await commitSession(session);
+	const committedSession = await commitSession(
+		session,
+		{
+			expires: new Date(Date.now() + 10000)
+		}
+	);
 
 	return json(
 		data,
@@ -102,17 +107,27 @@ export const action: ActionFunction = async ({ request }) => {
 		// Redirect back to the login page with errors.
 		return redirect("sign-in", {
 			headers: {
-				"Set-Cookie": await commitSession(session)
+				"Set-Cookie": await commitSession(session, { expires: new Date(Date.now() + 10000) })
 			}
 		});
 	}
 
 	session.set("userId", userId);
-	const cookie = await commitSession(session);
+
+	const cookie = await commitSession(
+		session,
+		{
+			expires: new Date(Date.now() + 10000)
+		}
+	);
 
 	return redirect(
 		"/dashboard",
-		{ headers: { "Set-Cookie": cookie } }
+		{
+			headers: {
+				"Set-Cookie": cookie
+			}
+		}
 	);
 
 };
